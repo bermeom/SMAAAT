@@ -173,7 +173,7 @@ public class WorldFloor {
       cube.setLocalTranslation(x+width-post(i), y+1.2f, z+length-post(j));
       Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
       mat1.setTexture("ColorMap", 
-            assetManager.loadTexture("Textures/texture9.jpg"));
+            assetManager.loadTexture("Textures/texture3.jpg"));
       mat1.setColor("Color", ColorRGBA.Gray);
       cube.setMaterial(mat1);
       return cube;
@@ -191,7 +191,7 @@ public class WorldFloor {
       cube.setLocalTranslation(x+width-post(i), y+1.2f, z+length-post(j));
       Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
       mat1.setTexture("ColorMap", 
-            assetManager.loadTexture("Textures/texture9.jpg"));
+            assetManager.loadTexture("Textures/texture3.jpg"));
       mat1.setColor("Color", ColorRGBA.Gray);
       cube.setMaterial(mat1);
       return cube;
