@@ -21,7 +21,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
     private DirectionalLight cameraLight;
     private BulletAppState bulletAppState;
-
+    private Node floor;
     public static void main(String[] args) {
         SmaaatApp app = new SmaaatApp();
         app.setShowSettings(false);
@@ -34,13 +34,19 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
-
-        Spatial floor = assetManager.loadModel("Models/floor.j3o");
-        rootNode.attachChild(floor);
-
-        cam.setLocation(floor.getWorldTranslation().add(0, 10, 10));
+        
+        createFloorN(7,7,0,-8,0);
+        
+        Spatial floorSpatial = assetManager.loadModel("Models/floor.j3o");
+        rootNode.attachChild(floorSpatial);
+        
+        cam.setLocation(floorSpatial.getWorldTranslation().add(0, 10, 10));
+        cam.lookAt(floorSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
+        //*/
+        /*
+        cam.setLocation(floor.getWorldTranslation());
         cam.lookAt(floor.getWorldTranslation(), Vector3f.UNIT_Y);
-
+        //*/
         setupLighting();
         setupKeys();
 
@@ -48,12 +54,18 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         stateManager.attach(bulletAppState);
         bulletAppState.setDebugEnabled(true);
 
-        CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) floor);
+        /*
+        CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) floorSpatial);
         RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
-        floor.addControl(floorRigidBody);
+        floorSpatial.addControl(floorRigidBody);
         bulletAppState.getPhysicsSpace().add(floorRigidBody);
-
+        //*/
+        CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) floorSpatial);
+        RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
+        floorSpatial.addControl(floorRigidBody);
+        bulletAppState.getPhysicsSpace().add(floorRigidBody);
         
+        //*/
         
         float radius = 0.2f;
         float height = 0.4f;
@@ -64,13 +76,30 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         BetterCharacterControl physicsCharacter = new BetterCharacterControl(radius, height, 1.0f);
         characterNode.addControl(physicsCharacter);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
-        WalkerNavControl wNavControl = new WalkerNavControl(inputManager, assetManager, floor);
+        WalkerNavControl wNavControl = new WalkerNavControl(inputManager, assetManager, floorSpatial);
         characterNode.addControl(wNavControl);
 
         rootNode.attachChild(characterNode);
 
     }
-
+    
+    private void createFloorN(int width, int length,int x,int y,int z){
+        WorldFloor we=new WorldFloor(assetManager, width, length, x, y, z);
+        floor =new Node("Shootables");//*/
+        rootNode.attachChild(floor);
+        floor.attachChild(we.makeFloor());
+        floor.attachChild(we.makeGridFloor(ColorRGBA.Blue));
+        floor.attachChild(we.makeWallFloor1());
+        floor.attachChild(we.makeWallFloor2());
+        floor.attachChild(we.makeWallFloor3());
+        floor.attachChild(we.makeWallFloor4());
+        floor.attachChild(we.makeWall("wall", 0, 3,true));
+        floor.attachChild(we.makeWall("wall1",1, 3,true));
+        floor.attachChild(we.makeCube("cube",2, 3));
+        floor.attachChild(we.makeWall("wall1",2, 2,false));
+        floor.attachChild(we.makeWall("wall1",2, 4,false));
+    }
+    
     public void setupLighting() {
         cameraLight = new DirectionalLight();
         cameraLight.setColor(ColorRGBA.White);
