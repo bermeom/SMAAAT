@@ -39,14 +39,13 @@ public class Test extends SimpleApplication implements ActionListener {
         boxGeometry.setMaterial(mat);
         boxGeometry.setLocalTranslation(0, 0, 0);
         rootNode.attachChild(boxGeometry);
-
-
-//VECTORS
-
+        
+        //VECTORS
+        
         Vector3f origen = Vector3f.UNIT_X.add(Vector3f.UNIT_Y);
         Vector3f direccion = Vector3f.UNIT_Y;
         sensor = Utils.createDebugArrow(assetManager, origen, direccion, rootNode);
-
+        
     }
 
     @Override

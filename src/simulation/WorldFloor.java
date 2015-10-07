@@ -22,12 +22,12 @@ public class WorldFloor {
     private int width;
     private int length;
     private float high;
-    private int x;
-    private int y;
-    private int z;
+    private float x;
+    private float y;
+    private float z;
     
     
-    public WorldFloor(AssetManager assetManager, int width, int length, int x, int y, int z) {
+    public WorldFloor(AssetManager assetManager, int width, int length, float x, float y, float z) {
         this.assetManager = assetManager;
         this.width = width;
         this.length = length;
@@ -62,27 +62,27 @@ public class WorldFloor {
         this.length = length;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
-    public int getZ() {
+    public float getZ() {
         return z;
     }
 
-    public void setZ(int z) {
+    public void setZ(float z) {
         this.z = z;
     }
     public Geometry generateEdifice(){

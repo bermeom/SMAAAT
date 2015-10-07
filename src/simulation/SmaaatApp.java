@@ -4,6 +4,7 @@ import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
@@ -21,6 +22,12 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import com.jme3.system.AppSettings;
+import simulation.Agent.EnemyAgent;
+import simulation.Agent.ExplorerAgent;
+import simulation.Agent.GuardianAgent;
+import simulation.Agent.HostageAgent;
+import simulation.world.Exit;
 
 public class SmaaatApp extends SimpleApplication implements ActionListener {
 
@@ -28,15 +35,28 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private BulletAppState bulletAppState;
     private Node ediffice;
     private ModelEdifice mEdifice;
+    private Node characterNode;
+    private float distBetweenFloors;
+    private float x;
+    private float y;
+    private float z;
+    private int width;
+    private int length;
+    
     public static void main(String[] args) {
         SmaaatApp app = new SmaaatApp();
         app.setShowSettings(false);
         app.setDisplayStatView(false);
+        AppSettings settings = new AppSettings(true);
+        settings.setTitle("SMAAAT");
+        app.setSettings(settings);
         app.start();
+        
     }
 
     @Override
     public void simpleInitApp() {
+        distBetweenFloors=5;
         createEdifice();
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
@@ -59,7 +79,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        //bulletAppState.setDebugEnabled(true);
+        bulletAppState.setDebugEnabled(true);
 
         /*
         CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) floorSpatial);
@@ -74,17 +94,43 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         
         //*/
         //loorSpatial;
-        createAgent();
+        //createAgent();
+        
+        characterNode = new Node();
 
+        new GuardianAgent(this, getPositionVirtiul(0, 0, 0), new Vector3f(0, 0, -1),"1",0.75f,createModelProtector());
+        new EnemyAgent(this, getPositionVirtiul(0, 5, 5), new Vector3f(0, 0, -1),""+1,0.75f,createModelEnemy());
+        new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(-1, 0, 0),""+1,0.5f,createModelHostage());
+        
+        /*
+        new GuardianAgent(this, new Vector3f(-4.5f, 1, 2), new Vector3f(0, 0, -1));
+        new EnemyAgent(this, new Vector3f(3, 1, 1), new Vector3f(0, 0, 1));
+        new EnemyAgent(this, new Vector3f(2, 1, -2), new Vector3f(0, 0, 1));
+        new EnemyAgent(this, new Vector3f(-4, 1, -2), new Vector3f(0, 0, 1));
+        new HostageAgent(this, new Vector3f(-1, 1, 2), new Vector3f(1, 0, 0));
+        new HostageAgent(this, new Vector3f(-1, 1, -0.5f), new Vector3f(1, 0, 0));
+        new ExplorerAgent(this, new Vector3f(-3, 1, -1), new Vector3f(-1, 0, 0));
+        */
+        Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
+        
+        rootNode.attachChild(characterNode);
+        
     }
     
+    private Vector3f getPositionVirtiul(int idFloor,int i,int j){
+        return new Vector3f(x+width-post(i), y-distBetweenFloors*idFloor+1, z+length-post(j));
+    }
+    
+    private int post(int i){
+        return i*2+1;
+    }
     private void createEdifice(){
-        int width=10;
-        int length=10;
-        int x=0;
-        int y=0;
-        int z=0;
-        int nFloors=1;
+        width=10;
+        length=10;
+        x=0;
+        y=0;
+        z=0;
+        int nFloors=2;
         mEdifice=new ModelEdifice(width, length, nFloors);
         mEdifice.setPostGridFloor(0,4 ,0, 'H');
         mEdifice.setPostGridFloor(0,4 ,1, 'H');
@@ -101,15 +147,15 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         mEdifice.setPostGridFloor(0,9 ,0, 'B');
         mEdifice.setPostGridFloor(0,9 ,9, 'E');
         System.out.println(mEdifice);
-        createVirtualEdifice(width, length, x, y, z);
+        createVirtualEdifice();
     }
     
     
-    private void createVirtualEdifice(int width, int length,int x,int y,int z){
+    private void createVirtualEdifice(){
         ediffice =new Node("Edifice");//*/
         for (int n=0;n<mEdifice.getnFlooors();n++){
             ModelFloor mf= mEdifice.getFloor(n);
-            WorldFloor we=new WorldFloor(assetManager, width, length, x, y-5*n, z);
+            WorldFloor we=new WorldFloor(assetManager, width, length, x, y-distBetweenFloors*n, z);
             Node floor=new Node("Floor"+n);
             ediffice.attachChild(floor);
             floor.attachChild(we.makeFloor());
@@ -148,6 +194,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
               assetManager.loadTexture("Textures/texture3.jpg"));
         mat1.setColor("Color", ColorRGBA.Blue);
         cube.setMaterial(mat1);
+        
         agentNode.attachChild(createModelExplorer());
         agentNode.setLocalTranslation(new Vector3f(4, 1, 2));
         BetterCharacterControl physicsCharacter = new BetterCharacterControl(radius, height, 1.0f);
@@ -178,6 +225,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         return machineSpatial;
     }
 
+    private Spatial createModelHostage(){
+        Spatial machineSpatial = assetManager.loadModel("Models/AgentHostage/Android/android.j3o");
+        machineSpatial.scale(0.3f);
+        //machineSpatial.scale(.15f);
+        //machineSpatial.rotate(0, -FastMath.PI/2, 0);
+        machineSpatial.setLocalTranslation(0, 0.5f, 0);
+        //machineSpatial.setMaterial(mat1);
+        return machineSpatial;
+    }
+    
     private Spatial createModelEnemy(){
         Spatial machineSpatial = assetManager.loadModel("Models/AgentEnemy/Marvin_Firefighter/Marvin_Firefighter.j3o");
         machineSpatial.scale(.5f);
@@ -187,7 +244,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         //machineSpatial.setMaterial(mat1);
         return machineSpatial;
     }
-
+    
     public void setupLighting() {
         cameraLight = new DirectionalLight();
         cameraLight.setColor(ColorRGBA.White);
@@ -214,14 +271,42 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private void setupKeys() {
         inputManager.addMapping("KEY_1", new KeyTrigger(KeyInput.KEY_1));
         inputManager.addListener(this, "KEY_1");
+        inputManager.addMapping("KEY_2", new KeyTrigger(KeyInput.KEY_2));
+        inputManager.addListener(this, "KEY_2");
+        inputManager.addMapping("KEY_3", new KeyTrigger(KeyInput.KEY_3));
+        inputManager.addListener(this, "KEY_3");
     }
 
     public void onAction(String name, boolean isPressed, float tpf) {
-        if(name.equals("KEY_1")){
-            Vector3f playerPos = rootNode.getChild("CharacterNode").getWorldTranslation();
-            //cam.setLocation(new Vector3f(0,3,0));//UP
-            cam.setLocation(playerPos.add(new Vector3f(0,3,0)));//SIDE
-            cam.lookAt(playerPos, Vector3f.UNIT_Y);
+        
+        Vector3f position = Vector3f.ZERO;
+        if (name.equals("KEY_1")) {
+            cam.setLocation(position.add(new Vector3f(0, 3, 0)));
+            cam.lookAt(position, Vector3f.UNIT_Y);
         }
+        if (name.equals("KEY_2")) {
+            cam.setLocation(position.add(new Vector3f(3, 0, 0)));
+            cam.lookAt(position, Vector3f.UNIT_Y);
+        }
+        if(name.equals("KEY_3"))
+        {
+            
+        }
+    }
+    
+        public BulletAppState getBulletAppState() {
+        return this.bulletAppState;
+    }
+
+    public PhysicsSpace getPhysicsSpace() {
+        return this.bulletAppState.getPhysicsSpace();
+    }
+
+    public Spatial getFloor() {
+        return this.ediffice;
+    }
+
+    public Node getCharacterNode() {
+        return this.characterNode;
     }
 }
