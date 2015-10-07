@@ -51,6 +51,7 @@ public class SMAAAT {
         //--------------------------------------------------------------------//
         // Creates the display agent.                                     //
         //--------------------------------------------------------------------//        
+        
         /*DisplayAgent displayAgent = null;
         String alias = "Display";
         DisplayState displaySate = new DisplayState();
@@ -58,7 +59,7 @@ public class SMAAAT {
         double passwdAg = 0.91;
         */
         
-        /*
+        
         double passwdAg = 0.91;
         // Create World Agent
         

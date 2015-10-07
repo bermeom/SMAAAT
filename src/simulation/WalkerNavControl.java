@@ -231,12 +231,12 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
             }
 
         }
-
+        /*
         System.out.println("FL: " + sdFrontL.collideWithObject + " FR: " + sdFrontR.collideWithObject
                 + " RF: " + sdRightF.collideWithObject + " RR: " + sdRightR.collideWithObject
                 + " RL: " + sdRearL.collideWithObject + " RR: " + sdRearR.collideWithObject
                 + " LF: " + sdLeftF.collideWithObject + " LR: " + sdLeftR.collideWithObject);
-
+             */
 
     }
     

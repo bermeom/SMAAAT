@@ -22,7 +22,8 @@ public class AgentState extends  StateBESA{
     protected  int idfloor;
     protected  String alias;
     protected  Queue<Motion> possibleMotions;
-
+    
+    
     public AgentState(ModelEdifice edifice, int xpos, int ypos, int idfloor, String alias) {
         this.edifice = edifice;
         this.xpos = xpos;

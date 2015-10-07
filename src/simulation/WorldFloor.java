@@ -167,7 +167,19 @@ public class WorldFloor {
     }
 
     
-    public Geometry makeCube(String name,int i,int j) {
+    public Geometry makeCubeb(String name,int i,int j,float highb) {
+      Box box = new Box(1, highb, 1);
+      Geometry cube = new Geometry(name, box);
+      cube.setLocalTranslation(x+width-post(i), y+1.2f-(1-highb), z+length-post(j));
+      Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+      mat1.setTexture("ColorMap", 
+            assetManager.loadTexture("Textures/texture3.jpg"));
+      mat1.setColor("Color", ColorRGBA.Gray);
+      cube.setMaterial(mat1);
+      return cube;
+    }
+    
+    public Geometry makeCubeB(String name,int i,int j) {
       Box box = new Box(1, 1, 1);
       Geometry cube = new Geometry(name, box);
       cube.setLocalTranslation(x+width-post(i), y+1.2f, z+length-post(j));
