@@ -1,5 +1,6 @@
 package simulation.Agent;
 
+import BESA.Kernell.System.AdmBESA;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -10,6 +11,13 @@ import simulation.SmaaatApp;
 import simulation.utils.SpatialSeenObject;
 
 public class GuardianAgent extends Character {
+    
+    public GuardianAgent(SmaaatApp app, Vector3f position, Vector3f direction, String id, float radius, Spatial model,AdmBESA admLoca) {
+        super(app, Const.GuardianAgent+id, position, direction,radius,admLoca);
+        node.attachChild(model);
+        speed = (speed*0.6f);
+                
+    }
     
     public GuardianAgent(SmaaatApp app, Vector3f position, Vector3f direction, String id, float radius, Spatial model) {
         super(app, Const.GuardianAgent+id, position, direction,radius);

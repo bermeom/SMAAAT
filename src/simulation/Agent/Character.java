@@ -1,5 +1,6 @@
 package simulation.Agent;
 
+import BESA.Kernell.System.AdmBESA;
 import com.jme3.bullet.collision.PhysicsCollisionEvent;
 import com.jme3.bullet.collision.PhysicsCollisionListener;
 import com.jme3.bullet.control.BetterCharacterControl;
@@ -47,11 +48,37 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
     protected boolean left_handed = true;
     protected boolean allowMovement = true;
     protected Vector3f atractionPoint;
+    protected WalkerNavControl wNavControl;
+    protected String alias;
+    protected AdmBESA admLocalBESA;
+    
+    public Character(SmaaatApp app, String name, Vector3f position, Vector3f direction,float radius,AdmBESA admLocal) {
+        this.admLocalBESA=admLocal;
+        this.radius=radius;
+        this.height=2*radius;
+        this.alias=name;
+        this.app = app;
+        this.node = new Node("Node_" + name);
+
+        node.setLocalTranslation(position);
+        //node.attachChild(createSpatialGeometry(name));
+
+        ((Spatial) (node)).setUserData(Const.Character, this);
+
+        shootingRestTime = Utils.randomInteger(100, 300);
+        setupPhysics();
+        setupControllers(direction);
+
+        bullet = new Sphere(4, 4, bulletRadius);
+
+        app.getCharacterNode().attachChild(node);
+    }
+    
 
     public Character(SmaaatApp app, String name, Vector3f position, Vector3f direction,float radius) {
         this.radius=radius;
         this.height=2*radius;
-        
+        this.alias=name;
         this.app = app;
         this.node = new Node("Node_" + name);
 
@@ -77,7 +104,11 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
     }
 
     private void setupControllers(Vector3f direction) {
-        WalkerNavControl wNavControl = new WalkerNavControl(this, direction);
+        if(admLocalBESA!=null){
+            wNavControl = new WalkerNavControl(this, direction,admLocalBESA,alias);
+        }else{
+            wNavControl = new WalkerNavControl(this, direction);
+        }
         node.addControl(wNavControl);
     }
 
@@ -285,4 +316,111 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
     public void atractionPointReached() {
         this.atractionPoint = null;
     }
+
+    public Node getNode() {
+        return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
+    }
+
+    public float getSightRange() {
+        return sightRange;
+    }
+
+    public void setSightRange(float sightRange) {
+        this.sightRange = sightRange;
+    }
+
+    public float getMass() {
+        return mass;
+    }
+
+    public void setMass(float mass) {
+        this.mass = mass;
+    }
+
+    public float getLive() {
+        return live;
+    }
+
+    public void setLive(float live) {
+        this.live = live;
+    }
+
+    public static Sphere getBullet() {
+        return bullet;
+    }
+
+    public static void setBullet(Sphere bullet) {
+        Character.bullet = bullet;
+    }
+
+    public float getBulletRadius() {
+        return bulletRadius;
+    }
+
+    public void setBulletRadius(float bulletRadius) {
+        this.bulletRadius = bulletRadius;
+    }
+
+    public float getBulletSpeed() {
+        return bulletSpeed;
+    }
+
+    public void setBulletSpeed(float bulletSpeed) {
+        this.bulletSpeed = bulletSpeed;
+    }
+
+    public Date getLastShootTime() {
+        return lastShootTime;
+    }
+
+    public void setLastShootTime(Date lastShootTime) {
+        this.lastShootTime = lastShootTime;
+    }
+
+    public int getShootingRestTime() {
+        return shootingRestTime;
+    }
+
+    public void setShootingRestTime(int shootingRestTime) {
+        this.shootingRestTime = shootingRestTime;
+    }
+
+    public boolean isLeft_handed() {
+        return left_handed;
+    }
+
+    public void setLeft_handed(boolean left_handed) {
+        this.left_handed = left_handed;
+    }
+
+    public boolean isAllowMovement() {
+        return allowMovement;
+    }
+
+    public void setAllowMovement(boolean allowMovement) {
+        this.allowMovement = allowMovement;
+    }
+
+    public WalkerNavControl getwNavControl() {
+        return wNavControl;
+    }
+
+    public void setwNavControl(WalkerNavControl wNavControl) {
+        this.wNavControl = wNavControl;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+    
+    
+    
 }

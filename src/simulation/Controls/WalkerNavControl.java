@@ -1,5 +1,13 @@
 package simulation.Controls;
 
+import BESA.ExceptionBESA;
+import BESA.Kernell.Agent.Event.EventBESA;
+import BESA.Kernell.System.AdmBESA;
+import BESA.Kernell.System.Directory.AgHandlerBESA;
+import BESA.Log.ReportBESA;
+import BESAFile.Agent.Behavior.AgentMoveGuard;
+import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
+import BESAFile.Data.ActionDataWalkerNav;
 import simulation.Agent.Character;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.collision.CollisionResult;
@@ -36,7 +44,18 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
     SensorRay srLeftF = new SensorRay();
     boolean keyBoardPressed = false;
     protected float minDistanceFromAtractionPoint = 0.2f;
-
+    protected AdmBESA admLocalBESA;
+    protected String alias;
+    
+    public WalkerNavControl(Character character, Vector3f direction,AdmBESA admLocal, String alias) {
+        this.admLocalBESA=admLocal;
+        this.alias=alias;
+        this.viewDirection = direction;
+        this.character = character;
+        arrow = Utils.createDebugArrow(character.getApp().getAssetManager(), Vector3f.ZERO, new Vector3f(0, 0, 0.5f), null);
+        //setupKeys(character.getApp().getInputManager());
+    }
+    
     public WalkerNavControl(Character character, Vector3f direction) {
         this.viewDirection = direction;
         this.character = character;
@@ -55,7 +74,32 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
     protected void controlUpdate(float tpf) {
         if (spatial.getParent() != null) {
             character.update(tpf);
-            move(tpf);
+            //
+            if(admLocalBESA==null){
+                move(tpf);
+            }else{
+                move(tpf);
+                /*System.out.println(alias);
+                
+                ActionDataWalkerNav actionData=new ActionDataWalkerNav(tpf,"move");
+                EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
+                AgHandlerBESA ah;
+                boolean sw=true;
+                do{
+                    try {
+                        ah =admLocalBESA.getHandlerByAlias(alias);
+                        ah.sendEvent(event);
+                        sw=false;
+                    } catch (ExceptionBESA e) {
+                        ReportBESA.error(e);
+                        sw=true;
+                        System.out.println("ERROR");
+                    }
+                }while(sw);*/
+
+            }
+            
+            
         }
     }
 
@@ -238,7 +282,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
             }
         }
     }
-
+    
     private void move(float tpf) {
         float speed = character.getSpeed();
         wallFollowerMovement(tpf);
