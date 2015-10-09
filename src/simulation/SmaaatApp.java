@@ -1,11 +1,18 @@
 package simulation;
 
 import BESA.ExceptionBESA;
+import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.StructBESA;
 import BESA.Kernell.System.AdmBESA;
+import BESA.Kernell.System.Directory.AgHandlerBESA;
+import BESA.Log.ReportBESA;
 import BESAFile.Agent.AgentProtector;
+import BESAFile.Agent.Behavior.AgentMoveGuard;
+import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
+import BESAFile.Data.ActionData;
+import BESAFile.Data.ActionDataWalkerNav;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
 import com.jme3.app.SimpleApplication;
@@ -55,7 +62,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private int consecutiveAgenEnemy;
     private int consecutiveAgenHostage;
     private int consecutiveAgenExplorer;
-    private AdmBESA admLocal;
+    private static AdmBESA admLocal;
     private double passwdAg;
     
     public static void main(String[] args) {
@@ -78,7 +85,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         consecutiveAgenHostage=0;
         
         createEdifice();
-        //setupBesa();
+        setupBesa();
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
         
@@ -115,12 +122,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
             createAgentProtector(0, 1, 1, new Vector3f(0, 0, -1));
+            
+            /*
             createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 8, 8, new Vector3f(0, 0, -1));
+            
             createAgentEnemy(0, 5, 6, new Vector3f(0, 0, -1));
             createAgentEnemy(0, 0, 9, new Vector3f(0, 0, 1));
             createAgentHostage(0, 3, 4, new Vector3f(1, 0, 0));
             createAgentExplorer(0, 6, 4, new Vector3f(-1, 0, 0));
-            
+            //*/
         } catch (ExceptionBESA ex) {
             Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -133,41 +144,70 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         new HostageAgent(this, new Vector3f(-1, 1, -0.5f), new Vector3f(1, 0, 0));
         new ExplorerAgent(this, new Vector3f(-3, 1, -1), new Vector3f(-1, 0, 0));
         */
-        Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
+        //Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
         
         rootNode.attachChild(characterNode);
+        sendEventAgentMove();
+    }
+    
+    private void sendEventAgentMove() {
         
+        ActionDataWalkerNav actionData=new ActionDataWalkerNav(1,"move");
+        EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
+        AgHandlerBESA ah;
+        boolean sw=true;
+        do{
+            try {
+                ah =SmaaatApp.admLocal.getHandlerByAlias("GuardianAgent0");
+                ah.sendEvent(event);
+                sw=false;
+            } catch (ExceptionBESA e) {
+                ReportBESA.error(e);
+                sw=true;
+            }
+        }while(sw);
+        System.out.println("   -------------------------- Move Agent --------------- ");
     }
     
     private void createAgentProtector(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        GuardianAgent ga=new GuardianAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenProtector,0.75f,createModelProtector(),admLocal);
+        GuardianAgent agente=new GuardianAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenProtector,0.75f,createModelProtector(),admLocal);
         consecutiveAgenProtector++;
-        /*
+        
         //AgentProtectorState state = new AgentProtectorState(ga,new ModelEdifice(width, length, nFloors),i,j,idFloor,ga.getAlias());
-        AgentProtectorState state = new AgentProtectorState(ga,mEdifice,i,j,idFloor,ga.getAlias());
+        AgentProtectorState state = new AgentProtectorState(agente,mEdifice,i,j,idFloor,agente.getAlias());
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
-        struct.bindGuard("agentMove", AgentProtectorState.class);
+        struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
-        agent.start();*/
+        agent.start();
+        //*/
     }
     
      private void createAgentEnemy(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        EnemyAgent ga=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy(),admLocal);
+        //EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy(),admLocal);
+        EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy());
+        /*AgentProtectorState state = new AgentProtectorState(agente,mEdifice,i,j,idFloor,agente.getAlias());
+        StructBESA struct = new StructBESA();
+        struct.addBehavior("agentMove");
+        struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
+        AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
+        agent.start();*/
         consecutiveAgenEnemy++;
      }
      
      private void createAgentHostage(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        EnemyAgent ga=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenHostage,0.5f,createModelHostage(),admLocal);
+        //HostageAgent agente=new HostageAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenHostage,0.5f,createModelHostage(),admLocal);
+        HostageAgent agente=new HostageAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenHostage,0.5f,createModelHostage());
         consecutiveAgenHostage++;
      }
      
      private void createAgentExplorer(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        EnemyAgent ga=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer(),admLocal);
+        //ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer(),admLocal);
+        ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer());
         consecutiveAgenExplorer++;
      }
     
@@ -320,7 +360,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     
     private void setupBesa(){
         passwdAg = 0.91;
-        admLocal = AdmBESA.getInstance();
+       SmaaatApp.admLocal = AdmBESA.getInstance();
         
     }
 

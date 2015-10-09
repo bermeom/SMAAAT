@@ -1,5 +1,6 @@
 package simulation.Agent;
 
+import BESA.Kernell.System.AdmBESA;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -10,6 +11,12 @@ import simulation.SmaaatApp;
 import simulation.utils.SpatialSeenObject;
 
 public class ExplorerAgent extends Character {
+
+    public ExplorerAgent(SmaaatApp app, Vector3f position, Vector3f direction, String id, float radius, Spatial model,AdmBESA admLocal) {
+        super(app, Const.ExplorerAgent+id, position, direction,radius,admLocal);
+        node.attachChild(model);
+        speed = (speed*1.3f);
+    }
 
     public ExplorerAgent(SmaaatApp app, Vector3f position, Vector3f direction, String id, float radius, Spatial model) {
         super(app, Const.ExplorerAgent+id, position, direction,radius);

@@ -136,7 +136,7 @@ public class SMAAAT {
         boolean sw=true;
         do{
             try {
-                ah =admLocal.getHandlerByAlias(actionData.getAlias());
+                ah =AdmBESA.getInstance().getHandlerByAlias(actionData.getAlias());
                 ah.sendEvent(event);
                 sw=false;
             } catch (ExceptionBESA e) {

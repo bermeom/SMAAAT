@@ -25,6 +25,7 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import simulation.SmaaatApp;
 import simulation.utils.Utils;
 
 public class WalkerNavControl extends AbstractControl implements ActionListener {
@@ -78,8 +79,8 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
             if(admLocalBESA==null){
                 move(tpf);
             }else{
-                move(tpf);
-                /*System.out.println(alias);
+                //move(tpf);
+                //System.out.println(alias);
                 
                 ActionDataWalkerNav actionData=new ActionDataWalkerNav(tpf,"move");
                 EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
@@ -87,15 +88,17 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
                 boolean sw=true;
                 do{
                     try {
-                        ah =admLocalBESA.getHandlerByAlias(alias);
+                        ah = AdmBESA.getInstance().getHandlerByAlias(alias);
+                        //ah = admLocalBESA.getHandlerByAlias(alias);
                         ah.sendEvent(event);
                         sw=false;
                     } catch (ExceptionBESA e) {
                         ReportBESA.error(e);
                         sw=true;
-                        System.out.println("ERROR");
                     }
-                }while(sw);*/
+                }while(sw);
+                
+                //*/
 
             }
             
@@ -283,7 +286,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
         }
     }
     
-    private void move(float tpf) {
+    public void move(float tpf) {
         float speed = character.getSpeed();
         wallFollowerMovement(tpf);
         BetterCharacterControl control = spatial.getControl(BetterCharacterControl.class);

@@ -9,6 +9,7 @@ import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.GuardBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
+import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.Motion;
 import BESAFile.Data.ActionData;
@@ -33,11 +34,15 @@ public class AgentProtectorMoveGuard extends GuardBESA{
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         try {
             ActionDataWalkerNav data = (ActionDataWalkerNav) ebesa.getData();
-            System.out.println("--++5+58486465");
+            
             switch (data.getAction()) {
                 case "move":
-                            System.out.println("-------------------Move:D--------- "+data.getTpf());
+                            ReportBESA.info("-------------------Move:D--------- "+data.getTpf());
+                            /*
+                            AgentProtectorState aState= (AgentProtectorState)this.getAgent().getState();
+                            aState.getGa().getwNavControl().move(data.getTpf());
                             //moveAgent(data);
+                            //*/
                             break;
                 case "NAKMove":
                             //System.out.println("-------------------NAK :(--------- ");

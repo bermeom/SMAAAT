@@ -1,5 +1,6 @@
 package simulation.Agent;
 
+import BESA.Kernell.System.AdmBESA;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -13,6 +14,13 @@ import simulation.utils.Utils;
 public class HostageAgent extends Character {
 
     boolean rescued = false;
+    
+
+    public HostageAgent(SmaaatApp app, Vector3f position, Vector3f direction, String id, float radius, Spatial model,AdmBESA admLocal) {
+        super(app, Const.HostageAgent+id, position, direction,radius,admLocal);
+        node.attachChild(model);
+        speed = (speed * 0.2f);
+    }
 
     public HostageAgent(SmaaatApp app, Vector3f position, Vector3f direction, String id, float radius, Spatial model) {
         super(app, Const.HostageAgent+id, position, direction,radius);
