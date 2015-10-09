@@ -79,7 +79,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
             if(admLocalBESA==null){
                 move(tpf);
             }else{
-                //move(tpf);
+                move(tpf);
                 //System.out.println(alias);
                 
                 ActionDataWalkerNav actionData=new ActionDataWalkerNav(tpf,"move");

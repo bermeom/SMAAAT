@@ -122,10 +122,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
             createAgentProtector(0, 1, 1, new Vector3f(0, 0, -1));
-            
-            /*
             createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 8, 8, new Vector3f(0, 0, -1));
             
             createAgentEnemy(0, 5, 6, new Vector3f(0, 0, -1));
             createAgentEnemy(0, 0, 9, new Vector3f(0, 0, 1));
