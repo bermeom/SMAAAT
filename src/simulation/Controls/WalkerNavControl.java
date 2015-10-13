@@ -83,7 +83,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
             }else{
                 move(tpf);
                 //System.out.println(alias);
-                
+                /*
                 ActionDataAgent actionData=new ActionDataAgent(tpf,"move");
                 EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
                 AgHandlerBESA ah;

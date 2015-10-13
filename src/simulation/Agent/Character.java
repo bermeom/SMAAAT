@@ -89,7 +89,7 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
         node.setLocalTranslation(position);
         //node.attachChild(createSpatialGeometry(name));
 
-        ((Spatial) (node)).setUserData(Const.Character, this);
+        //((Spatial) (node)).setUserData(Const.Character, this);
 
         shootingRestTime = Utils.randomInteger(100, 300);
         setupPhysics();
@@ -164,6 +164,7 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
                 }
             }
         }
+        
         Collections.sort(seenObjects, new Comparator<SpatialSeenObject>() {
             public int compare(SpatialSeenObject o1, SpatialSeenObject o2) {
                 if (o1.distance == o1.distance) {

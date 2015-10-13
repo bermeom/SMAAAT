@@ -72,10 +72,10 @@ public class SubscribeGuardJME extends GuardBESA {
     private Spatial createModelProtector(){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentProtector/ED-209.j3o");
-        machineSpatial.scale(.3f);
+        machineSpatial.scale(.25f);
        
         //machineSpatial.rotate(0, FastMath.PI, 0);
-        //machineSpatial.setLocalTranslation(1.5f, 1.5f, 0);
+        machineSpatial.setLocalTranslation(0, 0, 0.2f);
         //machineSpatial.setMaterial(mat1);
         return machineSpatial;
     }
@@ -115,7 +115,7 @@ public class SubscribeGuardJME extends GuardBESA {
     
     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
-        return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()-post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+1, ws.getApp().getZ()+ws.getApp().getLength()-post(j));
+        return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()-post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getLength()-post(j));
         
     }
     

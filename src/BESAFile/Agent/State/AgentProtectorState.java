@@ -25,7 +25,8 @@ public class AgentProtectorState   extends  StateBESA{
     protected Vector3D direction;
     protected double radius;
     protected double height;
-
+    protected float sightRange;
+    
     protected  Queue<Motion> possibleMotions;
 
     public AgentProtectorState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius) {
@@ -36,6 +37,7 @@ public class AgentProtectorState   extends  StateBESA{
         this.direction = direction;
         this.radius = radius;
         this.height = radius*2;
+        this.sightRange = 2f;
     }
     
     public AgentProtectorState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height) {
@@ -46,6 +48,7 @@ public class AgentProtectorState   extends  StateBESA{
         this.direction = direction;
         this.radius = radius;
         this.height = height;
+        this.sightRange = 2f;
     }
 
     public ModelEdifice getEdifice() {
@@ -119,11 +122,13 @@ public class AgentProtectorState   extends  StateBESA{
     public void setPossibleMotions(Queue<Motion> possibleMotions) {
         this.possibleMotions = possibleMotions;
     }
-    
-    
-    
-    
-    
-    
+
+    public float getSightRange() {
+        return sightRange;
+    }
+
+    public void setSightRange(float sightRange) {
+        this.sightRange = sightRange;
+    }
     
 }

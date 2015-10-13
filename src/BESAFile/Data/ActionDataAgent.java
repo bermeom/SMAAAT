@@ -11,26 +11,30 @@ import BESA.Kernell.Agent.Event.DataBESA;
  * @author berme_000
  */
 public class ActionDataAgent extends DataBESA {
-    private float tpf;
+    
+    private float sightRange;
+    protected double radius;
+    protected double height;
     private String action;
     private String alias;
+    private int type;
 
-    public ActionDataAgent(float tpf, String action) {
-        this.tpf = tpf;
-        this.action = action;
+    public ActionDataAgent(int type,String alias) {
+        this.alias = alias;
+        this.type = type;
     }
-    public ActionDataAgent(String action) {
-        this.tpf = 0;
-        this.action = action;
-    }
-
     
-    public float getTpf() {
-        return tpf;
+    public ActionDataAgent(float sightRange, double radius, double height, String alias, String action) {
+        this.sightRange = sightRange;
+        this.radius = radius;
+        this.height = height;
+        this.action = action;
+        this.alias = alias;
     }
-
-    public void setTpf(float tpf) {
-        this.tpf = tpf;
+    
+    public ActionDataAgent(String action) {
+        this.sightRange = sightRange;
+        this.action = action;
     }
 
     public String getAction() {
@@ -40,6 +44,40 @@ public class ActionDataAgent extends DataBESA {
     public void setAction(String action) {
         this.action = action;
     }
+
+    public float getSightRange() {
+        return sightRange;
+    }
+
+    public void setSightRange(float sightRange) {
+        this.sightRange = sightRange;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+    
+    
     
     
     

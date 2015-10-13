@@ -14,6 +14,7 @@ import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.Motion;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
+import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.UpdateGuard;
 import BESAFile.World.Model.ModelEdifice;
 import java.util.ArrayDeque;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
+import simulation.utils.Const;
 
 /**
  *
@@ -37,7 +39,7 @@ public class AgentProtectorMoveGuard extends GuardBESA{
             
             switch (data.getAction()) {
                 case "move":
-                            ReportBESA.info("-------------------Move:D--------- "+data.getTpf());
+                            ReportBESA.info("-------------------Move:D--------- ");
                             /*
                             AgentProtectorState aState= (AgentProtectorState)this.getAgent().getState();
                             aState.getGa().getwNavControl().move(data.getTpf());
@@ -50,6 +52,7 @@ public class AgentProtectorMoveGuard extends GuardBESA{
                             break;
                 case "ACK":
                             System.out.println("-------------------ACK:D--------- ");
+                            dataSensorRequest();
                             //moveACKAgent(data);
                             break;
                     
@@ -139,20 +142,17 @@ public class AgentProtectorMoveGuard extends GuardBESA{
     }
     
     public void dataSensorRequest (){
-        /*
-        ActionDataAgent actionData=new ActionDataAgent("NAK");
-        if (ack){
-            actionData.setAction("ACK");
-        }
-        EventBESA event = new EventBESA(evType, actionData);
+        AgentProtectorState state= (AgentProtectorState)this.getAgent().getState();
+        ActionDataAgent actionData=new ActionDataAgent(state.getSightRange(),state.getRadius(), state.getHeight(), state.getAlias(),"Sensing");
+        EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {
-            ah = getAgent().getAdmLocal().getHandlerByAlias(alias);
+            ah = getAgent().getAdmLocal().getHandlerByAlias(Const.World);
             ah.sendEvent(event);
         } catch (ExceptionBESA e) {
             ReportBESA.error(e);
         }    
-        */
+        //*/
     }
     
 }

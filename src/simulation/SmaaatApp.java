@@ -15,6 +15,7 @@ import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
+import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
@@ -128,8 +129,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //new EnemyAgent(this, getPositionVirtiul(0, 5, 5), new Vector3f(0, 0, -1),""+1,0.75f,createModelEnemy());
             //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
+            //createAgentEnemy(0, 5, 4, new Vector3f(0, 0, -1));
             createAgentProtector(0, 4, 4, new Vector3f(0, 0, -1));
-            //createAgentEnemy(0, 5, 6, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 5, 4, new Vector3f(0, 0, -1));
             
             /*
             createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
@@ -157,24 +159,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         //sendEventAgentMove();
     }
     
-    private void sendEventAgentMove() {
-        
-        ActionDataAgent actionData=new ActionDataAgent(1,"move");
-        EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
-        AgHandlerBESA ah;
-        boolean sw=true;
-        do{
-            try {
-                ah =SmaaatApp.admLocal.getHandlerByAlias("GuardianAgent0");
-                ah.sendEvent(event);
-                sw=false;
-            } catch (ExceptionBESA e) {
-                ReportBESA.error(e);
-                sw=true;
-            }
-        }while(sw);
-        System.out.println("   -------------------------- Move Agent --------------- ");
-    }
     
     
     private void sendEventSuscribeAgent() {
@@ -400,8 +384,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         */
         wrlStruct.addBehavior("ChangeBehavior");
         wrlStruct.bindGuard("ChangeBehavior", SubscribeGuardJME.class);
-        //wrlStruct.bindGuard("ChangeBehavior", UpdateGuard.class);
-        WorldAgentJME wa = new WorldAgentJME("WORLD", ws, wrlStruct, passwdAg);
+        wrlStruct.bindGuard("ChangeBehavior", SensorsAgentGuardJME.class);
+        WorldAgentJME wa = new WorldAgentJME(Const.World, ws, wrlStruct, passwdAg);
         wa.start();
 
     }
@@ -502,6 +486,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         return passwdAg;
     }
     
+    public Node getRootNode(){
+        return rootNode;
+    }
    
    
 }

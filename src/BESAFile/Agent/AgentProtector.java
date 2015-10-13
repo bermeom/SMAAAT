@@ -17,6 +17,7 @@ import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
 import BESAFile.World.Behavior.SubscribeGuardJME;
+import simulation.utils.Const;
 
 /**
  *
@@ -47,7 +48,7 @@ public class AgentProtector extends AgentBESA{
         boolean sw=true;
         do{
             try {
-                ah =AdmBESA.getInstance().getHandlerByAlias("WORLD");
+                ah =AdmBESA.getInstance().getHandlerByAlias(Const.World);
                 ah.sendEvent(event);
                 sw=false;
             } catch (ExceptionBESA e) {
