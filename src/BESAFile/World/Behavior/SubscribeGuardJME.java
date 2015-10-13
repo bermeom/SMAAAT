@@ -57,8 +57,7 @@ public class SubscribeGuardJME extends GuardBESA {
             BetterCharacterControl physicsCharacter = new BetterCharacterControl((float)data.getRadius(),(float)data.getHeight() , 15.0f);
             node.addControl(physicsCharacter);
             ws.getApp().getPhysicsSpace().add(physicsCharacter);
-            BetterCharacterControl control = ((Spatial) (node)).getControl(BetterCharacterControl.class);
-            control.setViewDirection(direction);
+            physicsCharacter.setViewDirection(direction);
             //ws.getApp().getPhysicsSpace().addCollisionListener(this);
             //*/
             ws.getApp().getCharacterNode().attachChild(node);
