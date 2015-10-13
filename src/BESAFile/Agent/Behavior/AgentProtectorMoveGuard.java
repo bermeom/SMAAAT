@@ -143,7 +143,7 @@ public class AgentProtectorMoveGuard extends GuardBESA{
     
     public void dataSensorRequest (){
         AgentProtectorState state= (AgentProtectorState)this.getAgent().getState();
-        ActionDataAgent actionData=new ActionDataAgent(state.getSightRange(),state.getRadius(), state.getHeight(), state.getAlias(),"Sensing");
+        ActionDataAgent actionData=new ActionDataAgent(state.getIdfloor(),state.getSightRange(),state.getRadius(), state.getHeight(), state.getAlias(),"Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {

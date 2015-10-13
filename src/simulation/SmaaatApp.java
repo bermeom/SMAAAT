@@ -42,6 +42,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import simulation.Agent.EnemyAgent;
@@ -56,6 +58,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private DirectionalLight cameraLight;
     private BulletAppState bulletAppState;
     private Node ediffice;
+    private List<Node> floors;
     private ModelEdifice mEdifice;
     private Node characterNode;
     private float distBetweenFloors;
@@ -91,7 +94,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         consecutiveAgenEnemy=0;
         consecutiveAgenExplorer=0;
         consecutiveAgenHostage=0;
-        
+        floors=new ArrayList<Node>();
         createEdifice();
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
@@ -283,15 +286,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             for (int i=0;i<width;i++){
                 for (int j=0;j<length;j++){
                      switch(mf.get(i, j)){
-                         case 'H':floor.attachChild(we.makeWall("wallH"+n+""+i+""+j, i, j,false)); break;
-                         case 'V':floor.attachChild(we.makeWall("wallV"+n+""+i+""+j, i, j,true)); break;
-                         case 'b':floor.attachChild(we.makeCubeb("cubeb"+n+""+i+""+j, i, j,0.3f)); break;
-                         case 'B':floor.attachChild(we.makeCubeB("cubeB"+n+""+i+""+j, i, j)); break;
+                         case 'H':floor.attachChild(we.makeWall("H"+n+""+i+""+j, i, j,false)); break;
+                         case 'V':floor.attachChild(we.makeWall("V"+n+""+i+""+j, i, j,true)); break;
+                         case 'b':floor.attachChild(we.makeCubeb("b"+n+""+i+""+j, i, j,0.3f)); break;
+                         case 'B':floor.attachChild(we.makeCubeB("B"+n+""+i+""+j, i, j)); break;
                      }
                 }
             }
+            floors.add(floor);
         }
-        rootNode.attachChild(ediffice);
+        rootNode.attachChild(   ediffice );
         
     }
     

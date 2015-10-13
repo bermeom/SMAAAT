@@ -40,6 +40,7 @@ public class AgentProtector extends AgentBESA{
         ReportBESA.info("SHUTDOWN AGENT -> " + getAlias());
     
     }
+    
     private void sendEventSubscribeJME(){
         AgentProtectorState state=(AgentProtectorState)this.state;
         SubscribeDataJME actionData=new SubscribeDataJME(state.getXpos(), state.getYpos(), state.getIdfloor(), this.getAlias(), state.getDirection(), 1, state.getRadius(),state.getHeight());
@@ -56,7 +57,6 @@ public class AgentProtector extends AgentBESA{
                 sw=true;
             }
         }while(sw);
-        System.out.println("   -------------------------- SUCRIBE Agent --------------- ");
     }
     
 }

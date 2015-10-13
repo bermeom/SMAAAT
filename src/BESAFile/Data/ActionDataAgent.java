@@ -18,13 +18,16 @@ public class ActionDataAgent extends DataBESA {
     private String action;
     private String alias;
     private int type;
+    protected  int idfloor;
 
+    
     public ActionDataAgent(int type,String alias) {
         this.alias = alias;
         this.type = type;
     }
     
-    public ActionDataAgent(float sightRange, double radius, double height, String alias, String action) {
+    public ActionDataAgent(int idfloor,float sightRange, double radius, double height, String alias, String action) {
+        this.idfloor=idfloor;
         this.sightRange = sightRange;
         this.radius = radius;
         this.height = height;
@@ -76,6 +79,23 @@ public class ActionDataAgent extends DataBESA {
     public void setHeight(double height) {
         this.height = height;
     }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getIdfloor() {
+        return idfloor;
+    }
+
+    public void setIdfloor(int idfloor) {
+        this.idfloor = idfloor;
+    }
+    
     
     
     

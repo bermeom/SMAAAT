@@ -34,32 +34,31 @@ public class SensorsAgentGuardJME extends GuardBESA{
             List<SeenObject> seenObjects=new ArrayList<SeenObject>();
             state.getApp().getCharacterNode();
             try {
+                //Sensor Object
                 List<Spatial> characters = state.getApp().getCharacterNode().getChildren();
                 Node node=(Node)state.getApp().getCharacterNode().getChild(data.getAlias());
-               System.out.println("Sensing ->"+characters.size()+" <-");
+                Vector3f position = node.getWorldTranslation().clone();
+                System.out.println("Sensing ->"+characters.size()+" <-");
                 if (characters != null && characters.size() > 1) {
                     for (Spatial s : characters) {
                         //System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
                         if (!s.equals(node) && !s.getName().toLowerCase().contains("debug")) {
                             float distance = node.getWorldTranslation().distance(s.getWorldTranslation());
-                            System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
+                            //System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
                             if (distance <= data.getSightRange()) {
-                                System.out.println("OK");
-                                Vector3f position = node.getWorldTranslation().clone();
-                                System.out.println(s.getWorldTranslation()+" "+position);
+                                //System.out.println("OK "+s.getWorldTranslation()+" "+position);
                                 position.setY(position.getY()+(float) (data.getHeight()/2));
                                 Vector3f direction = s.getWorldTranslation().subtract(node.getWorldTranslation());
-                                
                                 position.addLocal(direction.normalize().mult((float)data.getRadius() + ((float)data.getRadius() * 0.1f)));
-
                                 Ray r = new Ray(position, direction.normalize());
                                 r.setLimit(data.getSightRange());
                                 CollisionResults results = new CollisionResults();
                                 state.getApp().getCharacterNode().collideWith(r, results);
                                 if (results.size() > 0) {
-                                    System.out.println("+");
+                                    //System.out.println("+");
                                     CollisionResult cr = results.getClosestCollision();
                                     String name = cr.getGeometry().getParent().getName();
+                                    //System.out.println("Name"+name);
                                     if (name != null && !name.equals("floor") && !name.toLowerCase().contains("debug")) {
                                         seenObjects.add(new SeenObject(new Vector3D(((Node)s).getLocalTranslation().x, ((Node)s).getLocalTranslation().y, ((Node)s).getLocalTranslation().z),s.getName(), getType(s.getName())));
                                     }
@@ -68,18 +67,16 @@ public class SensorsAgentGuardJME extends GuardBESA{
                         }
                     }
                 }
-                /*
-                Collections.sort(seenObjects, new Comparator<SpatialSeenObject>() {
-                    public int compare(SpatialSeenObject o1, SpatialSeenObject o2) {
-                        if (o1.distance == o1.distance) {
-                            return 0;
-                        } else {
-                            return o2.distance > o1.distance ? -1 : 1;
-                        }
-                    }
-                });
-                //*/
                 print(seenObjects);
+                //*/
+                //Sensor FLOOR
+                
+                
+                
+                
+                
+                //*/
+            
             } catch (Exception e) {
                 System.out.println("ERREOR Sensing ->"+data.getAlias()+" <-");
             }
@@ -107,4 +104,11 @@ public class SensorsAgentGuardJME extends GuardBESA{
             System.out.println(so);
         }
     }
+    
+    private void DetectionWalls(Node agent,Vector3f position,ActionDataAgent data){
+        
+    
+    }
+    
+    
 }
