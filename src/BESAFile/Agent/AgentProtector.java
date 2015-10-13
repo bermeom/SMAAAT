@@ -17,13 +17,15 @@ import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
 import BESAFile.World.Behavior.SubscribeGuardJME;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simulation.utils.Const;
 
 /**
  *
  * @author berme_000
  */
-public class AgentProtector extends AgentBESA{
+public class AgentProtector extends AgentBESA {
 
     public AgentProtector(String alias, StateBESA state, StructBESA structAgent, double passwd) throws KernellAgentExceptionBESA {
         super(alias, state, structAgent, passwd);
@@ -38,25 +40,20 @@ public class AgentProtector extends AgentBESA{
     @Override
     public void shutdownAgent() {
         ReportBESA.info("SHUTDOWN AGENT -> " + getAlias());
-    
+
     }
-    
-    private void sendEventSubscribeJME(){
-        AgentProtectorState state=(AgentProtectorState)this.state;
-        SubscribeDataJME actionData=new SubscribeDataJME(state.getXpos(), state.getYpos(), state.getIdfloor(), this.getAlias(), state.getDirection(), 1, state.getRadius(),state.getHeight());
+
+    private void sendEventSubscribeJME() {
+        AgentProtectorState state = (AgentProtectorState) this.state;
+        SubscribeDataJME actionData = new SubscribeDataJME(state.getXpos(), state.getYpos(), state.getIdfloor(), this.getAlias(), state.getDirection(), 1, state.getRadius(), state.getHeight());
         EventBESA event = new EventBESA(SubscribeGuardJME.class.getName(), actionData);
-        AgHandlerBESA ah;
-        boolean sw=true;
-        do{
-            try {
-                ah =AdmBESA.getInstance().getHandlerByAlias(Const.World);
-                ah.sendEvent(event);
-                sw=false;
-            } catch (ExceptionBESA e) {
-                ReportBESA.error(e);
-                sw=true;
-            }
-        }while(sw);
+        
+        try {
+            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(Const.World);
+            ah.sendEvent(event);
+        } catch (ExceptionBESA ex) {
+            Logger.getLogger(AgentProtector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
-    
 }

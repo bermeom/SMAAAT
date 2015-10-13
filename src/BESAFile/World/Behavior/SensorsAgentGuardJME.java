@@ -6,6 +6,8 @@ package BESAFile.World.Behavior;
 
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.GuardBESA;
+import BESAFile.Agent.Agent;
+import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.Vector3D;
 import BESAFile.Model.SeenObject;
@@ -80,6 +82,11 @@ public class SensorsAgentGuardJME extends GuardBESA{
             } catch (Exception e) {
                 System.out.println("ERREOR Sensing ->"+data.getAlias()+" <-");
             }
+            
+            ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias());
+            sod.seenObjects = seenObjects;
+            sod.setAction("move");
+            Agent.sendMessage(AgentProtectorMoveGuard.class, data.getAlias(), sod );
             
     }
 

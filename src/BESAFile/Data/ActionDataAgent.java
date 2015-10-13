@@ -5,6 +5,8 @@
 package BESAFile.Data;
 
 import BESA.Kernell.Agent.Event.DataBESA;
+import BESAFile.Model.SeenObject;
+import java.util.List;
 
 /**
  *
@@ -19,6 +21,7 @@ public class ActionDataAgent extends DataBESA {
     private String alias;
     private int type;
     protected  int idfloor;
+    public List<SeenObject> seenObjects;
 
     
     public ActionDataAgent(int type,String alias) {

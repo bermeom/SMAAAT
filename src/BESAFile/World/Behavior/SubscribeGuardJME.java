@@ -11,6 +11,7 @@ import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
+import BESAFile.Agent.Behavior.SubscribeResponseGuard;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.SubscribeData;
 import BESAFile.Data.SubscribeDataJME;
@@ -40,7 +41,7 @@ public class SubscribeGuardJME extends GuardBESA {
         Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
         String evType="";
         switch(data.getType()){
-            case(1): model=createModelProtector();evType=AgentProtectorMoveGuard.class.getName();  break;
+            case(1): model=createModelProtector();evType=SubscribeResponseGuard.class.getName();  break;
             case(2): model=createModelExplorer();  break;
             case(3): model=createModelHostage();  break;
             case(4): model=createModelEnemy();  break;

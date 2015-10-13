@@ -9,6 +9,7 @@ import BESA.Log.ReportBESA;
 import BESAFile.Agent.AgentProtector;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
+import BESAFile.Agent.Behavior.SubscribeResponseGuard;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Data.ActionData;
@@ -17,6 +18,7 @@ import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
+import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
 import BESAFile.World.State.WorldStateJME;
@@ -134,7 +136,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
             //createAgentEnemy(0, 5, 4, new Vector3f(0, 0, -1));
             createAgentProtector(0, 4, 4, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 5, 4, new Vector3f(0, 0, -1));
+            //createAgentProtector(0, 5, 4, new Vector3f(0, 0, -1));
             
             /*
             createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
@@ -195,6 +197,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
+        struct.addBehavior("SubscribeResponseGuard");
+        struct.bindGuard(SubscribeResponseGuard.class);
+        
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
         agent.start();
         consecutiveAgenProtector++;
@@ -386,9 +391,13 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         /*wrlStruct.addBehavior("WorldBehavior");
         wrlStruct.bindGuard("WorldBehavior", GameGuard.class);
         */
-        wrlStruct.addBehavior("ChangeBehavior");
-        wrlStruct.bindGuard("ChangeBehavior", SubscribeGuardJME.class);
-        wrlStruct.bindGuard("ChangeBehavior", SensorsAgentGuardJME.class);
+        wrlStruct.addBehavior("SubscribeGuardJME");
+        wrlStruct.addBehavior("SensorsAgentGuardJME");
+        wrlStruct.addBehavior("UpdateGuardJME");
+        wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
+        wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
+        wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
+        
         WorldAgentJME wa = new WorldAgentJME(Const.World, ws, wrlStruct, passwdAg);
         wa.start();
 
@@ -494,5 +503,14 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         return rootNode;
     }
    
-   
+   @Override
+    public void destroy() {
+        try {
+            AdmBESA.getInstance().kill(passwdAg);
+        } catch (ExceptionBESA ex) {
+            Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        super.destroy();
+        //System.exit(0);
+    }
 }

@@ -13,11 +13,14 @@ import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.KernellAgentExceptionBESA;
 import BESA.Kernell.Agent.StateBESA;
 import BESA.Kernell.Agent.StructBESA;
+import BESA.Kernell.System.AdmBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Data.SubscribeData;
 import BESAFile.World.Behavior.SubscribeGuard;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -53,6 +56,16 @@ public class Agent extends AgentBESA{
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         ReportBESA.info("SHUTDOWN AGENT -> " + getAlias());
     
+    }
+    
+    public static void sendMessage(Class guard, String alias, DataBESA data) {
+        EventBESA ev = new EventBESA(guard.getName(), data);
+        try {
+            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
+            ah.sendEvent(ev);
+        } catch (ExceptionBESA ex) {
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
