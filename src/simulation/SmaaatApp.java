@@ -12,9 +12,14 @@ import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Data.ActionData;
-import BESAFile.Data.ActionDataWalkerNav;
+import BESAFile.Data.ActionDataAgent;
+import BESAFile.Data.SubscribeDataJME;
+import BESAFile.Data.Vector3D;
+import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
+import BESAFile.World.State.WorldStateJME;
+import BESAFile.World.WorldAgentJME;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
@@ -42,6 +47,7 @@ import simulation.Agent.EnemyAgent;
 import simulation.Agent.ExplorerAgent;
 import simulation.Agent.GuardianAgent;
 import simulation.Agent.HostageAgent;
+import simulation.utils.Const;
 import simulation.world.Exit;
 
 public class SmaaatApp extends SimpleApplication implements ActionListener {
@@ -73,6 +79,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         settings.setTitle("SMAAAT");
         app.setSettings(settings);
         app.start();
+        System.out.println("HOLAAAAAAAA");
         
     }
 
@@ -85,7 +92,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         consecutiveAgenHostage=0;
         
         createEdifice();
-        setupBesa();
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
         
@@ -107,7 +113,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        //bulletAppState.setDebugEnabled(true);
+        bulletAppState.setDebugEnabled(true);
 
         CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) ediffice);
         RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
@@ -118,15 +124,19 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         
         characterNode = new Node();
         try {
+            setupBesa();
             //new EnemyAgent(this, getPositionVirtiul(0, 5, 5), new Vector3f(0, 0, -1),""+1,0.75f,createModelEnemy());
             //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
-            createAgentProtector(0, 1, 1, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 4, 4, new Vector3f(0, 0, -1));
+            //createAgentEnemy(0, 5, 6, new Vector3f(0, 0, -1));
             
-            createAgentEnemy(0, 5, 6, new Vector3f(0, 0, -1));
+            /*
+            createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
             createAgentEnemy(0, 0, 9, new Vector3f(0, 0, 1));
             createAgentHostage(0, 3, 4, new Vector3f(1, 0, 0));
+            createAgentHostage(0, 5, 4, new Vector3f(1, 0, 0));
+            createAgentHostage(0, 2, 2, new Vector3f(1, 0, 0));
             createAgentExplorer(0, 6, 4, new Vector3f(-1, 0, 0));
             //*/
         } catch (ExceptionBESA ex) {
@@ -144,12 +154,12 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         //Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
         
         rootNode.attachChild(characterNode);
-        sendEventAgentMove();
+        //sendEventAgentMove();
     }
     
     private void sendEventAgentMove() {
         
-        ActionDataWalkerNav actionData=new ActionDataWalkerNav(1,"move");
+        ActionDataAgent actionData=new ActionDataAgent(1,"move");
         EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
         AgHandlerBESA ah;
         boolean sw=true;
@@ -166,18 +176,42 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         System.out.println("   -------------------------- Move Agent --------------- ");
     }
     
+    
+    private void sendEventSuscribeAgent() {
+        
+        SubscribeDataJME actionData=new SubscribeDataJME(0, 0, 0, "Agent", new Vector3D(1, 0, 0), 1, 0.75f);
+        EventBESA event = new EventBESA(SubscribeGuardJME.class.getName(), actionData);
+        AgHandlerBESA ah;
+        boolean sw=true;
+        do{
+            try {
+                ah =AdmBESA.getInstance().getHandlerByAlias("WORLD");
+                ah.sendEvent(event);
+                sw=false;
+            } catch (ExceptionBESA e) {
+                ReportBESA.error(e);
+                sw=true;
+            }
+        }while(sw);
+        System.out.println("   -------------------------- SUCRIBE Agent --------------- ");
+    }
+    
+    
     private void createAgentProtector(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        GuardianAgent agente=new GuardianAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenProtector,0.75f,createModelProtector(),admLocal);
-        consecutiveAgenProtector++;
-        
-        //AgentProtectorState state = new AgentProtectorState(ga,new ModelEdifice(width, length, nFloors),i,j,idFloor,ga.getAlias());
-        AgentProtectorState state = new AgentProtectorState(agente,mEdifice,i,j,idFloor,agente.getAlias());
+        //GuardianAgent agente=new GuardianAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenProtector,0.75f,createModelProtector(),AdmBESA.getInstance());
+        /*
+        GuardianAgent agente=new GuardianAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenProtector,0.75f,createModelProtector());
+        System.out.println(agente.getNode().getControl(BetterCharacterControl.class));
+        */
+        AgentProtectorState state = new AgentProtectorState(i,j,idFloor,Const.GuardianAgent+consecutiveAgenProtector,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.75f);
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
         agent.start();
+        consecutiveAgenProtector++;
+       
         //*/
     }
     
@@ -210,6 +244,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     
     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
         return new Vector3f(x+width-post(i), y-distBetweenFloors*idFloor+1, z+length-post(j));
+        
     }
     
     private int post(int i){
@@ -355,10 +390,20 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         //*/
     }
     
-    private void setupBesa(){
+    private void setupBesa() throws ExceptionBESA{
         passwdAg = 0.91;
-       SmaaatApp.admLocal = AdmBESA.getInstance();
-        
+        SmaaatApp.admLocal = AdmBESA.getInstance();
+        WorldStateJME ws=new WorldStateJME(this);
+        StructBESA wrlStruct = new StructBESA();
+        /*wrlStruct.addBehavior("WorldBehavior");
+        wrlStruct.bindGuard("WorldBehavior", GameGuard.class);
+        */
+        wrlStruct.addBehavior("ChangeBehavior");
+        wrlStruct.bindGuard("ChangeBehavior", SubscribeGuardJME.class);
+        //wrlStruct.bindGuard("ChangeBehavior", UpdateGuard.class);
+        WorldAgentJME wa = new WorldAgentJME("WORLD", ws, wrlStruct, passwdAg);
+        wa.start();
+
     }
 
     @Override
@@ -397,7 +442,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         }
     }
     
-        public BulletAppState getBulletAppState() {
+    public BulletAppState getBulletAppState() {
         return this.bulletAppState;
     }
 
@@ -412,4 +457,51 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     public Node getCharacterNode() {
         return this.characterNode;
     }
+
+    /*
+    public AssetManager getAssetManager(){
+    return this.assetManager;
+    } */
+    public Node getEdiffice() {
+        return ediffice;
+    }
+
+    public ModelEdifice getmEdifice() {
+        return mEdifice;
+    }
+
+    public float getDistBetweenFloors() {
+        return distBetweenFloors;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getnFloors() {
+        return nFloors;
+    }
+
+    public double getPasswdAg() {
+        return passwdAg;
+    }
+    
+   
+   
 }

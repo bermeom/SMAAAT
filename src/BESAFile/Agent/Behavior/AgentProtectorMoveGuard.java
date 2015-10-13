@@ -13,7 +13,7 @@ import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.Motion;
 import BESAFile.Data.ActionData;
-import BESAFile.Data.ActionDataWalkerNav;
+import BESAFile.Data.ActionDataAgent;
 import BESAFile.World.Behavior.UpdateGuard;
 import BESAFile.World.Model.ModelEdifice;
 import java.util.ArrayDeque;
@@ -33,7 +33,7 @@ public class AgentProtectorMoveGuard extends GuardBESA{
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         try {
-            ActionDataWalkerNav data = (ActionDataWalkerNav) ebesa.getData();
+            ActionDataAgent data = (ActionDataAgent) ebesa.getData();
             
             switch (data.getAction()) {
                 case "move":
@@ -44,12 +44,12 @@ public class AgentProtectorMoveGuard extends GuardBESA{
                             //moveAgent(data);
                             //*/
                             break;
-                case "NAKMove":
-                            //System.out.println("-------------------NAK :(--------- ");
+                case "NAK":
+                            System.out.println("-------------------NAK :(--------- ");
                             //moveAgent(data);
                             break;
-                case "ACKMove":
-                            //System.out.println("-------------------ACK:D--------- "+data.getXpos()+" "+data.getYpos()+" "+data.getAlias());
+                case "ACK":
+                            System.out.println("-------------------ACK:D--------- ");
                             //moveACKAgent(data);
                             break;
                     
@@ -136,6 +136,23 @@ public class AgentProtectorMoveGuard extends GuardBESA{
                     sw=true;
                 }
             }while(sw);
+    }
+    
+    public void dataSensorRequest (){
+        /*
+        ActionDataAgent actionData=new ActionDataAgent("NAK");
+        if (ack){
+            actionData.setAction("ACK");
+        }
+        EventBESA event = new EventBESA(evType, actionData);
+        AgHandlerBESA ah;
+        try {
+            ah = getAgent().getAdmLocal().getHandlerByAlias(alias);
+            ah.sendEvent(event);
+        } catch (ExceptionBESA e) {
+            ReportBESA.error(e);
+        }    
+        */
     }
     
 }

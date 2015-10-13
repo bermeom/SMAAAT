@@ -4,11 +4,19 @@
  */
 package BESAFile.Agent;
 
+import BESA.ExceptionBESA;
 import BESA.Kernell.Agent.AgentBESA;
+import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.KernellAgentExceptionBESA;
 import BESA.Kernell.Agent.StateBESA;
 import BESA.Kernell.Agent.StructBESA;
+import BESA.Kernell.System.AdmBESA;
+import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
+import BESAFile.Agent.State.AgentProtectorState;
+import BESAFile.Data.SubscribeDataJME;
+import BESAFile.Data.Vector3D;
+import BESAFile.World.Behavior.SubscribeGuardJME;
 
 /**
  *
@@ -23,7 +31,7 @@ public class AgentProtector extends AgentBESA{
     @Override
     public void setupAgent() {
         ReportBESA.info("SETUP AGENT -> " + getAlias());
-        
+        sendEventSubscribeJME();
     }
 
     @Override
@@ -31,6 +39,23 @@ public class AgentProtector extends AgentBESA{
         ReportBESA.info("SHUTDOWN AGENT -> " + getAlias());
     
     }
-
+    private void sendEventSubscribeJME(){
+        AgentProtectorState state=(AgentProtectorState)this.state;
+        SubscribeDataJME actionData=new SubscribeDataJME(state.getXpos(), state.getYpos(), state.getIdfloor(), this.getAlias(), state.getDirection(), 1, state.getRadius(),state.getHeight());
+        EventBESA event = new EventBESA(SubscribeGuardJME.class.getName(), actionData);
+        AgHandlerBESA ah;
+        boolean sw=true;
+        do{
+            try {
+                ah =AdmBESA.getInstance().getHandlerByAlias("WORLD");
+                ah.sendEvent(event);
+                sw=false;
+            } catch (ExceptionBESA e) {
+                ReportBESA.error(e);
+                sw=true;
+            }
+        }while(sw);
+        System.out.println("   -------------------------- SUCRIBE Agent --------------- ");
+    }
     
 }

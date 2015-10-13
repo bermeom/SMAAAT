@@ -7,7 +7,7 @@ import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
-import BESAFile.Data.ActionDataWalkerNav;
+import BESAFile.Data.ActionDataAgent;
 import simulation.Agent.Character;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.collision.CollisionResult;
@@ -46,6 +46,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
     boolean keyBoardPressed = false;
     protected float minDistanceFromAtractionPoint = 0.2f;
     protected AdmBESA admLocalBESA;
+    private double passwdAg;
     protected String alias;
     
     public WalkerNavControl(Character character, Vector3f direction,AdmBESA admLocal, String alias) {
@@ -53,6 +54,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
         this.alias=alias;
         this.viewDirection = direction;
         this.character = character;
+        this.passwdAg=0.91;
         arrow = Utils.createDebugArrow(character.getApp().getAssetManager(), Vector3f.ZERO, new Vector3f(0, 0, 0.5f), null);
         //setupKeys(character.getApp().getInputManager());
     }
@@ -82,7 +84,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
                 move(tpf);
                 //System.out.println(alias);
                 
-                ActionDataWalkerNav actionData=new ActionDataWalkerNav(tpf,"move");
+                ActionDataAgent actionData=new ActionDataAgent(tpf,"move");
                 EventBESA event = new EventBESA(AgentProtectorMoveGuard.class.getName(), actionData);
                 AgHandlerBESA ah;
                 boolean sw=true;
@@ -218,12 +220,13 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
             if (character.getAllowMovement()) {
                 this.resetMove();
 
-                /*float angle =  this.viewDirection.normalize().angleBetween(Vector3f.UNIT_X);
+                float angle =  this.viewDirection.normalize().angleBetween(Vector3f.UNIT_X);
                 if ((angle % FastMath.HALF_PI)>0.15) {
-                    System.out.println("Name: " + spatial.getName());
+                    System.out.println("My Name:"+this.alias+" Name: " + spatial.getName());
                     viewDirection = Vector3f.UNIT_Z;
                     control.setViewDirection(viewDirection);
-                }*/
+                }
+                //*/
 
                 /*No hay obstaculo en ningun sensor: avanza adelante*/
                 if (!sdFrontL.collideWithObject && !sdFrontR.collideWithObject
@@ -268,7 +271,7 @@ public class WalkerNavControl extends AbstractControl implements ActionListener 
                  + " RF: " + sdRightF.collideWithObject + " RR: " + sdRightR.collideWithObject
                  + " RL: " + sdRearL.collideWithObject + " RR: " + sdRearR.collideWithObject
                  + " LF: " + sdLeftF.collideWithObject + " LR: " + sdLeftR.collideWithObject);
-                 */
+                 //*/
             }
         } else {
 

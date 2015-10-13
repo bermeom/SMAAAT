@@ -1,5 +1,6 @@
 package simulation.Agent;
 
+import BESA.ExceptionBESA;
 import BESA.Kernell.System.AdmBESA;
 import com.jme3.bullet.collision.PhysicsCollisionEvent;
 import com.jme3.bullet.collision.PhysicsCollisionListener;
@@ -23,6 +24,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simulation.Controls.BulletControl;
 import simulation.SmaaatApp;
 import simulation.Controls.WalkerNavControl;
@@ -51,6 +54,7 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
     protected WalkerNavControl wNavControl;
     protected String alias;
     protected AdmBESA admLocalBESA;
+    private double passwdAg;
     
     public Character(SmaaatApp app, String name, Vector3f position, Vector3f direction,float radius,AdmBESA admLocal) {
         this.admLocalBESA=admLocal;
@@ -59,11 +63,11 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
         this.alias=name;
         this.app = app;
         this.node = new Node("Node_" + name);
-
+        this.passwdAg=0.91;
         node.setLocalTranslation(position);
         //node.attachChild(createSpatialGeometry(name));
 
-        ((Spatial) (node)).setUserData(Const.Character, this);
+        //((Spatial) (node)).setUserData(Const.Character, this);
 
         shootingRestTime = Utils.randomInteger(100, 300);
         setupPhysics();
@@ -244,13 +248,22 @@ public abstract class Character implements Savable, PhysicsCollisionListener {
         this.node.removeFromParent();
         this.app.getPhysicsSpace().removeCollisionListener(this);
         this.app.getPhysicsSpace().remove(this.node.getControl(BetterCharacterControl.class));
-
+          System.out.println("KILLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+        if(this.admLocalBESA!=null){
+          
+            try {
+                this.admLocalBESA.killAgent(alias,  passwdAg);
+            } catch (ExceptionBESA ex) {
+                Logger.getLogger(Character.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void update(float tpf) {
         if (live <= 0) {
             killCharacter();
         } else {
+            //System.out.println(live);
             checkSeenObjects();
         }
     }

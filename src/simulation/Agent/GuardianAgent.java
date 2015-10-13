@@ -23,6 +23,8 @@ public class GuardianAgent extends Character {
         super(app, Const.GuardianAgent+id, position, direction,radius);
         node.attachChild(model);
         speed = (speed*0.6f);
+        this.atractionPoint=position;
+        
                 
     }
 
