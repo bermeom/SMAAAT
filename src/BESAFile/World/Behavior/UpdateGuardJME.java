@@ -53,7 +53,7 @@ public class UpdateGuardJME extends GuardBESA {
         if(data.getYpos()==0 && data.getXpos() < 0)
             angle = -FastMath.HALF_PI;
         if(data.getYpos()<0 && data.getXpos() == 0)
-            angle = FastMath.PI;
+            angle = FastMath.PI; 
         
         Vector3f modelForwardDir = s.getWorldRotation().mult(Vector3f.UNIT_Z.negate());
         Vector3f walkDirection = new Vector3f();
