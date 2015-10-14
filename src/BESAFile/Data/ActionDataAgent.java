@@ -6,6 +6,7 @@ package BESAFile.Data;
 
 import BESA.Kernell.Agent.Event.DataBESA;
 import BESAFile.Model.SeenObject;
+import BESAFile.Model.SeenWall;
 import java.util.List;
 
 /**
@@ -21,9 +22,17 @@ public class ActionDataAgent extends DataBESA {
     private String alias;
     private int type;
     protected  int idfloor;
-    public List<SeenObject> seenObjects;
+    private List<SeenObject> seenObjects;
+    private List<SeenWall> seenWalls;
 
-    
+    public ActionDataAgent(String alias, int type, List<SeenObject> seenObjects, List<SeenWall> seenWalls,String action) {
+        this.alias = alias;
+        this.type = type;
+        this.seenObjects = seenObjects;
+        this.seenWalls = seenWalls;
+        this.action=action;
+    }
+
     public ActionDataAgent(int type,String alias) {
         this.alias = alias;
         this.type = type;
@@ -98,6 +107,23 @@ public class ActionDataAgent extends DataBESA {
     public void setIdfloor(int idfloor) {
         this.idfloor = idfloor;
     }
+
+    public List<SeenObject> getSeenObjects() {
+        return seenObjects;
+    }
+
+    public void setSeenObjects(List<SeenObject> seenObjects) {
+        this.seenObjects = seenObjects;
+    }
+
+    public List<SeenWall> getSeenWalls() {
+        return seenWalls;
+    }
+
+    public void setSeenWalls(List<SeenWall> seenWalls) {
+        this.seenWalls = seenWalls;
+    }
+    
     
     
     

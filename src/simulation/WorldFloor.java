@@ -97,7 +97,7 @@ public class WorldFloor {
     
     public Geometry makeGridFloor(ColorRGBA color){
          Grid grid=new Grid(length+1,width+1, 2);
-         Geometry g = new Geometry("wireframe grid", grid );
+         Geometry g = new Geometry("GridFloor", grid );
          Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
          mat.getAdditionalRenderState().setWireframe(true);
          mat.setColor("Color", color);
@@ -107,7 +107,7 @@ public class WorldFloor {
     }    
     public Geometry makeFloor() {
         Box box = new Box(width, .2f, length);
-        Geometry floor = new Geometry("the Floor", box);
+        Geometry floor = new Geometry("Floor", box);
         floor.setLocalTranslation(x, y, z);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setTexture("ColorMap", 
@@ -119,7 +119,7 @@ public class WorldFloor {
 
     public Geometry makeWallFloor1() {
         Box box = new Box(.2f,high+.2f, length);
-        Geometry floor = new Geometry("the Floor", box);
+        Geometry floor = new Geometry("WallFloor1", box);
         floor.setLocalTranslation(x+width+0.2f, y+high, z);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setTexture("ColorMap", 
@@ -131,7 +131,7 @@ public class WorldFloor {
     
     public Geometry makeWallFloor2() {
         Box box = new Box(.2f,high+.2f, length);
-        Geometry floor = new Geometry("the Floor", box);
+        Geometry floor = new Geometry("WallFloor2", box);
         floor.setLocalTranslation(x-width-0.2f, y+high, z);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setTexture("ColorMap", 
@@ -143,7 +143,7 @@ public class WorldFloor {
     
     public Geometry makeWallFloor3() {
         Box box = new Box(width+.4f,high+.2f, .2f);
-        Geometry floor = new Geometry("the Floor", box);
+        Geometry floor = new Geometry("WallFloor3", box);
         floor.setLocalTranslation(x, y+high, z-length-.2f);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setTexture("ColorMap", 
@@ -155,7 +155,7 @@ public class WorldFloor {
 
     public Geometry makeWallFloor4() {
         Box box = new Box(width+.4f,high+.2f, .2f);
-        Geometry floor = new Geometry("the Floor", box);
+        Geometry floor = new Geometry("WallFloor4", box);
         floor.setLocalTranslation(x, y+high, z+length+.2f);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setTexture("ColorMap", 

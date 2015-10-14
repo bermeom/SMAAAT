@@ -11,6 +11,7 @@ import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.Vector3D;
 import BESAFile.Model.SeenObject;
+import BESAFile.Model.SeenWall;
 import BESAFile.World.State.WorldStateJME;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -34,60 +35,24 @@ public class SensorsAgentGuardJME extends GuardBESA{
             System.out.println("Sensing ->"+data.getAlias()+" <-");
             WorldStateJME state = (WorldStateJME)this.getAgent().getState();
             List<SeenObject> seenObjects=new ArrayList<SeenObject>();
-            state.getApp().getCharacterNode();
+            List<SeenWall> seenWalls=new ArrayList<SeenWall>();
             try {
                 //Sensor Object
-                List<Spatial> characters = state.getApp().getCharacterNode().getChildren();
-                Node node=(Node)state.getApp().getCharacterNode().getChild(data.getAlias());
-                Vector3f position = node.getWorldTranslation().clone();
-                System.out.println("Sensing ->"+characters.size()+" <-");
-                if (characters != null && characters.size() > 1) {
-                    for (Spatial s : characters) {
-                        //System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
-                        if (!s.equals(node) && !s.getName().toLowerCase().contains("debug")) {
-                            float distance = node.getWorldTranslation().distance(s.getWorldTranslation());
-                            //System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
-                            if (distance <= data.getSightRange()) {
-                                //System.out.println("OK "+s.getWorldTranslation()+" "+position);
-                                position.setY(position.getY()+(float) (data.getHeight()/2));
-                                Vector3f direction = s.getWorldTranslation().subtract(node.getWorldTranslation());
-                                position.addLocal(direction.normalize().mult((float)data.getRadius() + ((float)data.getRadius() * 0.1f)));
-                                Ray r = new Ray(position, direction.normalize());
-                                r.setLimit(data.getSightRange());
-                                CollisionResults results = new CollisionResults();
-                                state.getApp().getCharacterNode().collideWith(r, results);
-                                if (results.size() > 0) {
-                                    //System.out.println("+");
-                                    CollisionResult cr = results.getClosestCollision();
-                                    String name = cr.getGeometry().getParent().getName();
-                                    //System.out.println("Name"+name);
-                                    if (name != null && !name.equals("floor") && !name.toLowerCase().contains("debug")) {
-                                        seenObjects.add(new SeenObject(new Vector3D(((Node)s).getLocalTranslation().x, ((Node)s).getLocalTranslation().y, ((Node)s).getLocalTranslation().z),s.getName(), getType(s.getName())));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                print(seenObjects);
-                //*/
+                Node agent=(Node)state.getApp().getCharacterNode().getChild(data.getAlias());
+                Vector3f position = agent.getWorldTranslation().clone();
+                seenObjects=searchObjectsRangeSightRange(agent, position,data,state.getApp().getCharacterNode());
                 //Sensor FLOOR
-                
-                
-                
-                
-                
+                Node floor=state.getApp().getWallsFloors().get(data.getIdfloor());
+                seenWalls=searchWallsRangeSightRange(agent, position,data,state.getApp().getWallsFloors().get(data.getIdfloor()));
+                System.out.println("------------------ EXIT  ---------------");
                 //*/
             
             } catch (Exception e) {
-                System.out.println("ERREOR Sensing ->"+data.getAlias()+" <-");
+                System.out.println("ERREOR Sensing ->"+data.getAlias()+" <- "+e);
             }
-            
-            ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias());
-            sod.seenObjects = seenObjects;
-            sod.setAction("move");
+
+            ActionDataAgent sod = new ActionDataAgent(data.getAlias(),data.getType(),seenObjects,seenWalls,"move");
             Agent.sendMessage(AgentProtectorMoveGuard.class, data.getAlias(), sod );
-            
     }
 
     private int getType(String name) {
@@ -112,10 +77,83 @@ public class SensorsAgentGuardJME extends GuardBESA{
         }
     }
     
-    private void DetectionWalls(Node agent,Vector3f position,ActionDataAgent data){
-        
-    
+    private List<SeenObject> searchObjectsRangeSightRange(Node agent,Vector3f position,ActionDataAgent data,Node root){
+            List<SeenObject> seenObjects=new ArrayList<SeenObject>();
+            List<Spatial> characters = root.getChildren();
+            //System.out.println("Entro ->"+data.getAlias()+" Sensing ->"+characters.size()+" <-");
+            if (characters != null && characters.size() > 1) {
+                for (Spatial s : characters) {
+                    //System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
+                    if (!s.equals(agent) && !s.getName().toLowerCase().contains("debug")) {
+                        float distance = agent.getWorldTranslation().distance(s.getWorldTranslation());
+                        //System.out.println("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <- "+distance+" "+data.getSightRange());
+                        if (distance <= data.getSightRange()) {
+                            //System.out.println("OK "+s.getWorldTranslation()+" "+position);
+                            position.setY(position.getY()+(float) (data.getHeight()/2));
+                            Vector3f direction = s.getWorldTranslation().subtract(position);
+                            position.addLocal(direction.normalize().mult((float)data.getRadius() + ((float)data.getRadius() * 0.1f)));
+                            Ray r = new Ray(position, direction.normalize());
+                            r.setLimit(data.getSightRange());
+                            CollisionResults results = new CollisionResults();
+                            root.collideWith(r, results);
+                            if (results.size() > 0) {
+                                CollisionResult cr = results.getClosestCollision();
+                                String name = cr.getGeometry().getParent().getName();
+                                //System.out.println("+++++++ Name : "+name);
+                                if (name.equals(s.getName())) {
+                                    Vector3D positionS=new Vector3D(s.getLocalTranslation().x, s.getLocalTranslation().y, s.getLocalTranslation().z);
+                                    seenObjects.add(new SeenObject(positionS,name, getType(s.getName())));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            print(seenObjects);
+            return seenObjects;
     }
     
+    private List<SeenWall> searchWallsRangeSightRange(Node agent,Vector3f position,ActionDataAgent data,Node root){
+            List<SeenWall> seenWalls=new ArrayList<SeenWall>();
+            List<Spatial> characters = root.getChildren();
+            //System.out.println("Entro ->"+data.getAlias()+" Sensing ->"+characters.size()+" <-");
+            if (characters != null && characters.size() > 1) {
+                for (Spatial s : characters) {
+                    //System.out.print("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <-");
+                    if (!s.equals(agent) && !s.getName().toLowerCase().contains("debug")) {
+                        float distance = agent.getWorldTranslation().distance(s.getWorldTranslation());
+                        //System.out.println("NAME Sensing ->"+s.getName()+" "+s.getName().toLowerCase()+" <- "+distance+" "+data.getSightRange());
+                        if (distance <= data.getSightRange()) {
+                            
+                            position.setY(position.getY()+(float) (data.getHeight()/2));
+                            Vector3f direction = s.getWorldTranslation().subtract(position);
+                            position.addLocal(direction.normalize().mult((float)data.getRadius() + ((float)data.getRadius() * 0.5f)));
+                            Ray r = new Ray(position, direction.normalize());
+                            //System.out.println("OK "+position+" "+direction);
+                            //*/
+                            
+                            r.setLimit(data.getSightRange());
+                            CollisionResults results = new CollisionResults();
+                            root.collideWith(r, results);
+                            if (results.size() > 0) {
+                                CollisionResult cr = results.getClosestCollision();
+                                String name = cr.getGeometry().getParent().getName();
+                                //System.out.println("+++++++ Name : "+name+" "+results.size());
+                                if (name.equals("Walls"+data.getIdfloor())) {
+                                    Vector3D positionS=new Vector3D(s.getLocalTranslation().x, s.getLocalTranslation().y, s.getLocalTranslation().z);
+                                    seenWalls.add(new SeenWall(positionS,s.getName(), getType(s.getName())));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            /*
+            for(SeenWall so:seenWalls){
+                System.out.println(so.getName()+" "+so);
+            }*/
+            return seenWalls;
+    
+    }
     
 }

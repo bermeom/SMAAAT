@@ -41,6 +41,7 @@ public class SubscribeGuardJME extends GuardBESA {
         Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
         String evType="";
         switch(data.getType()){
+            //case(1): model=createModelProtector();evType=AgentProtectorMoveGuard.class.getName();  break;
             case(1): model=createModelProtector();evType=SubscribeResponseGuard.class.getName();  break;
             case(2): model=createModelExplorer();  break;
             case(3): model=createModelHostage();  break;
@@ -58,12 +59,13 @@ public class SubscribeGuardJME extends GuardBESA {
             node.addControl(physicsCharacter);
             ws.getApp().getPhysicsSpace().add(physicsCharacter);
             physicsCharacter.setViewDirection(direction);
-            //ws.getApp().getPhysicsSpace().addCollisionListener(this);
             //*/
             ws.getApp().getCharacterNode().attachChild(node);
             ws.addAgent(data.getAlias());
+           
             answer(true, data.getAlias(), evType);
         } catch (Exception e) {
+            ReportBESA.error(e);
             answer(false, data.getAlias(), evType);
         }
     

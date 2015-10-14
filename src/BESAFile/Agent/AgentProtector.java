@@ -25,7 +25,7 @@ import simulation.utils.Const;
  *
  * @author berme_000
  */
-public class AgentProtector extends AgentBESA {
+public class AgentProtector extends AgentBESA{
 
     public AgentProtector(String alias, StateBESA state, StructBESA structAgent, double passwd) throws KernellAgentExceptionBESA {
         super(alias, state, structAgent, passwd);
@@ -40,9 +40,9 @@ public class AgentProtector extends AgentBESA {
     @Override
     public void shutdownAgent() {
         ReportBESA.info("SHUTDOWN AGENT -> " + getAlias());
-
+    
     }
-
+    
     private void sendEventSubscribeJME() {
         AgentProtectorState state = (AgentProtectorState) this.state;
         SubscribeDataJME actionData = new SubscribeDataJME(state.getXpos(), state.getYpos(), state.getIdfloor(), this.getAlias(), state.getDirection(), 1, state.getRadius(), state.getHeight());
@@ -56,4 +56,6 @@ public class AgentProtector extends AgentBESA {
         }
         
     }
+   
+    
 }

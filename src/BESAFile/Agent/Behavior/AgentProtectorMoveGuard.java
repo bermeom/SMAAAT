@@ -38,7 +38,6 @@ public class AgentProtectorMoveGuard extends GuardBESA {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         try {
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
-
             switch (data.getAction()) {
                 case "move":
                     ReportBESA.info("-------------------Move:D--------- ");

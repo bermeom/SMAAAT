@@ -60,7 +60,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private DirectionalLight cameraLight;
     private BulletAppState bulletAppState;
     private Node ediffice;
-    private List<Node> floors;
+    private List<Node> wallsFloors;
     private ModelEdifice mEdifice;
     private Node characterNode;
     private float distBetweenFloors;
@@ -96,7 +96,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         consecutiveAgenEnemy=0;
         consecutiveAgenExplorer=0;
         consecutiveAgenHostage=0;
-        floors=new ArrayList<Node>();
+        wallsFloors=new ArrayList<Node>();
         createEdifice();
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
@@ -135,8 +135,11 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
             //createAgentEnemy(0, 5, 4, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 4, 4, new Vector3f(0, 0, -1));
-            //createAgentProtector(0, 5, 4, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 4, 4, new Vector3f(0, 0, 1));
+            
+            createAgentProtector(0, 5, 4, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 3, 3, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 5, 0, new Vector3f(0, 0, 1));
             
             /*
             createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
@@ -198,7 +201,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
-        struct.bindGuard(SubscribeResponseGuard.class);
+        struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -281,6 +284,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             ModelFloor mf= mEdifice.getFloor(n);
             WorldFloor we=new WorldFloor(assetManager, width, length, x, y-distBetweenFloors*n, z);
             Node floor=new Node("Floor"+n);
+            Node walls=new Node("Walls"+n);
             ediffice.attachChild(floor);
             floor.attachChild(we.makeFloor());
             floor.attachChild(we.makeGridFloor(ColorRGBA.Blue));
@@ -291,14 +295,15 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             for (int i=0;i<width;i++){
                 for (int j=0;j<length;j++){
                      switch(mf.get(i, j)){
-                         case 'H':floor.attachChild(we.makeWall("H"+n+""+i+""+j, i, j,false)); break;
-                         case 'V':floor.attachChild(we.makeWall("V"+n+""+i+""+j, i, j,true)); break;
-                         case 'b':floor.attachChild(we.makeCubeb("b"+n+""+i+""+j, i, j,0.3f)); break;
-                         case 'B':floor.attachChild(we.makeCubeB("B"+n+""+i+""+j, i, j)); break;
+                         case 'H':walls.attachChild(we.makeWall("H-"+n+"-"+i+"-"+j, i, j,false)); break;
+                         case 'V':walls.attachChild(we.makeWall("V-"+n+"-"+i+"-"+j, i, j,true)); break;
+                         case 'b':walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
+                         case 'B':walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, i, j)); break;
                      }
                 }
             }
-            floors.add(floor);
+            floor.attachChild(walls);
+            wallsFloors.add(walls);
         }
         rootNode.attachChild(   ediffice );
         
@@ -391,11 +396,18 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         /*wrlStruct.addBehavior("WorldBehavior");
         wrlStruct.bindGuard("WorldBehavior", GameGuard.class);
         */
+        /*
+        wrlStruct.addBehavior("ChangeBehavior");
+        wrlStruct.bindGuard("ChangeBehavior", SubscribeGuardJME.class);
+        wrlStruct.bindGuard("ChangeBehavior", SensorsAgentGuardJME.class);
+        //*/
         wrlStruct.addBehavior("SubscribeGuardJME");
         wrlStruct.addBehavior("SensorsAgentGuardJME");
-        wrlStruct.addBehavior("UpdateGuardJME");
         wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
         wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
+        
+        //*/
+        wrlStruct.addBehavior("UpdateGuardJME");
         wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
         
         WorldAgentJME wa = new WorldAgentJME(Const.World, ws, wrlStruct, passwdAg);
@@ -502,8 +514,12 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     public Node getRootNode(){
         return rootNode;
     }
-   
-   @Override
+
+    public List<Node> getWallsFloors() {
+        return wallsFloors;
+    }
+    
+    @Override
     public void destroy() {
         try {
             AdmBESA.getInstance().kill(passwdAg);
@@ -513,4 +529,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         super.destroy();
         //System.exit(0);
     }
+   
+   
 }

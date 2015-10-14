@@ -11,9 +11,9 @@ import BESAFile.Data.Vector3D;
  * @author berme_000
  */
 public class SeenObject {
-    private Vector3D position;
-    private String name;
-    private int type;
+    protected Vector3D position;
+    protected  String name;
+    protected  int type;
 
     public SeenObject(Vector3D position, String name, int type) {
         this.position = position;
@@ -49,7 +49,5 @@ public class SeenObject {
     public String toString() {
         return   " name= " + name +" position= " + position + " type=" + type ;
     }
-    
-     
     
 }

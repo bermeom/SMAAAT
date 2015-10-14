@@ -24,9 +24,9 @@ import com.jme3.scene.Spatial;
  *
  * @author berme_000
  */
-public class UpdateGuardJME extends GuardBESA {
+public class UpdateGuardJME extends GuardBESA{
 
-    @Override
+  @Override
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
@@ -45,9 +45,7 @@ public class UpdateGuardJME extends GuardBESA {
     public void moveAgent(ActionData data, WorldStateJME state) {
         Spatial s = state.getApp().getRootNode().getChild(data.getAlias());
         BetterCharacterControl control = s.getControl(BetterCharacterControl.class);
-
         float angle = 0;
-        
         if(data.getYpos()==0 && data.getXpos() > 0)
             angle = FastMath.HALF_PI;
         if(data.getYpos()==0 && data.getXpos() < 0)

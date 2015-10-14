@@ -58,7 +58,7 @@ public class Agent extends AgentBESA{
     
     }
     
-    public static void sendMessage(Class guard, String alias, DataBESA data) {
+     public static void sendMessage(Class guard, String alias, DataBESA data) {
         EventBESA ev = new EventBESA(guard.getName(), data);
         try {
             AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
@@ -67,5 +67,4 @@ public class Agent extends AgentBESA{
             Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 }

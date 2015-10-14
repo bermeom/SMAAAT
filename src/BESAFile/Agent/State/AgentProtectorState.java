@@ -37,7 +37,7 @@ public class AgentProtectorState   extends  StateBESA{
         this.direction = direction;
         this.radius = radius;
         this.height = radius*2;
-        this.sightRange = 2f;
+        this.sightRange = 3f;
     }
     
     public AgentProtectorState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height) {
@@ -48,7 +48,7 @@ public class AgentProtectorState   extends  StateBESA{
         this.direction = direction;
         this.radius = radius;
         this.height = height;
-        this.sightRange = 2f;
+        this.sightRange = 3f;
     }
 
     public ModelEdifice getEdifice() {
