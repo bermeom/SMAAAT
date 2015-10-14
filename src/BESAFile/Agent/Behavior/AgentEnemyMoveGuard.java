@@ -10,6 +10,7 @@ import BESA.Kernell.Agent.GuardBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
+import BESAFile.Agent.State.AgentEnemyState;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
@@ -20,7 +21,6 @@ import BESAFile.Data.Vector3D;
 import BESAFile.Model.SeenObject;
 import BESAFile.Model.SeenWall;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
-import BESAFile.World.Behavior.UpdateGuard;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Model.ModelEdifice;
 import java.util.ArrayDeque;
@@ -35,9 +35,9 @@ import simulation.utils.Const;
  *
  * @author berme_000
  */
-public class AgentProtectorMoveGuard extends GuardBESA {
-
-    private final int type=1;
+public class AgentEnemyMoveGuard  extends GuardBESA  {
+    
+    private final int type=4;
     @Override
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -70,7 +70,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
     }
 
     public void moveAgent(ActionDataAgent data,float speed) {
-        AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
+        AgentState state = (AgentState) this.getAgent().getState();
         System.out.println(data.getViewDirection());
         ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),speed);
         Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
@@ -137,7 +137,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
     }
 
     public void dataSensorRequest() {
-        AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
+        AgentState state = (AgentState) this.getAgent().getState();
         ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getIdfloor(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
@@ -222,7 +222,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
     
     
     private void ackSensor(ActionDataAgent data){
-            AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
+            AgentEnemyState state = (AgentEnemyState) this.getAgent().getState();
             List<SeenObject> enemies=new ArrayList<>();
             boolean [][]mat=new boolean[3][3];
             for (int i=0;i<3;i++){
@@ -329,5 +329,4 @@ public class AgentProtectorMoveGuard extends GuardBESA {
             ReportBESA.error(e);
         }
     }
-    
 }

@@ -31,6 +31,40 @@ public class SeenWall extends SeenObject{
     public String toString() {
         return "SeenWall{" + "xpos=" + xpos + ", ypos=" + ypos + ", idfloor=" + idfloor + ", wall=" + wall + '}';
     }
+
+    public int getXpos() {
+        return xpos;
+    }
+
+    public void setXpos(int xpos) {
+        this.xpos = xpos;
+    }
+
+    public int getYpos() {
+        return ypos;
+    }
+
+    public void setYpos(int ypos) {
+        this.ypos = ypos;
+    }
+
+    public int getIdfloor() {
+        return idfloor;
+    }
+
+    public void setIdfloor(int idfloor) {
+        this.idfloor = idfloor;
+    }
+
+    public char getWall() {
+        return wall;
+    }
+
+    public void setWall(char wall) {
+        this.wall = wall;
+    }
+    
+    
     
     
     

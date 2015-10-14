@@ -1,18 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
+ * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package BESAFile.Agent.State;
 
 import BESA.Kernell.Agent.StateBESA;
+import BESAFile.Data.Vector3D;
 import BESAFile.World.Model.ModelEdifice;
-import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
  *
- * @author angel
+ * @author berme_000
  */
 public class AgentState extends  StateBESA{
         
@@ -21,16 +20,38 @@ public class AgentState extends  StateBESA{
     protected  int ypos;
     protected  int idfloor;
     protected  String alias;
-    protected  Queue<Motion> possibleMotions;
+    protected Vector3D direction;
+    protected double radius;
+    protected double height;
+    protected float sightRange;
+    protected  Queue<Vector3D> possibleMotions;
+    protected int type;
     
-    
-    public AgentState(ModelEdifice edifice, int xpos, int ypos, int idfloor, String alias) {
-        this.edifice = edifice;
+
+    public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
         this.xpos = xpos;
         this.ypos = ypos;
-        this.idfloor = idfloor;
+        this.idfloor=idfloor;
         this.alias = alias;
-        possibleMotions=new ArrayDeque<Motion>();
+        this.direction = direction;
+        this.radius = radius;
+        this.height = radius*2;
+        this.sightRange = 3f;
+        this.type=0;
+        this.edifice=new ModelEdifice(width, length, nFlooors);
+    }
+    
+    public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
+        this.xpos = xpos;
+        this.ypos = ypos;
+        this.idfloor=idfloor;
+        this.alias = alias;
+        this.direction = direction;
+        this.radius = radius;
+        this.height = height;
+        this.sightRange = 3f;
+        this.type=0;
+        this.edifice=new ModelEdifice(width, length, nFlooors);
     }
 
     public ModelEdifice getEdifice() {
@@ -73,15 +94,56 @@ public class AgentState extends  StateBESA{
         this.alias = alias;
     }
 
-    public Queue<Motion> getPossibleMotions() {
+    public Vector3D getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Vector3D direction) {
+        this.direction = direction;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public Queue<Vector3D> getPossibleMotions() {
         return possibleMotions;
     }
 
-    public void setPossibleMotions(Queue<Motion> possibleMotions) {
+    public void setPossibleMotions(Queue<Vector3D> possibleMotions) {
         this.possibleMotions = possibleMotions;
     }
+
+    public float getSightRange() {
+        return sightRange;
+    }
+
+    public void setSightRange(float sightRange) {
+        this.sightRange = sightRange;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
     
+    public void setModelEdiffice(int idFloor,int i,int j,char value){
+        this.edifice.setPostGridFloor(idFloor, i, j, value);
+    }
     
-    
-        
 }

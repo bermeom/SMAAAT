@@ -9,7 +9,7 @@ package BESAFile;
 
 import BESAFile.Agent.Agent;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
-import BESAFile.Agent.State.AgentState;
+import BESAFile.Agent.State.AgentStateTest;
 import BESA.ExceptionBESA;
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.PeriodicGuardBESA;
@@ -74,7 +74,7 @@ public class SMAAAT {
         WorldAgent wa = new WorldAgent("WORLD", ws, wrlStruct, passwdAg);
         wa.start();
         
-        AgentState a1State = new AgentState(edifice,0,0,0,"a1");
+        AgentStateTest a1State = new AgentStateTest(edifice,0,0,0,"a1");
         StructBESA a1Struct = new StructBESA();
         a1Struct.addBehavior("agentMove");
         a1Struct.bindGuard("agentMove", AgentMoveGuard.class);
@@ -84,7 +84,7 @@ public class SMAAAT {
         agent.start();
         sendEventAgentMove( admLocal,new ActionData(a1State.getXpos(), a1State.getYpos(), a1State.getIdfloor(), a1State.getAlias(), "move"));
         
-        AgentState a2State = new AgentState(edifice,0,3,0,"a2");
+        AgentStateTest a2State = new AgentStateTest(edifice,0,3,0,"a2");
         StructBESA a2Struct = new StructBESA();
         a2Struct.addBehavior("agentMove");
         a2Struct.bindGuard("agentMove", AgentMoveGuard.class);

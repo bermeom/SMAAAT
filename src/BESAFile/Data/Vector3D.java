@@ -53,8 +53,33 @@ public class Vector3D {
         return  "x= " + x + ", y= " + y + ", z= " + z;
     }
     
+    public Vector3D normalize(){
+           double h=Math.sqrt(x*x+y*y+z*z);
+           return new Vector3D(x/h, y/h, z/h);
+    }
     
     
+    
+    private double floor(double a){
+        
+        double f=Math.abs(a);
+        double b=0;
+        if(f>0.41){
+             b=1;
+        }
+        if(a<0){
+            f=-b;
+        }else{
+            f=b;
+        }
+        return f;
+        
+    }
+    
+    public Vector3D normalize1(){
+           double h=Math.sqrt(x*x+z*z);
+           return new Vector3D((floor(x/h)), (y), (floor(z/h)));
+    }
     
     
 }

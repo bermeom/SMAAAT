@@ -8,12 +8,14 @@ package BESAFile.World.State;
 import BESA.Kernell.Agent.StateBESA;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelAgentWorld;
+import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import simulation.SmaaatApp;
+import simulation.utils.Const;
 
 /**
  *
@@ -21,19 +23,19 @@ import simulation.SmaaatApp;
  */
 public class WorldStateJME extends StateBESA{
     
-    private List<String> agents;
+    private Map<String,Node> agents;
     protected SmaaatApp app;
 
     public WorldStateJME(SmaaatApp app) {
         this.app=app;
-        agents=new ArrayList<String>();
+        agents=new HashMap<String, Node>();
     }
 
-    public List<String> getAgents() {
+    public Map<String, Node> getAgents() {
         return agents;
     }
 
-    public void setAgents(List<String> agents) {
+    public void setAgents(Map<String, Node> agents) {
         this.agents = agents;
     }
 
@@ -45,9 +47,16 @@ public class WorldStateJME extends StateBESA{
         this.app = app;
     }
     
-    public void addAgent(String agent){
-        agents.add(agent);
+    public void addAgent(String agent,Node node){
+        agents.put(agent,node);
     }
+    
+    public Node getNodeAgent(String agent){
+        return agents.get(agent);
+    }
+    
+
+    
     
 
     

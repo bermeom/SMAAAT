@@ -10,6 +10,8 @@ import BESA.Kernell.Agent.GuardBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
+import BESAFile.Agent.Behavior.AgentMoveGuard;
+import BESAFile.Agent.State.AgentExplorerState;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
@@ -20,7 +22,6 @@ import BESAFile.Data.Vector3D;
 import BESAFile.Model.SeenObject;
 import BESAFile.Model.SeenWall;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
-import BESAFile.World.Behavior.UpdateGuard;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Model.ModelEdifice;
 import java.util.ArrayDeque;
@@ -35,9 +36,9 @@ import simulation.utils.Const;
  *
  * @author berme_000
  */
-public class AgentProtectorMoveGuard extends GuardBESA {
-
-    private final int type=1;
+public class AgentExplorerMoveGuard extends GuardBESA  {
+    
+    private final int type=4;
     @Override
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -70,7 +71,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
     }
 
     public void moveAgent(ActionDataAgent data,float speed) {
-        AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
+        AgentState state = (AgentState) this.getAgent().getState();
         System.out.println(data.getViewDirection());
         ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),speed);
         Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
@@ -222,7 +223,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
     
     
     private void ackSensor(ActionDataAgent data){
-            AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
+            AgentExplorerState state = (AgentExplorerState) this.getAgent().getState();
             List<SeenObject> enemies=new ArrayList<>();
             boolean [][]mat=new boolean[3][3];
             for (int i=0;i<3;i++){
@@ -235,7 +236,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
                 switch(Const.getType(so.getName())){
                     case(1):break;//Protector
                     case(2):break;//Exprorator
-                    case(3):state.addHostage(so.getName()); break;//Hostage
+                    case(3):break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
                 }
             }
@@ -290,10 +291,6 @@ public class AgentProtectorMoveGuard extends GuardBESA {
                 System.out.println("");
             }
             
-            //System.out.println(state.getEdifice());
-            if(!state.getHostages().isEmpty()){
-                callHostages();
-            }
             if(!enemies.isEmpty()){
                 shootEnemies();
             }
@@ -329,5 +326,4 @@ public class AgentProtectorMoveGuard extends GuardBESA {
             ReportBESA.error(e);
         }
     }
-    
 }

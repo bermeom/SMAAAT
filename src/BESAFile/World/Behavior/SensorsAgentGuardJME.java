@@ -19,6 +19,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import de.lessvoid.nifty.elements.Action;
 import java.util.ArrayList;
 import java.util.List;
 import simulation.utils.Const;
@@ -36,40 +37,27 @@ public class SensorsAgentGuardJME extends GuardBESA{
             WorldStateJME state = (WorldStateJME)this.getAgent().getState();
             List<SeenObject> seenObjects=new ArrayList<SeenObject>();
             List<SeenWall> seenWalls=new ArrayList<SeenWall>();
+            Vector3f position ;
+            ActionDataAgent sod=new ActionDataAgent(data.getType(), data.getAlias(), "NACK_Sensor");
             try {
                 //Sensor Object
                 Node agent=(Node)state.getApp().getCharacterNode().getChild(data.getAlias());
-                Vector3f position = agent.getWorldTranslation().clone();
+                position = agent.getWorldTranslation().clone();
                 seenObjects=searchObjectsRangeSightRange(agent, position,data,state.getApp().getCharacterNode());
-                //Sensor FLOOR
-                Node floor=state.getApp().getWallsFloors().get(data.getIdfloor());
+                //Sensor FLOOR Node floor=state.getApp().getWallsFloors().get(data.getIdfloor());
                 seenWalls=searchWallsRangeSightRange(agent, position,data,state.getApp().getWallsFloors().get(data.getIdfloor()));
                 System.out.println("------------------ EXIT  ---------------");
                 //*/
+                position= agent.getWorldTranslation().clone();
+                sod = new ActionDataAgent(data.getAlias(),data.getType(),seenObjects,seenWalls,new Vector3D((double)position.x, (double)position.y, (double)position.z),"ACK_SENSOR");
             
             } catch (Exception e) {
                 System.out.println("ERREOR Sensing ->"+data.getAlias()+" <- "+e);
             }
-
-            ActionDataAgent sod = new ActionDataAgent(data.getAlias(),data.getType(),seenObjects,seenWalls,"move");
-            Agent.sendMessage(AgentProtectorMoveGuard.class, data.getAlias(), sod );
+            Agent.sendMessage(Const.getGuardMove(data.getType()), data.getAlias(), sod );
     }
 
-    private int getType(String name) {
-        if(name.contains(Const.GuardianAgent)){
-            return 1;
-        }
-        if(name.contains(Const.ExplorerAgent)){
-            return 2;
-        }
-        if(name.contains(Const.HostageAgent)){
-            return 3;
-        }
-        if(name.contains(Const.EnemyAgent)){
-            return 4;
-        }
-        return 0;
-    }
+    
 
     private void print(List<SeenObject> seenObjects) {
         for(SeenObject so:seenObjects){
@@ -102,7 +90,7 @@ public class SensorsAgentGuardJME extends GuardBESA{
                                 //System.out.println("+++++++ Name : "+name);
                                 if (name.equals(s.getName())) {
                                     Vector3D positionS=new Vector3D(s.getLocalTranslation().x, s.getLocalTranslation().y, s.getLocalTranslation().z);
-                                    seenObjects.add(new SeenObject(positionS,name, getType(s.getName())));
+                                    seenObjects.add(new SeenObject(positionS,name, Const.getType(s.getName())));
                                 }
                             }
                         }
@@ -141,7 +129,7 @@ public class SensorsAgentGuardJME extends GuardBESA{
                                 //System.out.println("+++++++ Name : "+name+" "+results.size());
                                 if (name.equals("Walls"+data.getIdfloor())) {
                                     Vector3D positionS=new Vector3D(s.getLocalTranslation().x, s.getLocalTranslation().y, s.getLocalTranslation().z);
-                                    seenWalls.add(new SeenWall(positionS,s.getName(), getType(s.getName())));
+                                    seenWalls.add(new SeenWall(positionS,s.getName(), Const.getType(s.getName())));
                                 }
                             }
                         }

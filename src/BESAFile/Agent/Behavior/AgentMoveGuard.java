@@ -5,8 +5,8 @@
  */
 package BESAFile.Agent.Behavior;
 
-import BESAFile.Agent.State.AgentState;
-import BESAFile.Agent.State.Motion;
+import BESAFile.Agent.State.AgentStateTest;
+import BESAFile.Agent.State.MotionTest;
 import BESA.ExceptionBESA;
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.GuardBESA;
@@ -54,8 +54,8 @@ public class AgentMoveGuard extends GuardBESA{
     }
     
     public void moveAgent(ActionData data) throws InterruptedException{
-            AgentState aState= (AgentState)this.getAgent().getState();
-            Queue<Motion> possibleMotions=(ArrayDeque<Motion>) aState.getPossibleMotions();
+            AgentStateTest aState= (AgentStateTest)this.getAgent().getState();
+            Queue<MotionTest> possibleMotions=(ArrayDeque<MotionTest>) aState.getPossibleMotions();
             if(possibleMotions.isEmpty()){
                 possibleMotions=generationPossibleMotions(aState);
                 if(possibleMotions.isEmpty()){
@@ -63,7 +63,7 @@ public class AgentMoveGuard extends GuardBESA{
                 }
                 aState.setPossibleMotions(possibleMotions);
             }
-            Motion m=possibleMotions.poll();
+            MotionTest m=possibleMotions.poll();
             ActionData actionData=new ActionData(m.getXpos(), m.getYpos(), m.getIdfloor(),aState.getAlias(), "move");
             EventBESA event = new EventBESA(UpdateGuard.class.getName(), actionData);
             AgHandlerBESA ah;
@@ -80,8 +80,8 @@ public class AgentMoveGuard extends GuardBESA{
     public boolean  intervalValidation(int n,int limit){
         return n>=0&&n<limit;
     }
-    public Queue<Motion> generationPossibleMotions(AgentState aState){
-            Queue<Motion> possibleMotions=new ArrayDeque<Motion>();
+    public Queue<MotionTest> generationPossibleMotions(AgentStateTest aState){
+            Queue<MotionTest> possibleMotions=new ArrayDeque<MotionTest>();
             ModelEdifice edifice=aState.getEdifice();
             int x,y,idFloor;
             x=aState.getXpos();y=aState.getYpos();idFloor=aState.getIdfloor();
@@ -101,7 +101,7 @@ public class AgentMoveGuard extends GuardBESA{
                 newX=movX[i]+x;
                 newY=movY[i]+y;
                 if (intervalValidation(newX,edifice.getWidth())&&intervalValidation(newY,edifice.getLength())&&edifice.getFloor(idFloor).get(newX, newY)=='0'){
-                   possibleMotions.add(new Motion(newX, newY, idFloor));
+                   possibleMotions.add(new MotionTest(newX, newY, idFloor));
                 }
             }
             
@@ -109,12 +109,12 @@ public class AgentMoveGuard extends GuardBESA{
     }
 
     private void moveACKAgent(ActionData data) throws InterruptedException {
-            AgentState aState= (AgentState)this.getAgent().getState();
+            AgentStateTest aState= (AgentStateTest)this.getAgent().getState();
             //System.out.println(" >>>>>>> "+aState.getXpos()+" - "+aState.getYpos());
             aState.setXpos(data.getXpos());
             aState.setYpos(data.getYpos());
             aState.setIdfloor(data.getIdfloor());
-            aState.setPossibleMotions(new ArrayDeque<Motion>() );
+            aState.setPossibleMotions(new ArrayDeque<MotionTest>() );
             data.setAlias(aState.getAlias());
             data.setAction("move");
             Thread.sleep(1000);

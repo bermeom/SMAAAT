@@ -6,16 +6,25 @@ import BESA.Kernell.Agent.StructBESA;
 import BESA.Kernell.System.AdmBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
+import BESAFile.Agent.AgentEnemy;
+import BESAFile.Agent.AgentExplorer;
+import BESAFile.Agent.AgentHostage;
 import BESAFile.Agent.AgentProtector;
+import BESAFile.Agent.Behavior.AgentEnemyMoveGuard;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Agent.Behavior.SubscribeResponseGuard;
+import BESAFile.Agent.State.AgentEnemyState;
+import BESAFile.Agent.State.AgentExplorerState;
+import BESAFile.Agent.State.AgentHostageState;
 import BESAFile.Agent.State.AgentProtectorState;
-import BESAFile.Agent.State.AgentState;
+import BESAFile.Agent.State.AgentStateTest;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
+import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
+import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
@@ -91,7 +100,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
     @Override
     public void simpleInitApp() {
-        distBetweenFloors=5;
+        distBetweenFloors= Const.distBetweenFloors;
         consecutiveAgenProtector=0;
         consecutiveAgenEnemy=0;
         consecutiveAgenExplorer=0;
@@ -135,11 +144,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
             //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
             //createAgentEnemy(0, 5, 4, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 4, 4, new Vector3f(0, 0, 1));
-            
-            createAgentProtector(0, 5, 4, new Vector3f(0, 0, 1));
-            createAgentProtector(0, 3, 3, new Vector3f(0, 0, 1));
-            createAgentProtector(0, 5, 0, new Vector3f(0, 0, 1));
+            createAgentEnemy(0, 9,9, new Vector3f(0, 0, -1));
+            createAgentEnemy(0, 1,1, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 1,1, new Vector3f(0, 0, -1));
+            createAgentExplorer(0, 0,8, new Vector3f(0, 0, -1));
+            createAgentHostage(0, 8,0, new Vector3f(0, 0, -1));
+           
+            /*
+            createAgentProtector(0, 5, 4, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 3, 3, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 5, 0, new Vector3f(0, 0, -1));
             
             /*
             createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
@@ -196,7 +210,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         GuardianAgent agente=new GuardianAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenProtector,0.75f,createModelProtector());
         System.out.println(agente.getNode().getControl(BetterCharacterControl.class));
         */
-        AgentProtectorState state = new AgentProtectorState(i,j,idFloor,Const.GuardianAgent+consecutiveAgenProtector,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.75f);
+        AgentProtectorState state = new AgentProtectorState(i,j,idFloor,Const.GuardianAgent+consecutiveAgenProtector,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.75f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
@@ -213,45 +227,64 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
      private void createAgentEnemy(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
         //EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy(),admLocal);
-        EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy());
-        /*AgentProtectorState state = new AgentProtectorState(agente,mEdifice,i,j,idFloor,agente.getAlias());
+        //EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy());
+        AgentEnemyState state = new AgentEnemyState(i,j,idFloor,Const.EnemyAgent+consecutiveAgenEnemy,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.75f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
-        struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
-        AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
-        agent.start();*/
+        struct.bindGuard("agentMove", AgentEnemyMoveGuard.class);
+        struct.addBehavior("SubscribeResponseGuard");
+        struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        
+        AgentEnemy agent = new AgentEnemy(state.getAlias(), state, struct, passwdAg);
+        agent.start();
         consecutiveAgenEnemy++;
      }
      
      private void createAgentHostage(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
-    
-        //HostageAgent agente=new HostageAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenHostage,0.5f,createModelHostage(),admLocal);
-        HostageAgent agente=new HostageAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenHostage,0.5f,createModelHostage());
+        AgentHostageState state = new AgentHostageState(i,j,idFloor,Const.HostageAgent+consecutiveAgenHostage,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.75f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
+        StructBESA struct = new StructBESA();
+        struct.addBehavior("agentMove");
+        struct.bindGuard("agentMove", AgentHostageMoveGuard.class);
+        struct.addBehavior("SubscribeResponseGuard");
+        struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        
+        AgentHostage agent = new AgentHostage(state.getAlias(), state, struct, passwdAg);
+        agent.start();
+        
         consecutiveAgenHostage++;
      }
      
      private void createAgentExplorer(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
         //ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer(),admLocal);
-        ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer());
+        //ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer());
+        AgentExplorerState state = new AgentExplorerState(i,j,idFloor,Const.ExplorerAgent+consecutiveAgenExplorer,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.75f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
+        StructBESA struct = new StructBESA();
+        struct.addBehavior("agentMove");
+        struct.bindGuard("agentMove", AgentExplorerMoveGuard.class);
+        struct.addBehavior("SubscribeResponseGuard");
+        struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        
+        AgentExplorer agent = new AgentExplorer(state.getAlias(), state, struct, passwdAg);
+        agent.start();
         consecutiveAgenExplorer++;
      }
     
-    private Vector3f getPositionVirtiul(int idFloor,int i,int j){
+    public Vector3f getPositionVirtiul(int idFloor,int i,int j){
         return new Vector3f(x+width-post(i), y-distBetweenFloors*idFloor+1, z+length-post(j));
         
     }
     
-    private int post(int i){
+    public int post(int i){
         return i*2+1;
     }
     private void createEdifice(){
-        width=10;
-        length=10;
-        x=0;
-        y=0;
-        z=0;
-        nFloors=2;
+        width=Const.width;
+        length=Const.length;
+        x=Const.x;
+        y=Const.y;
+        z=Const.z;
+        nFloors=Const.nFloors;
         mEdifice=new ModelEdifice(width, length, nFloors);
         for (int i=0;i<nFloors;i++){
             mEdifice.setPostGridFloor(i,4 ,0, 'H');
@@ -271,9 +304,10 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             mEdifice.setPostGridFloor(i,9,4, 'B');
             mEdifice.setPostGridFloor(i,4,3, 'H');
             mEdifice.setPostGridFloor(i,9 ,0, 'B');
+            mEdifice.setPostGridFloor(i,1 ,0, 'B');
             mEdifice.setPostGridFloor(i,9 ,9, 'E');
         }
-        //System.out.println(mEdifice);
+        System.out.println(mEdifice);
         createVirtualEdifice();
     }
     
@@ -292,13 +326,14 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             floor.attachChild(we.makeWallFloor2());
             floor.attachChild(we.makeWallFloor3());
             floor.attachChild(we.makeWallFloor4());
+            
             for (int i=0;i<width;i++){
                 for (int j=0;j<length;j++){
                      switch(mf.get(i, j)){
-                         case 'H':walls.attachChild(we.makeWall("H-"+n+"-"+i+"-"+j, i, j,false)); break;
-                         case 'V':walls.attachChild(we.makeWall("V-"+n+"-"+i+"-"+j, i, j,true)); break;
-                         case 'b':walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
-                         case 'B':walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, i, j)); break;
+                         case 'H':walls.attachChild(we.makeWall("H-"+n+"-"+i+"-"+j, j, i,true)); break;
+                         case 'V':walls.attachChild(we.makeWall("V-"+n+"-"+i+"-"+j, j, i,false)); break;
+                         case 'b':walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, j, i,0.3f)); break;
+                         case 'B':walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, j, i)); break;
                      }
                 }
             }

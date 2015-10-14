@@ -5,14 +5,14 @@
  */
 package BESAFile.Agent.kidnaped.State;
 
-import BESAFile.Agent.State.AgentState;
+import BESAFile.Agent.State.AgentStateTest;
 import BESAFile.World.Model.ModelEdifice;
 
 /**
  *
  * @author angel
  */
-public class KidnapedState extends  AgentState{
+public class KidnapedState extends  AgentStateTest{
 
     public KidnapedState(ModelEdifice edifice, int xpos, int ypos, int idfloor, String alias) {
         super(edifice, xpos, ypos, idfloor, alias);

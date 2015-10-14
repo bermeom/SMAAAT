@@ -9,13 +9,9 @@ import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.GuardBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
-import BESAFile.Agent.Behavior.AgentMoveGuard;
-import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Agent.Behavior.SubscribeResponseGuard;
 import BESAFile.Data.ActionDataAgent;
-import BESAFile.Data.SubscribeData;
 import BESAFile.Data.SubscribeDataJME;
-import BESAFile.World.State.WorldState;
 import BESAFile.World.State.WorldStateJME;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.material.Material;
@@ -40,9 +36,9 @@ public class SubscribeGuardJME extends GuardBESA {
         Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getXpos(), data.getYpos());
         Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
         String evType="";
+        evType=SubscribeResponseGuard.class.getName();
         switch(data.getType()){
-            //case(1): model=createModelProtector();evType=AgentProtectorMoveGuard.class.getName();  break;
-            case(1): model=createModelProtector();evType=SubscribeResponseGuard.class.getName();  break;
+            case(1): model=createModelProtector();  break;
             case(2): model=createModelExplorer();  break;
             case(3): model=createModelHostage();  break;
             case(4): model=createModelEnemy();  break;
@@ -61,7 +57,7 @@ public class SubscribeGuardJME extends GuardBESA {
             physicsCharacter.setViewDirection(direction);
             //*/
             ws.getApp().getCharacterNode().attachChild(node);
-            ws.addAgent(data.getAlias());
+            ws.addAgent(data.getAlias(),node);
            
             answer(true, data.getAlias(), evType);
         } catch (Exception e) {

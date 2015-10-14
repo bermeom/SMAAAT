@@ -5,7 +5,7 @@
  */
 package BESAFile.Agent;
 
-import BESAFile.Agent.State.AgentState;
+import BESAFile.Agent.State.AgentStateTest;
 import BESA.ExceptionBESA;
 import BESA.Kernell.Agent.AgentBESA;
 import BESA.Kernell.Agent.Event.DataBESA;
@@ -36,7 +36,7 @@ public class Agent extends AgentBESA{
     public void setupAgent() {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         ReportBESA.info("SETUP AGENT -> " + getAlias());
-        AgentState as = (AgentState)this.getState();
+        AgentStateTest as = (AgentStateTest)this.getState();
         SubscribeData data =new SubscribeData(as.getXpos(), as.getYpos(), as.getIdfloor(), as.getAlias());
         EventBESA event = new EventBESA(SubscribeGuard.class.getName(), data);
         AgHandlerBESA ah;

@@ -24,34 +24,59 @@ public class ActionDataAgent extends DataBESA {
     protected  int idfloor;
     private List<SeenObject> seenObjects;
     private List<SeenWall> seenWalls;
-
-    public ActionDataAgent(String alias, int type, List<SeenObject> seenObjects, List<SeenWall> seenWalls,String action) {
-        this.alias = alias;
-        this.type = type;
-        this.seenObjects = seenObjects;
-        this.seenWalls = seenWalls;
-        this.action=action;
-    }
+    private Vector3D viewDirection;
+    private Vector3D position;
+    
 
     public ActionDataAgent(int type,String alias) {
         this.alias = alias;
         this.type = type;
     }
+
+    public ActionDataAgent(int type,String alias,String action) {
+        this.alias = alias;
+        this.type = type;
+        this.action=action;
+    }
+
+    public ActionDataAgent(int type,String alias,String action,Vector3D viewDirection) {
+        this.alias = alias;
+        this.type = type;
+        this.action=action;
+        this.viewDirection=viewDirection;
+    }
     
-    public ActionDataAgent(int idfloor,float sightRange, double radius, double height, String alias, String action) {
+    
+    public ActionDataAgent(int type,int idfloor,float sightRange, double radius, double height, String alias, String action) {
         this.idfloor=idfloor;
         this.sightRange = sightRange;
         this.radius = radius;
         this.height = height;
         this.action = action;
         this.alias = alias;
+        this.type = type;
     }
     
     public ActionDataAgent(String action) {
-        this.sightRange = sightRange;
         this.action = action;
     }
 
+    //Response 
+    public ActionDataAgent(String action,Vector3D viewDirection) {
+        this.action = action;
+        this.viewDirection=viewDirection;
+        
+    }
+    
+    public ActionDataAgent(String alias, int type, List<SeenObject> seenObjects, List<SeenWall> seenWalls,Vector3D position,String action) {
+        this.alias = alias;
+        this.type = type;
+        this.seenObjects = seenObjects;
+        this.seenWalls = seenWalls;
+        this.action=action;
+        this.position=position;
+       
+    }
     public String getAction() {
         return action;
     }
@@ -123,6 +148,25 @@ public class ActionDataAgent extends DataBESA {
     public void setSeenWalls(List<SeenWall> seenWalls) {
         this.seenWalls = seenWalls;
     }
+
+    public Vector3D getViewDirection() {
+        return viewDirection;
+    }
+
+    public void setViewDirection(Vector3D viewDirection) {
+        this.viewDirection = viewDirection;
+    }
+
+    public Vector3D getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector3D position) {
+        this.position = position;
+    }
+    
+    
+    
     
     
     
