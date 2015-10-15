@@ -13,7 +13,6 @@ import BESA.Kernell.Agent.StructBESA;
 import BESA.Kernell.System.AdmBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
-import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;

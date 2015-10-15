@@ -35,8 +35,7 @@ public class SubscribeGuardJME extends GuardBESA {
         Spatial model=createSpatialGeometry(data.getAlias(),(float)data.getRadius(),(float)data.getHeight(),1);
         Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getXpos(), data.getYpos());
         Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
-        String evType="";
-        evType=SubscribeResponseGuard.class.getName();
+        String evType=SubscribeResponseGuard.class.getName();
         switch(data.getType()){
             case(1): model=createModelProtector();  break;
             case(2): model=createModelExplorer();  break;
@@ -71,7 +70,6 @@ public class SubscribeGuardJME extends GuardBESA {
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentProtector/ED-209.j3o");
         machineSpatial.scale(.25f);
-       
         //machineSpatial.rotate(0, FastMath.PI, 0);
         machineSpatial.setLocalTranslation(0, 0, 0.2f);
         //machineSpatial.setMaterial(mat1);

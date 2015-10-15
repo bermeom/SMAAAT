@@ -26,6 +26,7 @@ public class AgentState extends  StateBESA{
     protected float sightRange;
     protected  Queue<Vector3D> possibleMotions;
     protected int type;
+    protected double speed;
     
 
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
@@ -39,6 +40,7 @@ public class AgentState extends  StateBESA{
         this.sightRange = 3f;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
+        this.speed=3;
     }
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
@@ -52,6 +54,7 @@ public class AgentState extends  StateBESA{
         this.sightRange = 3f;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
+        this.speed=3;
     }
 
     public ModelEdifice getEdifice() {
@@ -145,5 +148,14 @@ public class AgentState extends  StateBESA{
     public void setModelEdiffice(int idFloor,int i,int j,char value){
         this.edifice.setPostGridFloor(idFloor, i, j, value);
     }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+    
     
 }

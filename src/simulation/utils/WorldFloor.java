@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package simulation;
+package simulation.utils;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -96,7 +96,7 @@ public class WorldFloor {
     }
     
     public Geometry makeGridFloor(ColorRGBA color){
-         Grid grid=new Grid(length+1,width+1, 2);
+         Grid grid=new Grid(2*length+1,2*width+1, 1);
          Geometry g = new Geometry("GridFloor", grid );
          Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
          mat.getAdditionalRenderState().setWireframe(true);

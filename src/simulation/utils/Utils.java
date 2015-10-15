@@ -1,5 +1,6 @@
 package simulation.utils;
 
+import BESAFile.Data.Vector3D;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -69,4 +70,39 @@ public class Utils {
         int randomNum = rand.nextInt((max - min) + 1) + min;
         return randomNum;
     }
+    
+    public static Vector3D direction(int i,int j){
+            int x,z;
+            if (i == 1){
+                z=0;
+                if (j == 0){
+                    x=-1;
+                    }else {
+                            x=1;
+                        }
+                }else if (j == 1){
+                        x=0;
+                        if (j == 0){
+                            z=-1;
+                            }else{
+                                    z=1;
+                                }
+                        }else{
+                                if(i==0&&j==2){
+                                    z=-1;
+                                    x=1;
+                                }else if (i==2&&j==0){
+                                            z=1;
+                                            x=-1;
+                                        }else{
+                                            x=i-1;
+                                            z=j-1;
+                                            }
+
+                            }
+            return (new Vector3D(x, 0, z));
+        
+    }
+    
+    
 }

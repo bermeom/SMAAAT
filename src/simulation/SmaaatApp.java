@@ -1,5 +1,6 @@
 package simulation;
 
+import simulation.utils.WorldFloor;
 import BESA.ExceptionBESA;
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.StructBESA;
@@ -140,41 +141,28 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         characterNode = new Node();
         try {
             setupBesa();
-            //new EnemyAgent(this, getPositionVirtiul(0, 5, 5), new Vector3f(0, 0, -1),""+1,0.75f,createModelEnemy());
-            //new HostageAgent(this, getPositionVirtiul(0, 3, 4), new Vector3f(1, 0, 0),""+1,0.5f,createModelHostage());
-            //new ExplorerAgent(this, getPositionVirtiul(0, 4, 4), new Vector3f(-1, 0, 0),""+1,0.75f,createModelExplorer());
-            //createAgentEnemy(0, 5, 4, new Vector3f(0, 0, -1));
+            createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 0,8, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 0,0, new Vector3f(0, 0, -1));
+            createAgentExplorer(0, 1,7, new Vector3f(0, 0, -1));
+            createAgentExplorer(0, 5,5, new Vector3f(0, 0, -1));
+            createAgentHostage(0, 8,1, new Vector3f(0, 0, -1));
+            createAgentHostage(0, 8,2, new Vector3f(0, 0, -1));
+            createAgentHostage(0, 8,3, new Vector3f(0, 0, -1));
             createAgentEnemy(0, 9,9, new Vector3f(0, 0, -1));
             createAgentEnemy(0, 1,1, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 1,1, new Vector3f(0, 0, -1));
-            createAgentExplorer(0, 0,8, new Vector3f(0, 0, -1));
-            createAgentHostage(0, 8,0, new Vector3f(0, 0, -1));
-           
-            /*
-            createAgentProtector(0, 5, 4, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 3, 3, new Vector3f(0, 0, -1));
-            createAgentProtector(0, 5, 0, new Vector3f(0, 0, -1));
             
-            /*
-            createAgentProtector(0, 9, 9, new Vector3f(0, 0, -1));
-            createAgentEnemy(0, 0, 9, new Vector3f(0, 0, 1));
-            createAgentHostage(0, 3, 4, new Vector3f(1, 0, 0));
-            createAgentHostage(0, 5, 4, new Vector3f(1, 0, 0));
-            createAgentHostage(0, 2, 2, new Vector3f(1, 0, 0));
-            createAgentExplorer(0, 6, 4, new Vector3f(-1, 0, 0));
+            /*    
+            createAgentProtector(1, 2,1, new Vector3f(0, 0, 1));
+            createAgentProtector(1, 0,1, new Vector3f(0, 0, 1));
+            createAgentExplorer(1, 0,8, new Vector3f(0, 0, -1));
+            createAgentHostage(1, 8,0, new Vector3f(0, 0, -1));
+            createAgentEnemy(1, 9,9, new Vector3f(0, 0, -1));
+            createAgentEnemy(1, 1,1, new Vector3f(0, 0, -1));
             //*/
         } catch (ExceptionBESA ex) {
             Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /*
-        new GuardianAgent(this, new Vector3f(-4.5f, 1, 2), new Vector3f(0, 0, -1));
-        new EnemyAgent(this, new Vector3f(3, 1, 1), new Vector3f(0, 0, 1));
-        new EnemyAgent(this, new Vector3f(2, 1, -2), new Vector3f(0, 0, 1));
-        new EnemyAgent(this, new Vector3f(-4, 1, -2), new Vector3f(0, 0, 1));
-        new HostageAgent(this, new Vector3f(-1, 1, 2), new Vector3f(1, 0, 0));
-        new HostageAgent(this, new Vector3f(-1, 1, -0.5f), new Vector3f(1, 0, 0));
-        new ExplorerAgent(this, new Vector3f(-3, 1, -1), new Vector3f(-1, 0, 0));
-        */
         //Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
         
         rootNode.attachChild(characterNode);
@@ -326,7 +314,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             floor.attachChild(we.makeWallFloor2());
             floor.attachChild(we.makeWallFloor3());
             floor.attachChild(we.makeWallFloor4());
-            
             for (int i=0;i<width;i++){
                 for (int j=0;j<length;j++){
                      switch(mf.get(i, j)){
@@ -337,6 +324,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
                      }
                 }
             }
+            
             floor.attachChild(walls);
             wallsFloors.add(walls);
         }

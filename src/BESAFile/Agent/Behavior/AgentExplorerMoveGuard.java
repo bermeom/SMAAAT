@@ -12,7 +12,6 @@ import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.State.AgentExplorerState;
-import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
 import BESAFile.Agent.State.MotionTest;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import simulation.utils.Const;
+import simulation.utils.Utils;
 
 /**
  *
@@ -47,7 +47,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             switch (data.getAction()) {
                 case "move":
                     ReportBESA.info("-------------------Move:D--------- ");
-                    moveAgent(data,3);
+                    moveAgent(data);
 
                     break;
                 case "NAK":
@@ -56,7 +56,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                     break;
                 case "ACK":
                      System.out.println("-------------------ACK:D--------- ");
-                     Thread.sleep(900);
+                     Thread.sleep(Const.sleep);
                      msnSensor();
                     //moveACKAgent(data);
                     break;
@@ -70,10 +70,10 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         }
     }
 
-    public void moveAgent(ActionDataAgent data,float speed) {
+    public void moveAgent(ActionDataAgent data) {
         AgentState state = (AgentState) this.getAgent().getState();
         System.out.println(data.getViewDirection());
-        ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),speed);
+        ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),(float)state.getSpeed());
         Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
 
     }
@@ -138,7 +138,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     }
 
     public void dataSensorRequest() {
-        AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
+        AgentState state = (AgentState) this.getAgent().getState();
         ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getIdfloor(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
@@ -155,13 +155,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         return Math.abs(a-b)<=delta;
     } 
     
-    private boolean positionEqual(Vector3D pActual,Vector3D p,double delta){
-            return  compareDistance(pActual.getX(),p.getX(), delta)&&compareDistance(pActual.getY(),p.getY(), delta)&&compareDistance(pActual.getZ(),p.getZ(), delta);
-    }
-   
     private Vector3D vectorDirection(Vector3D f,Vector3D a){
-            System.out.println("f "+f);
-            System.out.println("a "+a);
             return (new Vector3D((a.getX()-f.getX()), a.getY()-f.getY(), a.getZ()-f.getZ())).normalize1();
         
     }
@@ -172,27 +166,22 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         double borderZPlus=Const.z+Const.length;
         double borderZMinus=Const.z-Const.length;
         double delta=1.8f;
-        System.out.println(position.getX()+" "+position.getZ()+" "+borderZMinus);
         if(compareDistance(borderXPlus,position.getX(), delta-0.5)){
-            System.out.println("x+");
             for(int i=0;i<3;i++){
                 mat[i][2]=false;
             }
         }
         if(compareDistance(borderXMinus,position.getX(),  delta)){
-            System.out.println("x-");
             for(int i=0;i<3;i++){
                 mat[i][0]=false;
             }
         }
         if (compareDistance(borderZPlus,position.getZ(),  delta)){
-            System.out.println("z+");
             for(int i=0;i<3;i++){
                 mat[2][i]=false;
             }
         }
         if(compareDistance(borderZMinus,position.getZ(),  delta)){
-            System.out.println("z-");
             for(int i=0;i<3;i++){
                 mat[0][i]=false;
             }
@@ -239,79 +228,58 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                     case(3):break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
                 }
+                Vector3D directionObst=(vectorDirection(data.getPosition(), so.getPosition()));
+                mat[(int)(1+directionObst.getZ())][(int)(1+directionObst.getX())]=false;
             }
             for(SeenWall sw:data.getSeenWalls()){
                 state.setModelEdiffice(sw.getIdfloor(), sw.getXpos(), sw.getYpos(), sw.getWall());
                 Vector3D directionObst=(vectorDirection(data.getPosition(), sw.getPosition()));
                 mat[(int)(1+directionObst.getZ())][(int)(1+directionObst.getX())]=false;
-                System.out.println(directionObst);
             }
             
             mat=border(mat, data.getPosition(), pos);
             mat[1][1]=false;
             List<Vector3D> motions=new ArrayList<>();
+            boolean sw=false;
             for (int i=0;i<3;i++){
                 for (int j=0;j<3;j++){
-                  
                     if(mat[i][j]){
-                        int x,z;
-                        if(i==1){
-                            z=0;
-                            if(j==0){
-                                x=-1;
-                            }else{
-                                x=1;
-                            }
-                        }else if(j==1){
-                                x=0;
-                                if(j==0){
-                                    z=-1;
-                                }else{
-                                    z=1;
-                                }
-                            }else{
-                                if(i==0&&j==2){
-                                    z=-1;
-                                    x=1;
-                                }else if (i==2&&j==0){
-                                            z=1;
-                                            x=-1;
-                                        }else{
-                                            x=i-1;
-                                            z=j-1;
-                                            }
-                                  
-                                }
-                        motions.add(new Vector3D(x, 0, z));
-                        System.out.print("0 ");
-                    }else
-                        System.out.print("1 ");
-                    
+                        motions.add(Utils.direction(i, j));
+                        if(motions.get(motions.size()-1).isEquals(state.getDirection(), 0.1)){
+                            //sw=true;
+                        }
+                    }
                 }
-                System.out.println("");
             }
             
             if(!enemies.isEmpty()){
                 shootEnemies();
             }
-            Random random=new Random(System.currentTimeMillis());
-            Vector3D direction=motions.get(random.nextInt(motions.size()));
-            if(motions.size()==8){
+            Vector3D direction;
+            if(sw){
                 direction=state.getDirection();
-            }            
-            //System.out.println(direction);
+            }else{
+                if (motions.size()>0){
+                    Random random=new Random(System.currentTimeMillis());
+                    direction=motions.get(random.nextInt(motions.size()));
+                    if(motions.size()==8){
+                        direction=state.getDirection();
+                    }
+                }else{
+                    direction=new Vector3D();
+                }     
+            }
             state.setDirection(direction);
             ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias(),"move",direction);
-            //System.out.println(Const.getGuardMove(state.getType()).getName());
             Agent.sendMessage(Const.getGuardMove(state.getType()), data.getAlias(), sod );
     }
 
     private void callHostages() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
     }
 
     private void shootEnemies() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+   
     }
 
     private void msnSensor() {

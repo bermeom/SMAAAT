@@ -62,8 +62,9 @@ public class ActionDataAgent extends DataBESA {
     }
 
     //Response 
-    public ActionDataAgent(String action,Vector3D viewDirection) {
+    public ActionDataAgent(String action,String alias,Vector3D viewDirection) {
         this.action = action;
+        this.alias=alias;
         this.viewDirection=viewDirection;
         
     }

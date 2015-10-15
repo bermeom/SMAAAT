@@ -75,7 +75,7 @@ public class UpdateGuardJME extends GuardBESA{
         
         //*/
         
-        ActionDataAgent ad =new ActionDataAgent("ACK",new Vector3D(viewDirection.x,viewDirection.y, viewDirection.z));
+        ActionDataAgent ad =new ActionDataAgent("ACK",data.getAlias(),new Vector3D(viewDirection.x,viewDirection.y, viewDirection.z));
         Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
         
     }

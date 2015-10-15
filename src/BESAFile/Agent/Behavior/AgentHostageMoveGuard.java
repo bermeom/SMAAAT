@@ -12,7 +12,6 @@ import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
 import BESAFile.Agent.State.AgentEnemyState;
 import BESAFile.Agent.State.AgentHostageState;
-import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
 import BESAFile.Agent.State.MotionTest;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import simulation.utils.Const;
+import simulation.utils.Utils;
 
 /**
  *
@@ -47,7 +47,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
             switch (data.getAction()) {
                 case "move":
                     ReportBESA.info("-------------------Move:D--------- ");
-                    moveAgent(data,3);
+                    moveAgent(data);
 
                     break;
                 case "NAK":
@@ -56,7 +56,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                     break;
                 case "ACK":
                      System.out.println("-------------------ACK:D--------- ");
-                     Thread.sleep(900);
+                     Thread.sleep(Const.sleep);
                      msnSensor();
                     //moveACKAgent(data);
                     break;
@@ -70,13 +70,14 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
         }
     }
 
-    public void moveAgent(ActionDataAgent data,float speed) {
+    public void moveAgent(ActionDataAgent data) {
         AgentState state = (AgentState) this.getAgent().getState();
         System.out.println(data.getViewDirection());
-        ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),speed);
+        ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),(float)state.getSpeed());
         Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
 
     }
+
 
     public boolean intervalValidation(int n, int limit) {
         return n >= 0 && n < limit;
@@ -155,13 +156,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
         return Math.abs(a-b)<=delta;
     } 
     
-    private boolean positionEqual(Vector3D pActual,Vector3D p,double delta){
-            return  compareDistance(pActual.getX(),p.getX(), delta)&&compareDistance(pActual.getY(),p.getY(), delta)&&compareDistance(pActual.getZ(),p.getZ(), delta);
-    }
-   
     private Vector3D vectorDirection(Vector3D f,Vector3D a){
-            System.out.println("f "+f);
-            System.out.println("a "+a);
             return (new Vector3D((a.getX()-f.getX()), a.getY()-f.getY(), a.getZ()-f.getZ())).normalize1();
         
     }
@@ -172,27 +167,22 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
         double borderZPlus=Const.z+Const.length;
         double borderZMinus=Const.z-Const.length;
         double delta=1.8f;
-        System.out.println(position.getX()+" "+position.getZ()+" "+borderZMinus);
         if(compareDistance(borderXPlus,position.getX(), delta-0.5)){
-            System.out.println("x+");
             for(int i=0;i<3;i++){
                 mat[i][2]=false;
             }
         }
         if(compareDistance(borderXMinus,position.getX(),  delta)){
-            System.out.println("x-");
             for(int i=0;i<3;i++){
                 mat[i][0]=false;
             }
         }
         if (compareDistance(borderZPlus,position.getZ(),  delta)){
-            System.out.println("z+");
             for(int i=0;i<3;i++){
                 mat[2][i]=false;
             }
         }
         if(compareDistance(borderZMinus,position.getZ(),  delta)){
-            System.out.println("z-");
             for(int i=0;i<3;i++){
                 mat[0][i]=false;
             }
@@ -222,6 +212,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
     }
     
     
+    
     private void ackSensor(ActionDataAgent data){
             AgentHostageState state = (AgentHostageState) this.getAgent().getState();
             List<SeenObject> enemies=new ArrayList<>();
@@ -239,12 +230,13 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                     case(3): break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
                 }
+                Vector3D directionObst=(vectorDirection(data.getPosition(), so.getPosition()));
+                mat[(int)(1+directionObst.getZ())][(int)(1+directionObst.getX())]=false;
             }
             for(SeenWall sw:data.getSeenWalls()){
                 state.setModelEdiffice(sw.getIdfloor(), sw.getXpos(), sw.getYpos(), sw.getWall());
                 Vector3D directionObst=(vectorDirection(data.getPosition(), sw.getPosition()));
                 mat[(int)(1+directionObst.getZ())][(int)(1+directionObst.getX())]=false;
-                System.out.println(directionObst);
             }
             
             mat=border(mat, data.getPosition(), pos);
@@ -252,58 +244,28 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
             List<Vector3D> motions=new ArrayList<>();
             for (int i=0;i<3;i++){
                 for (int j=0;j<3;j++){
-                  
-                    if(mat[i][j]){
-                        int x,z;
-                        if(i==1){
-                            z=0;
-                            if(j==0){
-                                x=-1;
-                            }else{
-                                x=1;
-                            }
-                        }else if(j==1){
-                                x=0;
-                                if(j==0){
-                                    z=-1;
-                                }else{
-                                    z=1;
-                                }
-                            }else{
-                                if(i==0&&j==2){
-                                    z=-1;
-                                    x=1;
-                                }else if (i==2&&j==0){
-                                            z=1;
-                                            x=-1;
-                                        }else{
-                                            x=i-1;
-                                            z=j-1;
-                                            }
-                                  
-                                }
-                        motions.add(new Vector3D(x, 0, z));
-                        System.out.print("0 ");
-                    }else
-                        System.out.print("1 ");
-                    
+                    if (mat[i][j]){
+                        motions.add(Utils.direction(i, j)); 
+                    }
                 }
-                System.out.println("");
             }
             
             
             if(!enemies.isEmpty()){
                 shootEnemies();
             }
-            Random random=new Random(System.currentTimeMillis());
-            Vector3D direction=motions.get(random.nextInt(motions.size()));
-            if(motions.size()==8){
-                direction=state.getDirection();
+            Vector3D direction;
+            if (motions.size()>0){
+                Random random=new Random(System.currentTimeMillis());
+                direction=motions.get(random.nextInt(motions.size()));
+                if(motions.size()==8){
+                    direction=state.getDirection();
+                }
+            }else{
+                direction=new Vector3D();
             }            
-            //System.out.println(direction);
             state.setDirection(direction);
             ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias(),"move",direction);
-            //System.out.println(Const.getGuardMove(state.getType()).getName());
             Agent.sendMessage(Const.getGuardMove(state.getType()), data.getAlias(), sod );
     }
 

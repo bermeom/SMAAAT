@@ -23,6 +23,7 @@ public final class Const {
     public static final int width=10;
     public static final int length=10;
     public static final int nFloors=1;
+    public static final long sleep=300;
     
     public static int getType(String name) {
         if(name.contains(Const.GuardianAgent)){

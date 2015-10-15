@@ -81,5 +81,14 @@ public class Vector3D {
            return new Vector3D((floor(x/h)), (y), (floor(z/h)));
     }
     
+    private boolean compareDistance(double a, double b,double delta){
+        return Math.abs(a-b)<=delta;
+    } 
+    
+    public boolean isEquals(Vector3D v,double delta){
+            return  compareDistance(this.x,v.getX(), delta)&&compareDistance(this.y,v.getY(), delta)&&compareDistance(this.z,v.getZ(), delta);
+    
+    }
+    
     
 }
