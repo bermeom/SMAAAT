@@ -20,7 +20,10 @@ public class ActionData extends DataBESA{
     private String action;
     private Vector3D position;
     private Vector3D direction;
-    protected float speed = 3;
+    protected float speed;
+    protected double radius;
+    protected double height;
+    protected float sightRange;
     
     
     
@@ -124,6 +127,30 @@ public class ActionData extends DataBESA{
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public float getSightRange() {
+        return sightRange;
+    }
+
+    public void setSightRange(float sightRange) {
+        this.sightRange = sightRange;
     }
     
     

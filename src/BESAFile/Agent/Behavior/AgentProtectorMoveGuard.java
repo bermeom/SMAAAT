@@ -46,22 +46,22 @@ public class AgentProtectorMoveGuard extends GuardBESA {
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
             switch (data.getAction()) {
                 case "move":
-                    ReportBESA.info("-------------------Move:D--------- ");
+                    //ReportBESA.info("-------------------Move:D--------- ");
                     moveAgent(data);
 
                     break;
                 case "NAK":
-                    System.out.println("-------------------NAK :(--------- ");
+                    //System.out.println("-------------------NAK :(--------- ");
                     //moveAgent(data);
                     break;
                 case "ACK":
-                     System.out.println("-------------------ACK:D--------- ");
+                     //System.out.println("-------------------ACK:D--------- ");
                      Thread.sleep(Const.sleep);
                      msnSensor();
                     //moveACKAgent(data);
                     break;
                 case("ACK_SENSOR"):
-                    System.out.println("-------------------ACK_SENSOR :D--------- ");
+                    //System.out.println("-------------------ACK_SENSOR :D--------- ");
                     ackSensor(data);
                     break;
 

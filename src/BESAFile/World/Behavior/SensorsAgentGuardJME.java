@@ -33,7 +33,7 @@ public class SensorsAgentGuardJME extends GuardBESA{
     @Override
     public void funcExecGuard(EventBESA ebesa) {
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
-            System.out.println("Sensing ->"+data.getAlias()+" <-");
+            //System.out.println("Sensing ->"+data.getAlias()+" <-");
             WorldStateJME state = (WorldStateJME)this.getAgent().getState();
             List<SeenObject> seenObjects=new ArrayList<SeenObject>();
             List<SeenWall> seenWalls=new ArrayList<SeenWall>();
@@ -46,7 +46,7 @@ public class SensorsAgentGuardJME extends GuardBESA{
                 seenObjects=searchObjectsRangeSightRange(agent, position,data,state.getApp().getCharacterNode());
                 //Sensor FLOOR Node floor=state.getApp().getWallsFloors().get(data.getIdfloor());
                 seenWalls=searchWallsRangeSightRange(agent, position,data,state.getApp().getWallsFloors().get(data.getIdfloor()));
-                System.out.println("------------------ EXIT  ---------------");
+                //System.out.println("------------------ EXIT  ---------------");
                 //*/
                 position= agent.getWorldTranslation().clone();
                 sod = new ActionDataAgent(data.getAlias(),data.getType(),seenObjects,seenWalls,new Vector3D((double)position.x, (double)position.y, (double)position.z),"ACK_SENSOR");

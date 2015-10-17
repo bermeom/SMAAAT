@@ -26,6 +26,7 @@ import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
 import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
 import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
+import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
@@ -143,15 +144,17 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             setupBesa();
             createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
             createAgentProtector(0, 0,8, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 0,0, new Vector3f(0, 0, -1));
+            /*createAgentExplorer(0, 8,1, new Vector3f(0, 0, -1));
             createAgentExplorer(0, 1,7, new Vector3f(0, 0, -1));
             createAgentExplorer(0, 5,5, new Vector3f(0, 0, -1));
-            createAgentHostage(0, 8,1, new Vector3f(0, 0, -1));
+            //*/
+            createAgentHostage(0, 0,0, new Vector3f(0, 0, -1));
             createAgentHostage(0, 8,2, new Vector3f(0, 0, -1));
             createAgentHostage(0, 8,3, new Vector3f(0, 0, -1));
+            /*
             createAgentEnemy(0, 9,9, new Vector3f(0, 0, -1));
             createAgentEnemy(0, 1,1, new Vector3f(0, 0, -1));
-            
+            //*/
             /*    
             createAgentProtector(1, 2,1, new Vector3f(0, 0, 1));
             createAgentProtector(1, 0,1, new Vector3f(0, 0, 1));
@@ -202,6 +205,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
+        struct.bindGuard("agentMove", HELPAgentProtectorGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         

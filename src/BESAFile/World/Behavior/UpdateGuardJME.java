@@ -38,7 +38,7 @@ public class UpdateGuardJME extends GuardBESA{
         WorldStateJME state = (WorldStateJME) this.getAgent().getState();
         switch (data.getAction()) {
             case "move":
-                System.out.println("-------------------Move World:D--------- ");
+                //System.out.println("-------------------Move World:D--------- ");
                 moveAgent(data, state);
                 break;
 
@@ -52,7 +52,6 @@ public class UpdateGuardJME extends GuardBESA{
         Vector3f modelForwardDir = new Vector3f((float)data.getDirection().getX(), (float)data.getDirection().getY(), (float)data.getDirection().getZ());
                 
         //Vector3f modelForwardDir = state.getApp().getPositionVirtiul(0,5,5);
-        System.out.println(modelForwardDir);
         float angle = 0;
         if(data.getYpos()==0 && data.getXpos() > 0)
             angle = FastMath.HALF_PI;
@@ -61,7 +60,6 @@ public class UpdateGuardJME extends GuardBESA{
         if(data.getYpos()<0 && data.getXpos() == 0)
             angle = FastMath.PI; 
         
-        System.out.println(modelForwardDir);
         modelForwardDir.y=0;
         
         Vector3f walkDirection = new Vector3f(0, 0, 0);

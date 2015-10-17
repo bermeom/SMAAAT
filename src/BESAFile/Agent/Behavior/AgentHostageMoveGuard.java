@@ -46,22 +46,22 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
             switch (data.getAction()) {
                 case "move":
-                    ReportBESA.info("-------------------Move:D--------- ");
+                    //ReportBESA.info("-------------------Move:D--------- ");
                     moveAgent(data);
 
                     break;
                 case "NAK":
-                    System.out.println("-------------------NAK :(--------- ");
+                    //System.out.println("-------------------NAK :(--------- ");
                     //moveAgent(data);
                     break;
                 case "ACK":
-                     System.out.println("-------------------ACK:D--------- ");
+                     //System.out.println("-------------------ACK:D--------- ");
                      Thread.sleep(Const.sleep);
                      msnSensor();
                     //moveACKAgent(data);
                     break;
                 case("ACK_SENSOR"):
-                    System.out.println("-------------------ACK_SENSOR :D--------- ");
+                    //System.out.println("-------------------ACK_SENSOR :D--------- ");
                     ackSensor(data);
                     break;
 
@@ -216,6 +216,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
     private void ackSensor(ActionDataAgent data){
             AgentHostageState state = (AgentHostageState) this.getAgent().getState();
             List<SeenObject> enemies=new ArrayList<>();
+            List<SeenObject> protectors=new ArrayList<>();
             boolean [][]mat=new boolean[3][3];
             for (int i=0;i<3;i++){
                 for (int j=0;j<3;j++){
@@ -225,7 +226,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
             Vector3D pos=new Vector3D(1, 0, 1);
             for(SeenObject so:data.getSeenObjects()){
                 switch(Const.getType(so.getName())){
-                    case(1):break;//Protector
+                    case(1):protectors.add(so);break;//Protector
                     case(2):break;//Exprorator
                     case(3): break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
@@ -249,7 +250,9 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                     }
                 }
             }
-            
+            if(!protectors.isEmpty()){
+                callProtector(protectors);
+            }
             
             if(!enemies.isEmpty()){
                 shootEnemies();
@@ -271,6 +274,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
 
     private void callHostages() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            
     }
 
     private void shootEnemies() {
@@ -288,5 +292,22 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
         } catch (ExceptionBESA e) {
             ReportBESA.error(e);
         }
+    }
+
+    private void callProtector(List<SeenObject> protectors) {
+        AgentState state = (AgentState) this.getAgent().getState();
+        for (SeenObject p:protectors ){
+            ActionDataAgent actionData = new ActionDataAgent(state.getType(), state.getAlias());
+            EventBESA event = new EventBESA(HELPAgentProtectorGuard.class.getName(), actionData);
+            AgHandlerBESA ah;
+            try {
+                ah = getAgent().getAdmLocal().getHandlerByAlias(p.getName());
+                ah.sendEvent(event);
+            } catch (ExceptionBESA e) {
+                ReportBESA.error(e);
+            }
+        }
+
+    
     }
 }
