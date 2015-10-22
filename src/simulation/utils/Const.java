@@ -16,7 +16,7 @@ public final class Const {
     public static final String Character = "Character";
     public static final String Exit = "Exit";
     public static final String World = "WORLD";
-    public static final float distBetweenFloors=5;
+    public static final float distBetweenFloors=0.5f;
     public static final float x=0;
     public static final float y=0;
     public static final float z=0;
@@ -24,6 +24,7 @@ public final class Const {
     public static final int length=10;
     public static final int nFloors=1;
     public static final long sleep=300;
+    public static final int  kGrid=2;
     
     public static int getType(String name) {
         if(name.contains(Const.GuardianAgent)){
@@ -38,7 +39,7 @@ public final class Const {
         if(name.contains(Const.EnemyAgent)){
             return 4;
         }
-        return 0;
+        return -1;
     }
     
     public static Class getGuardMove(int type){
@@ -53,8 +54,8 @@ public final class Const {
         return class_;
     }
     
-    public static  int post(int i){
-        return i*2+1;
+    public static  float post(int i){
+        return (i*2)/Const.kGrid+1/Const.kGrid+0.5f;
     }
     
     //x'=x+width-post(i) 

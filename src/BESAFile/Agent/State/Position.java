@@ -9,12 +9,12 @@ package BESAFile.Agent.State;
  *
  * @author angel
  */
-public class MotionTest {
+public class Position {
     protected  int xpos;
     protected  int ypos;
     protected  int idfloor;
 
-    public MotionTest(int xpos, int ypos, int idfloor) {
+    public Position(int xpos, int ypos, int idfloor) {
         this.xpos = xpos;
         this.ypos = ypos;
         this.idfloor = idfloor;
@@ -43,6 +43,12 @@ public class MotionTest {
     public void setIdfloor(int idfloor) {
         this.idfloor = idfloor;
     }
+
+    @Override
+    public String toString() {
+        return "Position{" + "xpos=" + xpos + ", ypos=" + ypos + ", idfloor=" + idfloor + '}';
+    }
+    
     
     
 }

@@ -21,7 +21,7 @@ public class AgentStateTest extends  StateBESA{
     protected  int ypos;
     protected  int idfloor;
     protected  String alias;
-    protected  Queue<MotionTest> possibleMotions;
+    protected  Queue<Motion> possibleMotions;
     
     public AgentStateTest(ModelEdifice edifice, int xpos, int ypos, int idfloor, String alias) {
         this.edifice = edifice;
@@ -29,7 +29,7 @@ public class AgentStateTest extends  StateBESA{
         this.ypos = ypos;
         this.idfloor = idfloor;
         this.alias = alias;
-        possibleMotions=new ArrayDeque<MotionTest>();
+        possibleMotions=new ArrayDeque<Motion>();
     }
 
     public ModelEdifice getEdifice() {
@@ -72,11 +72,11 @@ public class AgentStateTest extends  StateBESA{
         this.alias = alias;
     }
 
-    public Queue<MotionTest> getPossibleMotions() {
+    public Queue<Motion> getPossibleMotions() {
         return possibleMotions;
     }
 
-    public void setPossibleMotions(Queue<MotionTest> possibleMotions) {
+    public void setPossibleMotions(Queue<Motion> possibleMotions) {
         this.possibleMotions = possibleMotions;
     }
     

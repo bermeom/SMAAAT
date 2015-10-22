@@ -10,10 +10,22 @@ package BESAFile.World.Model;
  * @author berme_000
  */
 public class ModelAgentWorld {
+    private int id;
     private int xpos;
     private int ypos;
     private int idfloor;
+    private int type;
     private String alias;
+    
+    public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias,int type,int id) {
+        this.xpos = xpos;
+        this.ypos = ypos;
+        this.idfloor = idfloor;
+        this.alias = alias;
+        this.id=id;
+        this.type=type;
+    }
+
 
     public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias) {
         this.xpos = xpos;
@@ -57,6 +69,22 @@ public class ModelAgentWorld {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
     
     

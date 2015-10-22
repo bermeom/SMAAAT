@@ -6,72 +6,86 @@
 package BESAFile.Data;
 
 import BESA.Kernell.Agent.Event.DataBESA;
+import BESAFile.Agent.State.Motion;
+import BESAFile.Agent.State.Position;
 
 /**
  *
  * @author berme_000
  */
 public class ActionData extends DataBESA{
-    private int xpos;
-    private int ypos;
-    private int idfloor;
     private int type;
     private String alias;
     private String action;
-    private Vector3D position;
-    private Vector3D direction;
     protected float speed;
     protected double radius;
     protected double height;
     protected float sightRange;
+    protected Motion motion;
+    protected Position position;
+
+    public ActionData(int type, String alias, float speed, Motion motion, Position position, String action) {
+        this.type = type;
+        this.alias = alias;
+        this.action = action;
+        this.speed = speed;
+        this.motion = motion;
+        this.position = position;
+    }
     
+    
+    
+    
+    public ActionData(int type,String alias,Vector3D direction,Position position, float speed,double radius,double height) {
+        this.alias = alias;
+        this.position = position;
+        this.speed=speed;
+        this.radius=radius;
+        this.height=height;
+        this.type=type;
+        
+    }
     
     
     public ActionData(int xpos, int ypos, int idfloor, String alias, String action) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor = idfloor;
+        this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.action = action;
-        this.position = new  Vector3D();
         this.speed=speed;
     }
     
     
-    public ActionData(int type,int xpos, int ypos, int idfloor, String alias, String action, Vector3D direction,float speed) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor = idfloor;
+    public ActionData(int type,int xpos, int ypos, int idfloor, String alias, String action,float speed) {
+        this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.action = action;
-        this.direction = direction;
         this.speed=speed;
         this.type=type;
  
     }
     
     public int getXpos() {
-        return xpos;
+        return this.position.getXpos();
     }
 
     public void setXpos(int xpos) {
-        this.xpos = xpos;
+        this.position.setXpos(xpos);
     }
 
     public int getYpos() {
-        return ypos;
+        return this.position.getYpos();
     }
 
     public void setYpos(int ypos) {
-        this.ypos = ypos;
+        this.position.setYpos(ypos);
     }
 
     public int getIdfloor() {
-        return idfloor;
+        return this.position.getIdfloor();
     }
 
     public void setIdfloor(int idfloor) {
-        this.idfloor = idfloor;
+        this.position.setIdfloor(idfloor);
     }
 
     public String getAlias() {
@@ -90,29 +104,24 @@ public class ActionData extends DataBESA{
         this.action = action;
     }
 
-    @Override
-    public String toString() {
-        return "ActionData{" + "xpos=" + xpos + ", ypos=" + ypos + ", idfloor=" + idfloor + ", alias=" + alias + ", action=" + action + '}';
+    
+    public Motion getMotion() {
+        return motion;
     }
 
-    public Vector3D getPosition() {
+    public void setMotion(Motion motion) {
+        this.motion = motion;
+    }
+
+    public Position getPosition() {
         return position;
     }
 
-    public void setPosition(Vector3D position) {
+    public void setPosition(Position position) {
         this.position = position;
     }
 
-    public Vector3D getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Vector3D direction) {
-        this.direction = direction;
-    }
-
    
-
     public float getSpeed() {
         return speed;
     }

@@ -4,28 +4,29 @@
  */
 package BESAFile.Model;
 
-import BESAFile.Data.Vector3D;
+import BESAFile.Agent.State.Position;
+
 
 /**
  *
  * @author berme_000
  */
 public class SeenObject {
-    protected Vector3D position;
+    protected Position position;
     protected  String name;
     protected  int type;
 
-    public SeenObject(Vector3D position, String name, int type) {
+    public SeenObject(Position position, String name, int type) {
         this.position = position;
         this.name = name;
         this.type = type;
     }
 
-    public Vector3D getPosition() {
+    public Position getPosition() {
            return position;
     }
 
-    public void setPosition(Vector3D position) {
+    public void setPosition(Position position) {
         this.position = position;
     }
 

@@ -15,7 +15,7 @@ import java.util.List;
 public class ModelFloor {
     
     
-    private char[][]floor;
+    private int[][]floor;
     private List<ModelObjectWorld> objects;
     private int width;
     private int length;
@@ -23,20 +23,20 @@ public class ModelFloor {
     public ModelFloor(int width,int length){
         this.width=width;
         this.length=length;
-        floor=new char[width][length];
+        floor=new int[width][length];
         for (int i=0;i<width;i++){
             for(int j=0;j<length;j++){
-                floor[i][j]='0';
+                floor[i][j]=0;
             }
         }
         objects=new ArrayList<ModelObjectWorld>();
     }
     
-    public char get(int i,int j){
+    public int get(int i,int j){
         return floor[i][j];
     }
 
-    public void set(int i,int j,char value){
+    public void set(int i,int j,int value){
         floor[i][j]=value;
     }
     
@@ -45,7 +45,7 @@ public class ModelFloor {
         objects.add(new ModelObjectWorld(j, j, value));
     }
     
-    public void copyFloorArry(char [][] f){
+    public void copyFloorArry(int [][] f){
         for (int i=0;i<width;i++){
             for(int j=0;j<length;j++){
                 floor[i][j]=f[i][j];
@@ -53,11 +53,11 @@ public class ModelFloor {
         }
     }
 
-    public char[][] getFloor() {
+    public int[][] getFloor() {
         return floor;
     }
 
-    public void setFloor(char[][] floor) {
+    public void setFloor(int[][] floor) {
         this.floor = floor;
     }
 

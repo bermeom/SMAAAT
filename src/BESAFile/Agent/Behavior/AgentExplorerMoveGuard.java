@@ -14,7 +14,7 @@ import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.State.AgentExplorerState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
-import BESAFile.Agent.State.MotionTest;
+import BESAFile.Agent.State.Motion;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.Vector3D;
@@ -73,7 +73,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     public void moveAgent(ActionDataAgent data) {
         AgentState state = (AgentState) this.getAgent().getState();
         System.out.println(data.getViewDirection());
-        ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),(float)state.getSpeed());
+        ActionData ad = new ActionData(state.getType(), state.getAlias(),(float)state.getSpeed(),data.getMotion(),data.getPosition(), "move");
         Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
 
     }
@@ -82,8 +82,8 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         return n >= 0 && n < limit;
     }
 
-    public Queue<MotionTest> generationPossibleMotions(AgentStateTest aState) {
-        Queue<MotionTest> possibleMotions = new ArrayDeque<MotionTest>();
+    public Queue<Motion> generationPossibleMotions(AgentStateTest aState) {
+        Queue<Motion> possibleMotions = new ArrayDeque<Motion>();
         ModelEdifice edifice = aState.getEdifice();
         int x, y, idFloor;
         x = aState.getXpos();
@@ -105,7 +105,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             newX = movX[i] + x;
             newY = movY[i] + y;
             if (intervalValidation(newX, edifice.getWidth()) && intervalValidation(newY, edifice.getLength()) && edifice.getFloor(idFloor).get(newX, newY) == '0') {
-                possibleMotions.add(new MotionTest(newX, newY, idFloor));
+                possibleMotions.add(new Motion(newX, newY, idFloor));
             }
         }
 
@@ -118,7 +118,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         aState.setXpos(data.getXpos());
         aState.setYpos(data.getYpos());
         aState.setIdfloor(data.getIdfloor());
-        aState.setPossibleMotions(new ArrayDeque<MotionTest>());
+        aState.setPossibleMotions(new ArrayDeque<Motion>());
         data.setAlias(aState.getAlias());
         data.setAction("move");
         Thread.sleep(1000);
@@ -139,7 +139,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
 
     public void dataSensorRequest() {
         AgentState state = (AgentState) this.getAgent().getState();
-        ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getIdfloor(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(), "Sensing");
+        ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {
@@ -213,6 +213,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     
     private void ackSensor(ActionDataAgent data){
             AgentExplorerState state = (AgentExplorerState) this.getAgent().getState();
+            /*
             List<SeenObject> enemies=new ArrayList<>();
             boolean [][]mat=new boolean[3][3];
             for (int i=0;i<3;i++){
@@ -272,6 +273,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             state.setDirection(direction);
             ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias(),"move",direction);
             Agent.sendMessage(Const.getGuardMove(state.getType()), data.getAlias(), sod );
+            //*/
     }
 
     private void callHostages() {
@@ -284,7 +286,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
 
     private void msnSensor() {
         AgentState state = (AgentState) this.getAgent().getState();
-        ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getIdfloor(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(), "Sensing");
+        ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {

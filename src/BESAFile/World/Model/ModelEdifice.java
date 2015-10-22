@@ -42,7 +42,7 @@ public class ModelEdifice {
             return floors[idFloor];
     } 
 
-    public char getPostGridFloor(int idFloor,int i,int j){
+    public int getPostGridFloor(int idFloor,int i,int j){
             return floors[idFloor].get(i, j);
     } 
 
@@ -50,11 +50,11 @@ public class ModelEdifice {
             floors[idFloor].copyFloorArry(floor.getFloor());
     }
     
-    public void setFloorArry(int idFloor,char [][]floor){
+    public void setFloorArry(int idFloor,int [][]floor){
             floors[idFloor].copyFloorArry(floor);
     }
     
-    public void setPostGridFloor(int idFloor,int i,int j,char value){
+    public void setPostGridFloor(int idFloor,int i,int j,int value){
             floors[idFloor].set(i, j,value);
     } 
 

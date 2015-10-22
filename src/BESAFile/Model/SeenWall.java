@@ -4,6 +4,7 @@
  */
 package BESAFile.Model;
 
+import BESAFile.Agent.State.Position;
 import BESAFile.Data.Vector3D;
 
 /**
@@ -18,7 +19,7 @@ public class SeenWall extends SeenObject{
     protected  char wall;
 
     
-    public SeenWall(Vector3D position, String name, int type) {
+    public SeenWall(Position position, String name, int type) {
         super(position, name, type);
         String []s=name.split("-");
         this.wall=s[0].charAt(0);

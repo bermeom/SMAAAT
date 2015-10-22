@@ -26,15 +26,15 @@ public class WorldFloor {
     private float y;
     private float z;
     
-    
     public WorldFloor(AssetManager assetManager, int width, int length, float x, float y, float z) {
         this.assetManager = assetManager;
-        this.width = width;
-        this.length = length;
+        this.width = width/Const.kGrid;
+        this.length = length/Const.kGrid;
         this.x = x;
         this.y = y;
         this.z = z;
         this.high=1.2f;
+
         
     }
 
@@ -91,12 +91,9 @@ public class WorldFloor {
         return makeFloor();
     }
     
-    private int post(int i){
-        return i*2+1;
-    }
-    
+ 
     public Geometry makeGridFloor(ColorRGBA color){
-         Grid grid=new Grid(2*length+1,2*width+1, 1);
+         Grid grid=new Grid((Const.kGrid*this.length+1),(Const.kGrid*this.width+1), 2/Const.kGrid);
          Geometry g = new Geometry("GridFloor", grid );
          Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
          mat.getAdditionalRenderState().setWireframe(true);
@@ -146,6 +143,7 @@ public class WorldFloor {
         Geometry floor = new Geometry("WallFloor3", box);
         floor.setLocalTranslation(x, y+high, z-length-.2f);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat1.getAdditionalRenderState().setWireframe(true);
         mat1.setTexture("ColorMap", 
             assetManager.loadTexture("Textures/texture2.jpg"));
         mat1.setColor("Color", ColorRGBA.LightGray);
@@ -161,16 +159,16 @@ public class WorldFloor {
         mat1.setTexture("ColorMap", 
             assetManager.loadTexture("Textures/texture2.jpg"));
         mat1.getAdditionalRenderState().setWireframe(true);
-        mat1.setColor("Color", ColorRGBA.LightGray);
+        //mat1.setColor("Color", ColorRGBA.LightGray);
         floor.setMaterial(mat1);
         return floor;
     }
 
     
     public Geometry makeCubeb(String name,int i,int j,float highb) {
-      Box box = new Box(1, highb, 1);
+      Box box = new Box(0.5f, highb, 0.5f);
       Geometry cube = new Geometry(name, box);
-      cube.setLocalTranslation(x+width-post(i), y+1.2f-(1-highb), z+length-post(j));
+      cube.setLocalTranslation(x+width-Const.post(i), y+1.2f-(1-highb), z+length-Const.post(j));
       Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
       mat1.setTexture("ColorMap", 
             assetManager.loadTexture("Textures/texture3.jpg"));
@@ -180,14 +178,16 @@ public class WorldFloor {
     }
     
     public Geometry makeCubeB(String name,int i,int j) {
-      Box box = new Box(1, 1, 1);
+      Box box = new Box(0.5f, 1, 0.5f);
       Geometry cube = new Geometry(name, box);
-      cube.setLocalTranslation(x+width-post(i), y+1.2f, z+length-post(j));
+      cube.setLocalTranslation(x+width-Const.post(i), y+1.2f, z+length-Const.post(j));
+        System.out.println(" "+i+" "+j+" "+cube.getLocalTranslation());
       Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
       mat1.setTexture("ColorMap", 
             assetManager.loadTexture("Textures/texture3.jpg"));
       mat1.setColor("Color", ColorRGBA.Gray);
       cube.setMaterial(mat1);
+      //cube.scale(0.5)
       return cube;
     }
     
@@ -200,7 +200,7 @@ public class WorldFloor {
             box = new Box(0.5f, 1, 1);
       }
       Geometry cube = new Geometry(name, box);
-      cube.setLocalTranslation(x+width-post(i), y+1.2f, z+length-post(j));
+      cube.setLocalTranslation(x+width-Const.post(i), y+1.2f, z+length-Const.post(j));
       Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
       mat1.setTexture("ColorMap", 
             assetManager.loadTexture("Textures/texture3.jpg"));

@@ -13,7 +13,9 @@ import BESAFile.Agent.Agent;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
-import BESAFile.Agent.State.MotionTest;
+import BESAFile.Agent.State.MotionN;
+import BESAFile.Agent.State.Motion;
+import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.Vector3D;
@@ -29,6 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simulation.utils.Const;
 import simulation.utils.Utils;
 
@@ -50,30 +54,33 @@ public class AgentProtectorMoveGuard extends GuardBESA {
                     moveAgent(data);
 
                     break;
-                case "NAK":
-                    //System.out.println("-------------------NAK :(--------- ");
-                    //moveAgent(data);
+                case "NACK1":
+                    System.out.println("-------------------NAK :(--------- ");
+                    msnSensor();
                     break;
                 case "ACK":
-                     //System.out.println("-------------------ACK:D--------- ");
-                     Thread.sleep(Const.sleep);
+                     System.out.println("-------------------ACK:D--------- ");
+                     AgentState state = (AgentState) this.getAgent().getState();
+                     state.setPosition(data.getPosition());
                      msnSensor();
                     //moveACKAgent(data);
                     break;
                 case("ACK_SENSOR"):
-                    //System.out.println("-------------------ACK_SENSOR :D--------- ");
+                    System.out.println("-------------------ACK_SENSOR :D--------- ");
                     ackSensor(data);
                     break;
 
             }
         } catch (Exception e) {
+            System.out.println("ERROR:");
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, e);
+ 
         }
     }
 
     public void moveAgent(ActionDataAgent data) {
         AgentState state = (AgentState) this.getAgent().getState();
-        System.out.println(data.getViewDirection());
-        ActionData ad = new ActionData(state.getType(),0, 1, state.getIdfloor(), state.getAlias(), "move",data.getViewDirection(),(float)state.getSpeed());
+        ActionData ad = new ActionData(state.getType(), state.getAlias(),(float)state.getSpeed(),data.getMotion(),state.getPosition(), "move");
         Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
 
     }
@@ -82,8 +89,8 @@ public class AgentProtectorMoveGuard extends GuardBESA {
         return n >= 0 && n < limit;
     }
 
-    public Queue<MotionTest> generationPossibleMotions(AgentStateTest aState) {
-        Queue<MotionTest> possibleMotions = new ArrayDeque<MotionTest>();
+    public Queue<Motion> generationPossibleMotions(AgentStateTest aState) {
+        Queue<Motion> possibleMotions = new ArrayDeque<Motion>();
         ModelEdifice edifice = aState.getEdifice();
         int x, y, idFloor;
         x = aState.getXpos();
@@ -105,7 +112,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
             newX = movX[i] + x;
             newY = movY[i] + y;
             if (intervalValidation(newX, edifice.getWidth()) && intervalValidation(newY, edifice.getLength()) && edifice.getFloor(idFloor).get(newX, newY) == '0') {
-                possibleMotions.add(new MotionTest(newX, newY, idFloor));
+                possibleMotions.add(new Motion(newX, newY, idFloor));
             }
         }
 
@@ -118,7 +125,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
         aState.setXpos(data.getXpos());
         aState.setYpos(data.getYpos());
         aState.setIdfloor(data.getIdfloor());
-        aState.setPossibleMotions(new ArrayDeque<MotionTest>());
+        aState.setPossibleMotions(new ArrayDeque<Motion>());
         data.setAlias(aState.getAlias());
         data.setAction("move");
         Thread.sleep(1000);
@@ -139,7 +146,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
 
     public void dataSensorRequest() {
         AgentState state = (AgentState) this.getAgent().getState();
-        ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getIdfloor(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(), "Sensing");
+        ActionDataAgent actionData = new ActionDataAgent(state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {
@@ -160,51 +167,47 @@ public class AgentProtectorMoveGuard extends GuardBESA {
         
     }
     
-    private boolean[][] border(boolean [][]mat,Vector3D position,Vector3D pos){
-        double borderXPlus=Const.x+Const.width;
-        double borderXMinus=Const.x-Const.width;
-        double borderZPlus=Const.z+Const.length;
-        double borderZMinus=Const.z-Const.length;
-        double delta=1.8f;
-        if(compareDistance(borderXPlus,position.getX(), delta-0.5)){
-            for(int i=0;i<3;i++){
-                mat[i][2]=false;
+    private boolean[][] border(boolean [][]mat, Position p, int width,int length ,int tam){
+        if(p.getYpos()+1>=width){
+            for(int i=0;i<tam;i++){
+                mat[i][1+(int)(tam/2)]=false;
             }
         }
-        if(compareDistance(borderXMinus,position.getX(),  delta)){
-            for(int i=0;i<3;i++){
-                mat[i][0]=false;
+        if(p.getYpos()-1<0){
+            for(int i=0;i<tam;i++){
+                mat[i][(int)(tam/2)-1]=false;
             }
         }
-        if (compareDistance(borderZPlus,position.getZ(),  delta)){
-            for(int i=0;i<3;i++){
-                mat[2][i]=false;
+        if(p.getXpos()+1>=length){
+            for(int i=0;i<tam;i++){
+                mat[1+(int)(tam/2)][i]=false;
             }
         }
-        if(compareDistance(borderZMinus,position.getZ(),  delta)){
-            for(int i=0;i<3;i++){
-                mat[0][i]=false;
+        if(p.getXpos()-1<0){
+            for(int i=0;i<tam;i++){
+                mat[(int)(tam/2)-1][i]=false;
             }
         }
+        int x=tam/2;
         
-        if(!mat[0][1]){
-            for(int i=0;i<3;i++){
-                mat[0][i]=false;
+        if(!mat[x-1][x]){
+            for(int i=0;i<tam;i++){
+                mat[x-1][i]=false;
             }
         }
-        if(!mat[2][1]){
-            for(int i=0;i<3;i++){
-                mat[2][i]=false;
+        if(!mat[x+1][x]){
+            for(int i=0;i<tam;i++){
+                mat[x+1][i]=false;
             }
         }
-        if(!mat[1][0]){
-            for(int i=0;i<3;i++){
-                mat[i][0]=false;
+        if(!mat[x][x-1]){
+            for(int i=0;i<tam;i++){
+                mat[i][x-1]=false;
             }
         }
-        if(!mat[1][2]){
-            for(int i=0;i<3;i++){
-                mat[i][2]=false;
+        if(!mat[x][x+1]){
+            for(int i=0;i<tam;i++){
+                mat[i][x+1]=false;
             }
         }
         return mat;
@@ -214,38 +217,40 @@ public class AgentProtectorMoveGuard extends GuardBESA {
     private void ackSensor(ActionDataAgent data){
             AgentProtectorState state = (AgentProtectorState) this.getAgent().getState();
             List<SeenObject> enemies=new ArrayList<>();
-            boolean [][]mat=new boolean[3][3];
-            for (int i=0;i<3;i++){
-                for (int j=0;j<3;j++){
+            int tam=(int)state.getSightRange()*2+1;
+            boolean [][]mat=new boolean[tam][tam];
+            for (int i=0;i<tam;i++){
+                for (int j=0;j<tam;j++){
                     mat[i][j]=true;
                 }
             }
-            Vector3D pos=new Vector3D(1, 0, 1);
-            for(SeenObject so:data.getSeenObjects()){
-                switch(Const.getType(so.getName())){
+            state.setPosition(data.getPosition());
+            System.out.println(data.getSeenObjects().size());
+            for (SeenObject so:data.getSeenObjects()){
+                System.out.println(so.getPosition()+" ------- "+so.getType()+"-> "+(data.getPosition().getXpos()-so.getPosition().getXpos())+" "+(data.getPosition().getYpos()-so.getPosition().getYpos()));
+                switch(so.getType()){
+                    case(-1):state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); break;//Walls
                     case(1):break;//Protector
                     case(2):break;//Exprorator
                     case(3):state.addHostage(so.getName()); break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
                 }
-                Vector3D directionObst=(vectorDirection(data.getPosition(), so.getPosition()));
-                mat[(int)(1+directionObst.getZ())][(int)(1+directionObst.getX())]=false;
+                System.out.println(so.getName()+" --------- "+(state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos())+" "+(state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()));
+                mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=false;
             }
-            for(SeenWall sw:data.getSeenWalls()){
-                state.setModelEdiffice(sw.getIdfloor(), sw.getXpos(), sw.getYpos(), sw.getWall());
-                Vector3D directionObst=(vectorDirection(data.getPosition(), sw.getPosition()));
-                mat[(int)(1+directionObst.getZ())][(int)(1+directionObst.getX())]=false;
-            }
-            
-            mat=border(mat, data.getPosition(), pos);
-            mat[1][1]=false;
-            List<Vector3D> motions=new ArrayList<>();
-            for (int i=0;i<3;i++){
-                for (int j=0;j<3;j++){
+            mat=border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
+            mat[tam/2][tam/2]=false;
+            List<Motion> motions=new ArrayList<>();
+            int offset=(int)(tam/2)-1;
+            System.out.println("**********************************" +tam+(int)(tam/2)+" oFFSET "+offset);
+            for (int i=offset;i<offset+3;i++){
+                for (int j=offset;j<offset+3;j++){
+                    System.out.print(mat[i][j]+" ");
                     if (mat[i][j]){
-                        motions.add(Utils.direction(i, j));
+                       motions.add(new Motion(state.getXpos()+i-1-offset, state.getYpos()+j-1-offset, state.getIdfloor()));
                     }
                 }
+                System.out.println("");
             }
             /*
             //System.out.println(state.getEdifice());
@@ -257,18 +262,17 @@ public class AgentProtectorMoveGuard extends GuardBESA {
                 shootEnemies();
             }
             */
-            Vector3D direction;
+            System.out.println("========== "+motions.size());
+            Motion motion;
             if (motions.size()>0){
                 Random random=new Random(System.currentTimeMillis());
-                direction=motions.get(random.nextInt(motions.size()));
-                if(motions.size()==8){
-                    direction=state.getDirection();
-                }
+                motion=motions.get(random.nextInt(motions.size()));
             }else{
-                direction=new Vector3D();
-            }            
-            state.setDirection(direction);
-            ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias(),"move",direction);
+                motion=new Motion(state.getXpos(),state.getYpos(), state.getIdfloor());
+            }
+            System.out.println("Motion: "+motion+" Position: "+state.getPosition());
+            state.setDirection(state.getDirection());//int xpos, int ypos, int idfloor,float speed
+            ActionDataAgent sod = new ActionDataAgent(data.getType(),data.getAlias(),motion,data.getPosition(),(float)state.getSpeed(),"move");
             Agent.sendMessage(Const.getGuardMove(state.getType()), data.getAlias(), sod );
     }
 
@@ -282,7 +286,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
 
     private void msnSensor() {
         AgentState state = (AgentState) this.getAgent().getState();
-        ActionDataAgent actionData = new ActionDataAgent(state.getType(),state.getIdfloor(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(), "Sensing");
+        ActionDataAgent actionData = new ActionDataAgent(state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {

@@ -16,42 +16,36 @@ import java.util.Queue;
 public class AgentState extends  StateBESA{
         
     protected ModelEdifice edifice;
-    protected  int xpos;
-    protected  int ypos;
-    protected  int idfloor;
+    protected Position position;
     protected  String alias;
     protected Vector3D direction;
     protected double radius;
     protected double height;
-    protected float sightRange;
+    protected int sightRange;
     protected  Queue<Vector3D> possibleMotions;
     protected int type;
     protected double speed;
     
 
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor=idfloor;
+        this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.direction = direction;
         this.radius = radius;
         this.height = radius*2;
-        this.sightRange = 3f;
+        this.sightRange = 2;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
-        this.speed=3;
+        this.speed=1;
     }
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor=idfloor;
+        this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.direction = direction;
         this.radius = radius;
         this.height = height;
-        this.sightRange = 3f;
+        this.sightRange = 2;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
         this.speed=3;
@@ -66,27 +60,27 @@ public class AgentState extends  StateBESA{
     }
 
     public int getXpos() {
-        return xpos;
+        return this.position.getXpos();
     }
 
     public void setXpos(int xpos) {
-        this.xpos = xpos;
+       this.position.setXpos(xpos);
     }
 
     public int getYpos() {
-        return ypos;
+        return this.position.getYpos();
     }
 
     public void setYpos(int ypos) {
-        this.ypos = ypos;
+       this.position.setYpos(ypos);
     }
 
     public int getIdfloor() {
-        return idfloor;
+        return this.position.getIdfloor();
     }
 
     public void setIdfloor(int idfloor) {
-        this.idfloor = idfloor;
+       this.position.setIdfloor(idfloor);
     }
 
     public String getAlias() {
@@ -129,11 +123,11 @@ public class AgentState extends  StateBESA{
         this.possibleMotions = possibleMotions;
     }
 
-    public float getSightRange() {
+    public int getSightRange() {
         return sightRange;
     }
 
-    public void setSightRange(float sightRange) {
+    public void setSightRange(int sightRange) {
         this.sightRange = sightRange;
     }
 
@@ -145,7 +139,7 @@ public class AgentState extends  StateBESA{
         this.type = type;
     }
     
-    public void setModelEdiffice(int idFloor,int i,int j,char value){
+    public void setModelEdiffice(int idFloor,int i,int j,int value){
         this.edifice.setPostGridFloor(idFloor, i, j, value);
     }
 
@@ -155,6 +149,14 @@ public class AgentState extends  StateBESA{
 
     public void setSpeed(double speed) {
         this.speed = speed;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
     
     

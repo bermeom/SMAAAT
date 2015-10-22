@@ -10,8 +10,11 @@ import BESA.Kernell.Agent.GuardBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Behavior.SubscribeResponseGuard;
+import BESAFile.Agent.State.Position;
+import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.SubscribeDataJME;
+import BESAFile.Data.Vector3D;
 import BESAFile.World.State.WorldStateJME;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.material.Material;
@@ -21,6 +24,8 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
+import simulation.Controls.PositionController;
+import simulation.utils.Const;
 
 /**
  *
@@ -33,7 +38,8 @@ public class SubscribeGuardJME extends GuardBESA {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         SubscribeDataJME data = (SubscribeDataJME)ebesa.getData();
         Spatial model=createSpatialGeometry(data.getAlias(),(float)data.getRadius(),(float)data.getHeight(),1);
-        Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getXpos(), data.getYpos());
+        Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getYpos(), data.getXpos());
+        System.out.println(position);
         Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
         String evType=SubscribeResponseGuard.class.getName();
         switch(data.getType()){
@@ -55,9 +61,10 @@ public class SubscribeGuardJME extends GuardBESA {
             ws.getApp().getPhysicsSpace().add(physicsCharacter);
             physicsCharacter.setViewDirection(direction);
             //*/
-            ws.getApp().getCharacterNode().attachChild(node);
-            ws.addAgent(data.getAlias(),node);
-           
+            ws.getApp().getCharacterNode().attachChild(node); 
+            PositionController controller=new PositionController(node,direction,position,data.getAlias(),data.getType(),0,data.getRadius(),data.getHeight(),new Position(data.getXpos(), data.getYpos(),data.getIdfloor()) );
+            ws.addAgent(data.getAlias(),controller,data);
+            node.addControl(controller);
             answer(true, data.getAlias(), evType);
         } catch (Exception e) {
             ReportBESA.error(e);
@@ -69,7 +76,7 @@ public class SubscribeGuardJME extends GuardBESA {
     private Spatial createModelProtector(){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentProtector/ED-209.j3o");
-        machineSpatial.scale(.25f);
+        machineSpatial.scale(.18f);
         //machineSpatial.rotate(0, FastMath.PI, 0);
         machineSpatial.setLocalTranslation(0, 0, 0.2f);
         //machineSpatial.setMaterial(mat1);
@@ -111,13 +118,11 @@ public class SubscribeGuardJME extends GuardBESA {
     
     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
-        return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()-post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getLength()-post(j));
+        return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()/Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getLength()/Const.kGrid-Const.post(j));
         
     }
     
-    private int post(int i){
-        return i*2+1;
-    }
+    
     
     protected Geometry createSpatialGeometry(String name,float radius,float height,int type) {
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
