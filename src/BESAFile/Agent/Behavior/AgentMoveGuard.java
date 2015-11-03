@@ -64,7 +64,9 @@ public class AgentMoveGuard extends GuardBESA{
                 aState.setPossibleMotions(possibleMotions);
             }
             Motion m=possibleMotions.poll();
-            ActionData actionData=new ActionData(m.getXpos(), m.getYpos(), m.getIdfloor(),aState.getAlias(), "move");
+            int reply_with=1;
+            int in_reply_to=data.getReply_with();
+            ActionData actionData=new ActionData(reply_with,in_reply_to,m.getXpos(), m.getYpos(), m.getIdfloor(),aState.getAlias(), "move");
             EventBESA event = new EventBESA(UpdateGuard.class.getName(), actionData);
             AgHandlerBESA ah;
             try {

@@ -65,7 +65,7 @@ public class WorldStateJME extends StateBESA{
        
     }
     
-    public PositionController getNodeAgent(String agent){
+    public PositionController getAgentController(String agent){
         return agents.get(agent);
     }
 

@@ -60,7 +60,7 @@ public class Agent extends AgentBESA{
     
      public static void sendMessage(Class guard, String alias, DataBESA data) {
         EventBESA ev = new EventBESA(guard.getName(), data);
-         System.out.println(guard.getName()+" >>>>>>>>>>>>>>><<<<<<<<<<<  "+alias);
+     
         try {
             AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
             ah.sendEvent(ev);

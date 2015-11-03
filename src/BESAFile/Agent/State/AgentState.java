@@ -25,6 +25,8 @@ public class AgentState extends  StateBESA{
     protected  Queue<Vector3D> possibleMotions;
     protected int type;
     protected double speed;
+    protected boolean[] consecutiveMSN;
+    protected int nextConsecutive;
     
 
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
@@ -33,10 +35,13 @@ public class AgentState extends  StateBESA{
         this.direction = direction;
         this.radius = radius;
         this.height = radius*2;
-        this.sightRange = 2;
+        this.sightRange = 4;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
-        this.speed=1;
+        this.speed=4;
+        this.consecutiveMSN=new boolean[1000];
+        this.nextConsecutive=0;
+        
     }
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
@@ -49,7 +54,9 @@ public class AgentState extends  StateBESA{
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
         this.speed=3;
-    }
+        this.consecutiveMSN=new boolean[1000];
+        this.nextConsecutive=0;
+     }
 
     public ModelEdifice getEdifice() {
         return edifice;
@@ -159,6 +166,22 @@ public class AgentState extends  StateBESA{
         this.position = position;
     }
     
+    public int getNextConsecutive(){
+        this.nextConsecutive++;
+        if(this.nextConsecutive>=this.consecutiveMSN.length){
+            this.nextConsecutive=0;
+        }
+        this.consecutiveMSN[this.nextConsecutive]=true;
+        return this.nextConsecutive;
+    }
     
+    public void marckConsecutive(int idConsecutive){
+        this.consecutiveMSN[idConsecutive]=false;
+    }
+    
+    public boolean getIdConsecutive(int idConsecutive){
+        return this.consecutiveMSN[idConsecutive];
+    }
+            
     
 }

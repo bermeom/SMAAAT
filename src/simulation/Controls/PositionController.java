@@ -1,6 +1,7 @@
 package simulation.Controls;
 
 import BESA.ExceptionBESA;
+import BESA.Kernell.Agent.Event.DataBESA;
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.System.AdmBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
@@ -13,6 +14,7 @@ import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.Vector3D;
+import BESAFile.World.Behavior.UpdateGuardJME;
 import simulation.Agent.Character;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.collision.CollisionResult;
@@ -30,6 +32,8 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simulation.SmaaatApp;
 import simulation.utils.Const;
 import simulation.utils.Utils;
@@ -43,6 +47,7 @@ public class PositionController extends AbstractControl implements ActionListene
     private Node node;
     private float delta;
     private boolean validationPosition;
+    private boolean move;
     protected float speed;
     private int type;
     private String alias;
@@ -50,7 +55,12 @@ public class PositionController extends AbstractControl implements ActionListene
     protected double height;
     protected Position poistion;
     protected Motion motion;
-    
+    protected Vector3f modelForwardDir ;
+    protected int contOut; 
+    // message
+    protected int reply_with;
+    protected int in_reply_to;
+    protected ActionData data;
 
   
     public PositionController(Node node,String alias) {
@@ -73,7 +83,9 @@ public class PositionController extends AbstractControl implements ActionListene
         this.validationPosition=false;
         this.delta=0.035f;
         this.poistion=position;
+        this.modelForwardDir=null;
         this.motion=new Motion(this.poistion.getXpos(), this.poistion.getYpos(), this.poistion.getIdfloor());
+        this.move=false;
     }
 
     @Override
@@ -87,67 +99,71 @@ public class PositionController extends AbstractControl implements ActionListene
     }
     
     private boolean validationPosition(){
-        Vector3f pos=node.getLocalTranslation();    
-        return differenceDelta(pos.x, this.believedPosition.x, delta)&&differenceDelta(pos.y, this.believedPosition.y, delta);
+        Vector3f pos=node.getLocalTranslation(); 
+        return differenceDelta(pos.x, this.believedPosition.x, delta)&&differenceDelta(pos.z, this.believedPosition.z, delta);
         //&&differenceDelta(pos.z, this.believedPosition.z, delta);
+    }
+    
+    
+    private boolean moveCharacter(Vector3f modelForwardDir,float speed_){
+        BetterCharacterControl control = spatial.getControl(BetterCharacterControl.class);
+        try {
+            control.setWalkDirection(modelForwardDir.normalizeLocal().mult(speed_));
+            control.setViewDirection(modelForwardDir.normalize());                    
+        } catch (Exception e) {
+            System.out.println(" -------------- ERROR  -------------   ");
+            Logger.getLogger(this.alias).log(Level.SEVERE, null, e);
+        }
+        return true;
     }
     
     @Override
     protected void controlUpdate(float tpf) {
         if (spatial.getParent() != null) {
+            //System.out.println("---> "+alias+" :  "+validationPosition+" "+this.spatial.getLocalTranslation()+" "+ validationPosition()+" "+this.believedPosition);
             if (validationPosition()){
                 if (!validationPosition){
+                    this.contOut=0;
+                    //System.out.println("++++++++++++++>>>>>>> LLEGOOOO "+this.alias);
+                    ActionDataAgent ad =new ActionDataAgent(this.reply_with,this.in_reply_to,"ACK",this.alias,new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor()));
+                    sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                    sendMessage(Const.getGuardMove(this.type),this.alias,ad);
                     validationPosition=true;
-                    super.enabled=false;
-                    BetterCharacterControl control = spatial.getControl(BetterCharacterControl.class);
-                    Vector3f modelForwardDir = new Vector3f(0, 0, 0);
-                    float angle = 0;
-                    if(this.poistion.getYpos()==0 && this.poistion.getXpos() > 0)
-                        angle = FastMath.HALF_PI;
-                    if(this.poistion.getYpos()==0 && this.poistion.getXpos() < 0)
-                        angle = -FastMath.HALF_PI;
-                    if(this.poistion.getYpos()<0 && this.poistion.getXpos() == 0)
-                        angle = FastMath.PI; 
-
-                    modelForwardDir.y=0;
-
-                    Vector3f walkDirection = new Vector3f(0, 0, 0);
-                    walkDirection.addLocal(modelForwardDir.normalize().mult(0));
-                    control.setWalkDirection(walkDirection);
-
-                    Quaternion rotateL = new Quaternion().fromAngleAxis(angle, Vector3f.UNIT_Y);
-                    Vector3f viewDirection = modelForwardDir.normalize();//control.getViewDirection();
-                    rotateL.multLocal(viewDirection);
-                    control.setViewDirection(viewDirection);
-                    ActionDataAgent ad =new ActionDataAgent("ACK",this.alias,new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor()));
-                    Agent.sendMessage(Const.getGuardMove(this.type),this.alias, ad);
+                    //super.enabled=false;
+                    modelForwardDir=new Vector3f(0,0,0);
+                    moveCharacter(modelForwardDir,0 );
                     
+                }else if(contOut>=1e3){
+                    System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
+                    ActionDataAgent ad =new ActionDataAgent(this.reply_with,this.in_reply_to,"ACK",this.alias,new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor()));
+                    sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                    sendMessage(Const.getGuardMove(this.type),this.alias,ad);
                     
                 }
+                
+                this.move=false;
             }else{
-                validationPosition=false;
-                BetterCharacterControl control = spatial.getControl(BetterCharacterControl.class);
-                
-                Vector3f positionNode = this.spatial.getLocalTranslation();
-                Vector3f modelForwardDir =new Vector3f(this.believedPosition.x-positionNode.x, this.believedPosition.y-positionNode.y, this.believedPosition.z-positionNode.z) ;
-                 float angle = 0;
-                 if(this.poistion.getYpos()==0 && this.poistion.getXpos() > 0)
-                    angle = FastMath.HALF_PI;
-                if(this.poistion.getYpos()==0 && this.poistion.getXpos() < 0)
-                    angle = -FastMath.HALF_PI;
-                if(this.poistion.getYpos()<0 && this.poistion.getXpos() == 0)
-                    angle = FastMath.PI; 
-                   modelForwardDir.y=0;
-                
-                Vector3f walkDirection = new Vector3f(0, 0, 0);
-                walkDirection.addLocal(modelForwardDir.normalizeLocal().mult(speed));
-                control.setWalkDirection(walkDirection);
-
-                Quaternion rotateL = new Quaternion().fromAngleAxis(angle, Vector3f.UNIT_Y);
-                Vector3f viewDirection = modelForwardDir.normalizeLocal();//control.getViewDirection();
-                rotateL.multLocal(viewDirection);
-                control.setViewDirection(viewDirection);
+               
+                if (!this.move){
+                    this.move=true;
+                    this.contOut=0;
+                }else{
+                    contOut++;
+                    if (contOut>=1e3){
+                        System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
+                        ActionDataAgent ad =new ActionDataAgent(this.reply_with,this.in_reply_to,"NACK",this.alias,new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor()));
+                        this.data.setAction("moveNACK");
+                        sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                        sendMessage(Const.getGuardMove(this.type),this.alias,ad);
+                    
+                    }
                 }
+                validationPosition=false;
+                Vector3f positionNode = this.spatial.getLocalTranslation();
+                modelForwardDir =new Vector3f(this.believedPosition.x-positionNode.x, 0, this.believedPosition.z-positionNode.z) ;
+                modelForwardDir.y=0;
+                moveCharacter(modelForwardDir, speed);
+               }
             
         }
     }
@@ -155,50 +171,27 @@ public class PositionController extends AbstractControl implements ActionListene
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
     }
-
-    private void setupKeys(InputManager inputManager) {
-        inputManager.addMapping("TurnLeft", new KeyTrigger(KeyInput.KEY_NUMPAD4));
-        inputManager.addMapping("TurnRight", new KeyTrigger(KeyInput.KEY_NUMPAD6));
-        inputManager.addMapping("Up", new KeyTrigger(KeyInput.KEY_NUMPAD8));
-        inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_NUMPAD2));
-        inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_NUMPAD7));
-        inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_NUMPAD9));
-        inputManager.addListener(this, "TurnLeft");
-        inputManager.addListener(this, "TurnRight");
-        inputManager.addListener(this, "Left");
-        inputManager.addListener(this, "Right");
-        inputManager.addListener(this, "Up");
-        inputManager.addListener(this, "Down");
+    
+    public void sendMessage(Class guard, String alias, DataBESA data) {
+        
+        EventBESA ev = new EventBESA(guard.getName(), data);
+        try {
+            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
+            ah.sendEvent(ev);
+        } catch (ExceptionBESA ex) {
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //System.out.println("+++ Send ACK "+alias);
     }
+    
 
     public void onAction(String name, boolean isPressed, float tpf) {
-        this.resetMove();
-        if (name.equals("TurnLeft")) {
-            turnLeft = isPressed;
-        }
-        if (name.equals("TurnRight")) {
-            turnRight = isPressed;
-        }
-        if (name.equals("Up")) {
-            forward = isPressed;
-        }
-        if (name.equals("Down")) {
-            backward = isPressed;
-        }
-        if (name.equals("Left")) {
-            left = isPressed;
-        }
-        if (name.equals("Right")) {
-            right = isPressed;
-        }
-        //keyBoardPressed = (left || right || forward || backward || turnLeft || turnRight);
+   
     }
 
     
     
-    private void resetMove() {
-        this.forward = this.backward = this.left = this.right = this.turnLeft = this.turnRight = false;
-    }
+    
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -227,7 +220,7 @@ public class PositionController extends AbstractControl implements ActionListene
     public void setBelievedPosition(Vector3f believedPosition) {
         this.believedPosition = believedPosition;
         this.validationPosition=false;
-       
+                
     }
 
     public boolean isForward() {
@@ -359,6 +352,35 @@ public class PositionController extends AbstractControl implements ActionListene
     public void setMotion(Motion motion) {
         this.motion = motion;
     }
+
+    public int getReply_with() {
+        return reply_with;
+    }
+
+    public void setReply_with(int reply_with) {
+        this.reply_with = reply_with;
+    }
+
+    public int getIn_reply_to() {
+        return in_reply_to;
+    }
+
+    public void setIn_reply_to(int in_reply_to) {
+        this.contOut=0;
+        this.in_reply_to = in_reply_to;
+    }
+
+    public ActionData getData() {
+        return data;
+    }
+
+    public void setData(ActionData data) {
+        data.setAction("moveACK");
+        this.data = data;
+    }
+    
+    
+    
     
     
 
@@ -367,5 +389,4 @@ public class PositionController extends AbstractControl implements ActionListene
     
     
 
-    
 }

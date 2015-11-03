@@ -39,7 +39,6 @@ public class SubscribeGuardJME extends GuardBESA {
         SubscribeDataJME data = (SubscribeDataJME)ebesa.getData();
         Spatial model=createSpatialGeometry(data.getAlias(),(float)data.getRadius(),(float)data.getHeight(),1);
         Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getYpos(), data.getXpos());
-        System.out.println(position);
         Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
         String evType=SubscribeResponseGuard.class.getName();
         switch(data.getType()){
@@ -47,6 +46,9 @@ public class SubscribeGuardJME extends GuardBESA {
             case(2): model=createModelExplorer();  break;
             case(3): model=createModelHostage();  break;
             case(4): model=createModelEnemy();  break;
+            /*case(2): model=createModelExplorer();  break;
+            case(3): model=createModelHostage();  break;
+            case(4): model=createModelEnemy();  break;*/
         };
 
         try {
@@ -86,9 +88,9 @@ public class SubscribeGuardJME extends GuardBESA {
     private Spatial createModelExplorer(){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentExplorer/Drone/Drone.j3o");
-        machineSpatial.scale(.25f);
+        machineSpatial.scale(.15f);
         //machineSpatial.rotate(0, 2*FastMath.PI, 0);
-        machineSpatial.setLocalTranslation(0f, 1.5f, 0);
+        machineSpatial.setLocalTranslation(0f, 1f, 0);
         //machineSpatial.setMaterial(mat1);
         return machineSpatial;
     }
@@ -97,21 +99,25 @@ public class SubscribeGuardJME extends GuardBESA {
         
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentHostage/Android/android.j3o");
-        machineSpatial.scale(0.3f);
+        machineSpatial.scale(0.25f);
         //machineSpatial.scale(.15f);
         //machineSpatial.rotate(0, -FastMath.PI/2, 0);
         machineSpatial.setLocalTranslation(0, 0.5f, 0);
-        //machineSpatial.setMaterial(mat1);
+        Material mat1 = new Material(ws.getApp().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        mat1.setColor("Color", ColorRGBA.Green);
+        machineSpatial.setMaterial(mat1);
+        
         return machineSpatial;
     }
     
     private Spatial createModelEnemy(){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
-        Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentEnemy/Marvin_Firefighter/Marvin_Firefighter.j3o");
-        machineSpatial.scale(.5f);
+        Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentEnemy/Falkenmorder ver2.j3o");
+        machineSpatial.scale(.06f);
+        
         //machineSpatial.scale(.15f);
         //machineSpatial.rotate(0, -FastMath.PI/2, 0);
-        //machineSpatial.setLocalTranslation(0, 1.2f, 0);
+        machineSpatial.setLocalTranslation(0, 0.5f, 0);
         //machineSpatial.setMaterial(mat1);
         return machineSpatial;
     }
@@ -136,7 +142,9 @@ public class SubscribeGuardJME extends GuardBESA {
     }
  
      public void answer(boolean ack,String alias,String evType){
-        ActionDataAgent actionData=new ActionDataAgent("NAK");
+        int reply_with=1;
+        int in_reply_to=-1;
+        ActionDataAgent actionData=new ActionDataAgent(reply_with,in_reply_to,"NAK");
         if (ack){
             actionData.setAction("ACK");
         }

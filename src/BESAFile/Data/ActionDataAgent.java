@@ -29,26 +29,37 @@ public class ActionDataAgent extends DataBESA {
     private Position position;
     private Motion motion;
     private float speed;
+    //
+    private int reply_with;
+    private int in_reply_to;
     
 
-    public ActionDataAgent(int type,String alias) {
+    public ActionDataAgent(int reply_with,int in_reply_to,int type,String alias) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.type = type;
     }
 
-    public ActionDataAgent(int type,String alias,String action) {
+    public ActionDataAgent(int reply_with,int in_reply_to,int type,String alias,String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.type = type;
         this.action=action;
     }
 
-    public ActionDataAgent(int type,String alias,String action,Vector3D viewDirection) {
+    public ActionDataAgent(int reply_with,int in_reply_to,int type,String alias,String action,Vector3D viewDirection) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.type = type;
         this.action=action;
         this.viewDirection=viewDirection;
     }
-    public ActionDataAgent(int type,String alias,Motion motion,Position position,float speed,String action) {
+    public ActionDataAgent(int reply_with,int in_reply_to,int type,String alias,Motion motion,Position position,float speed,String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.type = type;
         this.action=action;
@@ -58,13 +69,17 @@ public class ActionDataAgent extends DataBESA {
     }
     
     
-     public ActionDataAgent(int type,String alias,String action,int xpos, int ypos, int idfloor,float speed) {
+     public ActionDataAgent(int reply_with,int in_reply_to,int type,String alias,String action,int xpos, int ypos, int idfloor,float speed) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.type = type;
         this.action=action;
     }
     
-    public ActionDataAgent(int type,float sightRange, double radius, double height, String alias,Position position, String action) {
+    public ActionDataAgent(int reply_with,int in_reply_to,int type,float sightRange, double radius, double height, String alias,Position position, String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.idfloor=position.getIdfloor();
         this.sightRange = sightRange;
         this.radius = radius;
@@ -75,18 +90,26 @@ public class ActionDataAgent extends DataBESA {
         this.position=position;
     }
     
-    public ActionDataAgent(String action) {
+    public ActionDataAgent(int reply_with,int in_reply_to,String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.action = action;
     }
 
     //Response 
-    public ActionDataAgent(String action,String alias,Position position) {
+    public ActionDataAgent(int reply_with,int in_reply_to,String action,String alias,Position position) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.action = action;
         this.alias=alias;
         this.position=position;
     }
     
-    public ActionDataAgent(String alias, int type, List<SeenObject> seenObjects,Position position,String action) {
+    public ActionDataAgent(int reply_with,int in_reply_to,String alias, int type, List<SeenObject> seenObjects,Position position,String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.type = type;
         this.seenObjects = seenObjects;
@@ -188,6 +211,22 @@ public class ActionDataAgent extends DataBESA {
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public int getReply_with() {
+        return reply_with;
+    }
+
+    public void setReply_with(int reply_with) {
+        this.reply_with = reply_with;
+    }
+
+    public int getIn_reply_to() {
+        return in_reply_to;
+    }
+
+    public void setIn_reply_to(int in_reply_to) {
+        this.in_reply_to = in_reply_to;
     }
     
     

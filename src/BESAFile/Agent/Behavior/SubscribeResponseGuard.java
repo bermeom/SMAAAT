@@ -17,7 +17,10 @@ public class SubscribeResponseGuard extends GuardBESA {
     @Override
     public void funcExecGuard(EventBESA ebesa) {
         AgentState state = (AgentState) this.getAgent().getState();
-        ActionDataAgent actionData = new ActionDataAgent(state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
+        ActionDataAgent data = (ActionDataAgent) ebesa.getData();
+        int reply_with=state.getNextConsecutive();
+        int in_reply_to=data.getReply_with();
+        ActionDataAgent actionData = new ActionDataAgent(reply_with,in_reply_to,state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {

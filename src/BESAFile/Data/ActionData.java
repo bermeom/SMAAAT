@@ -23,8 +23,15 @@ public class ActionData extends DataBESA{
     protected float sightRange;
     protected Motion motion;
     protected Position position;
+    //
+    private int reply_with;
+    private int in_reply_to;
+    private int id;
+    
 
-    public ActionData(int type, String alias, float speed, Motion motion, Position position, String action) {
+    public ActionData(int reply_with,int in_reply_to,int type, String alias, float speed, Motion motion, Position position, String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.type = type;
         this.alias = alias;
         this.action = action;
@@ -36,7 +43,9 @@ public class ActionData extends DataBESA{
     
     
     
-    public ActionData(int type,String alias,Vector3D direction,Position position, float speed,double radius,double height) {
+    public ActionData(int reply_with,int in_reply_to,int type,String alias,Vector3D direction,Position position, float speed,double radius,double height) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.alias = alias;
         this.position = position;
         this.speed=speed;
@@ -47,7 +56,9 @@ public class ActionData extends DataBESA{
     }
     
     
-    public ActionData(int xpos, int ypos, int idfloor, String alias, String action) {
+    public ActionData(int reply_with,int in_reply_to,int xpos, int ypos, int idfloor, String alias, String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.action = action;
@@ -55,7 +66,9 @@ public class ActionData extends DataBESA{
     }
     
     
-    public ActionData(int type,int xpos, int ypos, int idfloor, String alias, String action,float speed) {
+    public ActionData(int reply_with,int in_reply_to,int type,int xpos, int ypos, int idfloor, String alias, String action,float speed) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
         this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.action = action;
@@ -161,6 +174,31 @@ public class ActionData extends DataBESA{
     public void setSightRange(float sightRange) {
         this.sightRange = sightRange;
     }
+
+    public int getReply_with() {
+        return reply_with;
+    }
+
+    public void setReply_with(int reply_with) {
+        this.reply_with = reply_with;
+    }
+
+    public int getIn_reply_to() {
+        return in_reply_to;
+    }
+
+    public void setIn_reply_to(int in_reply_to) {
+        this.in_reply_to = in_reply_to;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     
     
     

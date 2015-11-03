@@ -82,7 +82,7 @@ public class SMAAAT {
         //a1Struct.bindGuard("agentPerception", SensorGuard.class);
         Agent agent = new Agent(a1State.getAlias(), a1State, a1Struct, passwdAg);
         agent.start();
-        sendEventAgentMove( admLocal,new ActionData(a1State.getXpos(), a1State.getYpos(), a1State.getIdfloor(), a1State.getAlias(), "move"));
+        sendEventAgentMove( admLocal,new ActionData(1,1,a1State.getXpos(), a1State.getYpos(), a1State.getIdfloor(), a1State.getAlias(), "move"));
         
         AgentStateTest a2State = new AgentStateTest(edifice,0,3,0,"a2");
         StructBESA a2Struct = new StructBESA();
@@ -92,7 +92,7 @@ public class SMAAAT {
         //a1Struct.bindGuard("agentPerception", SensorGuard.class);
         Agent agent1 = new Agent(a2State.getAlias(), a2State, a2Struct, passwdAg);
         agent1.start();
-        sendEventAgentMove( admLocal,new ActionData(a2State.getXpos(), a2State.getYpos(), a2State.getIdfloor(), a2State.getAlias(), "move"));
+        sendEventAgentMove( admLocal,new ActionData(1,1,a2State.getXpos(), a2State.getYpos(), a2State.getIdfloor(), a2State.getAlias(), "move"));
         
         
         
