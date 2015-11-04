@@ -19,6 +19,7 @@ import BESAFile.World.State.WorldStateJME;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -116,7 +117,7 @@ public class SubscribeGuardJME extends GuardBESA {
         machineSpatial.scale(.06f);
         
         //machineSpatial.scale(.15f);
-        //machineSpatial.rotate(0, -FastMath.PI/2, 0);
+        machineSpatial.rotate(0, -FastMath.PI/2, 0);
         machineSpatial.setLocalTranslation(0, 0.5f, 0);
         //machineSpatial.setMaterial(mat1);
         return machineSpatial;

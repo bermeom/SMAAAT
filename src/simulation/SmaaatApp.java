@@ -145,6 +145,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             createAgentExplorer(0, 4,0, new Vector3f(0, 0, 1));
             createAgentHostage(0, 4,1, new Vector3f(0, 0, 1));
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
+            createAgentEnemy(0, 4,3, new Vector3f(0, 0, 1));
             createAgentProtector(0, 3,3, new Vector3f(0, 0, 1));
             
             createAgentProtector(0, 7,7, new Vector3f(0, 0, 1));
@@ -413,6 +414,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         wrlStruct.bindGuard("ChangeBehavior", SubscribeGuardJME.class);
         wrlStruct.bindGuard("ChangeBehavior", SensorsAgentGuardJME.class);
         //*/
+        
         wrlStruct.addBehavior("SubscribeGuardJME");
         wrlStruct.addBehavior("SensorsAgentGuardJME");
         wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);

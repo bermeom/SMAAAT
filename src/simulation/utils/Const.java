@@ -16,7 +16,7 @@ public final class Const {
     public static final String Character = "Character";
     public static final String Exit = "Exit";
     public static final String World = "WORLD";
-    public static final float distBetweenFloors=0.5f;
+    public static final float distBetweenFloors=10;
     public static final float x=0;
     public static final float y=0;
     public static final float z=0;

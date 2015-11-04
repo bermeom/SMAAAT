@@ -5,13 +5,16 @@
 package BESAFile.World.Behavior;
 
 import BESA.ExceptionBESA;
+import BESA.Kernell.Agent.Event.DataBESA;
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.GuardBESA;
+import BESA.Kernell.System.AdmBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
 import BESAFile.Agent.Behavior.AgentMoveGuard;
 import BESAFile.Agent.State.AgentState;
+import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.Vector3D;
@@ -23,6 +26,8 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simulation.Controls.PositionController;
 import simulation.utils.Const;
 
@@ -50,6 +55,8 @@ public class UpdateGuardJME extends GuardBESA{
                 ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias());
                 if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
                     state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), 0);
+                    ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
+                    //sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                 }
                 break;
             case "moveNACK":
@@ -57,7 +64,8 @@ public class UpdateGuardJME extends GuardBESA{
                 if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
                     state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), -data.getId());
                     state.getmEdifice().setPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos(), 0);
-            
+                    ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),"NACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
+                    //sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                 }
                 break;
 
@@ -108,5 +116,18 @@ public class UpdateGuardJME extends GuardBESA{
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()/Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getLength()/Const.kGrid-Const.post(j));
         
+    }
+    
+    
+    public void sendMessage(Class guard, String alias, DataBESA data) {
+        
+        EventBESA ev = new EventBESA(guard.getName(), data);
+        try {
+            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
+            ah.sendEvent(ev);
+        } catch (ExceptionBESA ex) {
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //System.out.println("+++ Send ACK "+alias);
     }
 }

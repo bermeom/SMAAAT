@@ -126,16 +126,16 @@ public class PositionController extends AbstractControl implements ActionListene
                     this.contOut=0;
                     //System.out.println("++++++++++++++>>>>>>> LLEGOOOO "+this.alias);
                     ActionDataAgent ad =new ActionDataAgent(this.reply_with,this.in_reply_to,"ACK",this.alias,new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor()));
+                    this.data.setAction("moveACK");
                     sendMessage(UpdateGuardJME.class,Const.World, this.data);
                     sendMessage(Const.getGuardMove(this.type),this.alias,ad);
                     validationPosition=true;
-                    //super.enabled=false;
-                    modelForwardDir=new Vector3f(0,0,0);
                     moveCharacter(modelForwardDir,0 );
                     
                 }else if(contOut>=1e3){
                     System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
                     ActionDataAgent ad =new ActionDataAgent(this.reply_with,this.in_reply_to,"ACK",this.alias,new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor()));
+                    this.data.setAction("moveACK");
                     sendMessage(UpdateGuardJME.class,Const.World, this.data);
                     sendMessage(Const.getGuardMove(this.type),this.alias,ad);
                     
@@ -375,7 +375,6 @@ public class PositionController extends AbstractControl implements ActionListene
     }
 
     public void setData(ActionData data) {
-        data.setAction("moveACK");
         this.data = data;
     }
     
