@@ -6,6 +6,8 @@
 package BESAFile.World.State;
 
 import BESA.Kernell.Agent.StateBESA;
+import BESAFile.Agent.State.Motion;
+import BESAFile.Agent.State.Position;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelAgentWorld;
@@ -63,6 +65,14 @@ public class WorldStateJME extends StateBESA{
         mEdifice.setPostGridFloor(data.getIdfloor(), data.getXpos(), data.getYpos(), consecutiveAgent);
         consecutiveAgent++;
        
+    }
+    
+    public boolean moveAgent(Position p,Motion m,int idAgent){
+        if (this.listAgents.get(idAgent).getPosition().equals(p)){
+            this.listAgents.get(idAgent).setPos(m.getXpos(), m.getYpos(), m.getIdfloor());
+            return true;
+        }
+        return false;
     }
     
     public PositionController getAgentController(String agent){

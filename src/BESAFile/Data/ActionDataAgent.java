@@ -107,6 +107,15 @@ public class ActionDataAgent extends DataBESA {
         this.position=position;
     }
     
+    public ActionDataAgent(int reply_with,int in_reply_to,int type,String action,String alias,Position position) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
+        this.action = action;
+        this.alias=alias;
+        this.position=position;
+        this.type=type;
+    }
+    
     public ActionDataAgent(int reply_with,int in_reply_to,String alias, int type, List<SeenObject> seenObjects,Position position,String action) {
         this.reply_with=reply_with;
         this.in_reply_to=in_reply_to;

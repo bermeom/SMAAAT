@@ -43,7 +43,11 @@ public class Position {
     public void setIdfloor(int idfloor) {
         this.idfloor = idfloor;
     }
-
+    
+    public boolean equals(Position p){
+        return p.getIdfloor()==this.idfloor && p.getXpos()== this.xpos && p.getYpos()==this.ypos;
+    }
+    
     @Override
     public String toString() {
         return "Position{" + "xpos=" + xpos + ", ypos=" + ypos + ", idfloor=" + idfloor + '}';

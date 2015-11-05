@@ -48,46 +48,43 @@ public class UpdateGuardJME extends GuardBESA{
         }
         switch (data.getAction()) {
             case "move":
-                //ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
                 moveAgent(data, state);
                 break;
             case "moveACK":
-                ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias());
-                if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
-                    state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), 0);
-                    ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
-                    //sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
-                }
+                moveACK(data, state);
                 break;
             case "moveNACK":
-                ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias());
-                if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
-                    state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), -data.getId());
-                    state.getmEdifice().setPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos(), 0);
-                    ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),"NACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
-                    //sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
-                }
+                moveNACK(data, state);
                 break;
 
         }
 
     }
-
-    public void moveAgent(ActionData data, WorldStateJME state) {
-        try {
+    
+    private void moveAgent(ActionData data, WorldStateJME state) {
+        //try {
             int reply_with=data.getIn_reply_to();
             int in_reply_to=data.getReply_with();
-              
-            if(state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())!=0){
-              ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),data.getAlias(),"NACK");
-              Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
-              return;
-            }
-            
+            //ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
             int id=state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos());
-            data.setId(-id);
+            //System.out.println("<><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< "+ id);
+            
+            if (id<=0 || !state.getListAgents().get(id-1).getAlias().equals(data.getAlias())){
+                ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
+                Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
+                return;
+                }else if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())!=0){
+                         ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
+                         Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
+                         return;
+                         }else if (!state.moveAgent(data.getPosition(), data.getMotion(), id-1)){
+                                    ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
+                                    Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
+                                    return;
+                                    }
+            data.setId(id);
             state.getmEdifice().setPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos(), id);
-            state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), -id);
+            state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), id);
             PositionController pc=state.getAgentController(data.getAlias());
             pc.setReply_with(reply_with);
             pc.setIn_reply_to(in_reply_to);
@@ -102,14 +99,65 @@ public class UpdateGuardJME extends GuardBESA{
             //System.out.println(state.getmEdifice());
             pc.setEnabled(true);
             
-        } catch (Exception e) {
-              ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE xxxxxxxxxxxxxxxxxxxxxxxxxxx");
+       /* } catch (Exception e) {
+              ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE xxxxxxxxxxxxxxxxxxxxxxxxxxx"+e );
+              
                   
-        }
+        }*/
  
         
     
     }
+    
+     public void moveACK(ActionData data, WorldStateJME state) {
+         boolean sw=false; 
+         do{
+            try {
+                   //ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId());
+                   if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
+                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
+                       state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), 0);
+                   }
+                   if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())==data.getId()){
+                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
+                       ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
+                       Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
+                   }
+                   
+                   sw=true;
+            } catch (Exception e) {
+                    ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE ACKxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                    sw=false;
+               }
+         }while(!sw);
+     }
+     
+      public void moveNACK(ActionData data, WorldStateJME state) {
+          boolean sw=false;
+          do{
+            try {
+                  //ReportBESA.info("-------------------+++++++++++  MoveNACK World:D--------- "+data.getAlias());
+
+
+                  if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())==data.getId()){
+                      //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
+                      state.getmEdifice().setPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos(), 0);
+                  }
+                  if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
+                      //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
+                      ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"NACK",data.getAlias(),data.getPosition());
+                      Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
+                      state.getListAgents().get(data.getId()-1).setPosition(data.getPosition());
+                  }
+
+                  sw=false;
+              } catch (Exception e) {
+                   ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE NACK xxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                   sw=false;
+              }
+          }while(!sw);
+            
+      }
     
     
     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
@@ -119,15 +167,5 @@ public class UpdateGuardJME extends GuardBESA{
     }
     
     
-    public void sendMessage(Class guard, String alias, DataBESA data) {
-        
-        EventBESA ev = new EventBESA(guard.getName(), data);
-        try {
-            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
-            ah.sendEvent(ev);
-        } catch (ExceptionBESA ex) {
-            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //System.out.println("+++ Send ACK "+alias);
-    }
+  
 }

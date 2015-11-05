@@ -38,21 +38,18 @@ public class SubscribeGuardJME extends GuardBESA {
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         SubscribeDataJME data = (SubscribeDataJME)ebesa.getData();
-        Spatial model=createSpatialGeometry(data.getAlias(),(float)data.getRadius(),(float)data.getHeight(),1);
-        Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getYpos(), data.getXpos());
-        Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
-        String evType=SubscribeResponseGuard.class.getName();
-        switch(data.getType()){
-            case(1): model=createModelProtector();  break;
-            case(2): model=createModelExplorer();  break;
-            case(3): model=createModelHostage();  break;
-            case(4): model=createModelEnemy();  break;
-            /*case(2): model=createModelExplorer();  break;
-            case(3): model=createModelHostage();  break;
-            case(4): model=createModelEnemy();  break;*/
-        };
-
         try {
+            Spatial model=createSpatialGeometry(data.getAlias(),(float)data.getRadius(),(float)data.getHeight(),1);
+            Vector3f position=getPositionVirtiul(data.getIdfloor(), data.getYpos(), data.getXpos());
+            Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
+            switch(data.getType()){
+                case(1): model=createModelProtector();  break;
+                case(2): model=createModelExplorer();  break;
+                case(3): model=createModelHostage();  break;
+                case(4): model=createModelEnemy();  break;
+                
+            };
+
             Node node = new Node(data.getAlias());
             node.setLocalTranslation(position);
             node.attachChild(model);
@@ -68,10 +65,10 @@ public class SubscribeGuardJME extends GuardBESA {
             PositionController controller=new PositionController(node,direction,position,data.getAlias(),data.getType(),0,data.getRadius(),data.getHeight(),new Position(data.getXpos(), data.getYpos(),data.getIdfloor()) );
             ws.addAgent(data.getAlias(),controller,data);
             node.addControl(controller);
-            answer(true, data.getAlias(), evType);
+            //answer(true, data.getAlias());
         } catch (Exception e) {
             ReportBESA.error(e);
-            answer(false, data.getAlias(), evType);
+            answer(false, data.getAlias());
         }
     
     }
@@ -112,15 +109,23 @@ public class SubscribeGuardJME extends GuardBESA {
     }
     
     private Spatial createModelEnemy(){
-        WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
-        Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentEnemy/Falkenmorder ver2.j3o");
-        machineSpatial.scale(.06f);
+        try {
+            WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
+            Spatial machineSpatial = ws.getApp().getAssetManager().loadModel("Models/AgentEnemy/Falkenmorder ver2.j3o");
+            machineSpatial.scale(.06f);
+
+            //machineSpatial.scale(.15f);
+            machineSpatial.rotate(0, -FastMath.PI/2, 0);
+            machineSpatial.setLocalTranslation(0, 0.5f, 0);
+            //machineSpatial.setMaterial(mat1);
+            //*/
+            return machineSpatial;
+        } catch (Exception e) {
         
-        //machineSpatial.scale(.15f);
-        machineSpatial.rotate(0, -FastMath.PI/2, 0);
-        machineSpatial.setLocalTranslation(0, 0.5f, 0);
-        //machineSpatial.setMaterial(mat1);
-        return machineSpatial;
+        }
+        
+        
+        return createModelProtector();
     }
     
     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
@@ -142,14 +147,14 @@ public class SubscribeGuardJME extends GuardBESA {
         return g;
     }
  
-     public void answer(boolean ack,String alias,String evType){
+     public void answer(boolean ack,String alias){
         int reply_with=1;
         int in_reply_to=-1;
         ActionDataAgent actionData=new ActionDataAgent(reply_with,in_reply_to,"NAK");
         if (ack){
             actionData.setAction("ACK");
         }
-        EventBESA event = new EventBESA(evType, actionData);
+        EventBESA event = new EventBESA(SubscribeResponseGuard.class.getName(), actionData);
         AgHandlerBESA ah;
         try {
             ah = getAgent().getAdmLocal().getHandlerByAlias(alias);

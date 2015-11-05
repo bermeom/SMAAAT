@@ -46,30 +46,21 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         try {
+            AgentState state = (AgentState) this.getAgent().getState();
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
             switch (data.getAction()) {
                 case "move":
                     //ReportBESA.info("-------------------Move:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
-                    moveAgent(data);
+                    moveAgent(data.getReply_with(),data.getIn_reply_to(),data.getMotion());
 
                     break;
                 case "NACK":
-                    //ReportBESA.info("-------------------NAK :(--------- ");
-                    msnSensor(data);
+                    nack(data,state);
                     break;
                 case "ACK":
-                     ReportBESA.info("-------------------ACK:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
-                     AgentState state = (AgentState) this.getAgent().getState();
-                     state.setPosition(data.getPosition());
-                     if (!state.getIdConsecutive(data.getIn_reply_to())){
-                         return ;
-                     }
-                     state.marckConsecutive(data.getIn_reply_to());
-                     msnSensor(data);
-                    //moveACKAgent(data);
-                    break;
+                     ack(data,state);
+                     break;
                 case("ACK_SENSOR"):
-                    //System.out.println("-------------------ACK_SENSOR :D--------- ");
                     ackSensor(data);
                     break;
 
@@ -81,12 +72,10 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         }
     }
 
-    public void moveAgent(ActionDataAgent data) {
+    public void moveAgent(int reply_with,int in_reply_to,Motion motion) {
         try {
             AgentState state = (AgentState) this.getAgent().getState();
-            int reply_with=data.getReply_with();
-            int in_reply_to=data.getIn_reply_to();
-            ActionData ad = new ActionData(reply_with,in_reply_to,state.getType(), state.getAlias(),(float)state.getSpeed(),data.getMotion(),state.getPosition(), "move");
+            ActionData ad = new ActionData(reply_with,in_reply_to,state.getType(), state.getAlias(),(float)state.getSpeed(),motion,state.getPosition(), "move");
             Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
         } catch (Exception e) {
                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -158,7 +147,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     
     private void ackSensor(ActionDataAgent data){
         try {
+            //System.out.println("-------------------ACK_SENSOR :D--------- "+data.getAlias());
             AgentExplorerState state = (AgentExplorerState) this.getAgent().getState();
+            state.resetContMsOld();
             List<SeenObject> enemies=new ArrayList<>();
             int tam=(int)state.getSightRange()*2+1;
             boolean [][]mat=new boolean[tam][tam];
@@ -201,17 +192,22 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             }
             */
             Motion motion;
-            if (motions.size()>0){
-                Random random=new Random(System.currentTimeMillis());
-                motion=motions.get(random.nextInt(motions.size()));
-            }else{
-                motion=new Motion(state.getXpos(),state.getYpos(), state.getIdfloor());
-            }
-            state.setDirection(state.getDirection());//int xpos, int ypos, int idfloor,float speed
+            state.marckConsecutive(data.getIn_reply_to());
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
-            ActionDataAgent sod = new ActionDataAgent(reply_with,in_reply_to,data.getType(),data.getAlias(),motion,data.getPosition(),(float)state.getSpeed(),"move");
-            Agent.sendMessage(Const.getGuardMove(state.getType()), data.getAlias(), sod );
+            if (motions.size()>0){
+                Random random=new Random(System.currentTimeMillis());
+                int n=0;
+                do{
+                    n= random.nextInt(motions.size());
+                }while(n<0 || n>=motions.size());
+                motion=motions.get(n);
+               
+                moveAgent(reply_with, in_reply_to, motion);
+            }else{
+                msnSensor(reply_with, in_reply_to);
+            }
+            
         } catch (Exception e) {
             System.out.println(" xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxx ERROR ACK SENSOR");
         }
@@ -226,22 +222,50 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     
     }
 
-    private void msnSensor(ActionDataAgent data) {
-        try {
-            AgentState state = (AgentState) this.getAgent().getState();
-            int reply_with=state.getNextConsecutive();
-            int in_reply_to=data.getReply_with();
+    private void msnSensor(int reply_with,int in_reply_to) {
+        boolean sw=false;
+        //do{
+            try {
+                AgentState state = (AgentState) this.getAgent().getState();
+                ActionDataAgent actionData = new ActionDataAgent(reply_with,in_reply_to,state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
+                Agent.sendMessage(SensorsAgentGuardJME.class,Const.World, actionData);
+                sw=true;
+            } catch (Exception e) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                ReportBESA.error(e);
+                sw=false;
+            }
+        //}while(!sw);
+    }
 
-            ActionDataAgent actionData = new ActionDataAgent(reply_with,in_reply_to,state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
-            EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
-            AgHandlerBESA ah;
-        
-            ah = getAgent().getAdmLocal().getHandlerByAlias(Const.World);
-            ah.sendEvent(event);
-        } catch (ExceptionBESA e) {
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-            ReportBESA.error(e);
-        }
+    private void nack(ActionDataAgent data, AgentState state) {
+        //ReportBESA.info("-------------------NAK :(--------- ");
+        state.setPosition(data.getPosition());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             System.out.println("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------NACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
+         msnSensor(data.getIn_reply_to(),data.getReply_with());
+    }
+
+    private void ack(ActionDataAgent data, AgentState state) {
+        //ReportBESA.info("-------------------ACK:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
+        state.setPosition(data.getPosition());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             ReportBESA.info("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------ACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
+         msnSensor(data.getIn_reply_to(),data.getReply_with());
     }
     
 }

@@ -59,13 +59,16 @@ public class Agent extends AgentBESA{
     }
     
      public static void sendMessage(Class guard, String alias, DataBESA data) {
-        EventBESA ev = new EventBESA(guard.getName(), data);
-     
-        try {
-            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
-            ah.sendEvent(ev);
-        } catch (ExceptionBESA ex) {
-            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        boolean sw=false;
+             EventBESA ev = new EventBESA(guard.getName(), data);
+            try {
+                AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(alias);
+                ah.sendEvent(ev);
+                sw=true;
+            } catch (ExceptionBESA ex) {
+                Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
+                sw=false;
+            }
+        
     }
 }

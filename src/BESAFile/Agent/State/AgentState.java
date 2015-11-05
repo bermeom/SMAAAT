@@ -27,6 +27,8 @@ public class AgentState extends  StateBESA{
     protected double speed;
     protected boolean[] consecutiveMSN;
     protected int nextConsecutive;
+    protected int contMessagesOld;
+    protected int limitContMessagesOld;
     
 
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
@@ -38,9 +40,12 @@ public class AgentState extends  StateBESA{
         this.sightRange = 4;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
-        this.speed=4;
+        this.speed=3;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
+        this.contMessagesOld=0;
+        this.limitContMessagesOld=5;
+        
         
     }
     
@@ -53,9 +58,12 @@ public class AgentState extends  StateBESA{
         this.sightRange = 2;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
-        this.speed=3;
+        this.speed=1;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
+         this.nextConsecutive=0;
+        this.contMessagesOld=0;
+        this.limitContMessagesOld=5;
      }
 
     public ModelEdifice getEdifice() {
@@ -183,5 +191,24 @@ public class AgentState extends  StateBESA{
         return this.consecutiveMSN[idConsecutive];
     }
             
+    public void plusPlusContMsOld(){
+        this.contMessagesOld++;
+    }
     
+    public void resetContMsOld(){
+        this.contMessagesOld=0;
+    }
+    
+    public boolean isExceededContMsOld(){
+            return this.contMessagesOld>=this.limitContMessagesOld;
+    }
+
+    public int getContMessagesOld() {
+        return contMessagesOld;
+    }
+
+    public void setContMessagesOld(int contMessagesOld) {
+        this.contMessagesOld = contMessagesOld;
+    }
+     
 }

@@ -27,6 +27,10 @@ public class ActionData extends DataBESA{
     private int reply_with;
     private int in_reply_to;
     private int id;
+
+    public ActionData() {
+    }
+    
     
 
     public ActionData(int reply_with,int in_reply_to,int type, String alias, float speed, Motion motion, Position position, String action) {

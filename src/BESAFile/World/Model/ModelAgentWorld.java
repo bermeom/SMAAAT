@@ -5,22 +5,20 @@
  */
 package BESAFile.World.Model;
 
+import BESAFile.Agent.State.Position;
+
 /**
  *
  * @author berme_000
  */
 public class ModelAgentWorld {
     private int id;
-    private int xpos;
-    private int ypos;
-    private int idfloor;
+    private Position position;
     private int type;
     private String alias;
     
     public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias,int type,int id) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor = idfloor;
+        this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.id=id;
         this.type=type;
@@ -28,39 +26,37 @@ public class ModelAgentWorld {
 
 
     public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor = idfloor;
+        this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
     }
     
     public void setPos(int xpos, int ypos, int idfloor) {
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.idfloor = idfloor;
+        this.position.setIdfloor(idfloor);
+        this.position.setXpos(xpos);
+        this.position.setYpos(ypos);
     }
     public int getXpos() {
-        return xpos;
+        return this.position.getXpos();
     }
 
     public void setXpos(int xpos) {
-        this.xpos = xpos;
+        this.position.setXpos(xpos);
     }
 
     public int getYpos() {
-        return ypos;
+        return this.position.getYpos();
     }
 
     public void setYpos(int ypos) {
-        this.ypos = ypos;
+        this.position.setYpos(ypos);
     }
 
     public int getIdfloor() {
-        return idfloor;
+        return this.position.getIdfloor();
     }
 
     public void setIdfloor(int idfloor) {
-        this.idfloor = idfloor;
+        this.position.setIdfloor(idfloor);
     }
 
     public String getAlias() {
@@ -85,6 +81,14 @@ public class ModelAgentWorld {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
     
     

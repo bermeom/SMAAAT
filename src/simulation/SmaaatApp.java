@@ -2,11 +2,13 @@ package simulation;
 
 import simulation.utils.WorldFloor;
 import BESA.ExceptionBESA;
+import BESA.Kernell.Agent.Event.DataBESA;
 import BESA.Kernell.Agent.Event.EventBESA;
 import BESA.Kernell.Agent.StructBESA;
 import BESA.Kernell.System.AdmBESA;
 import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
+import BESAFile.Agent.Agent;
 import BESAFile.Agent.AgentEnemy;
 import BESAFile.Agent.AgentExplorer;
 import BESAFile.Agent.AgentHostage;
@@ -30,6 +32,7 @@ import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
+import BESAFile.World.Behavior.SimulationStartJME;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
 import BESAFile.World.State.WorldStateJME;
@@ -87,7 +90,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private int consecutiveAgenExplorer;
     private static AdmBESA admLocal;
     private double passwdAg;
-    
+    private boolean startAPP;
     public static void main(String[] args) {
         SmaaatApp app = new SmaaatApp();
         app.setShowSettings(false);
@@ -141,17 +144,20 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         characterNode = new Node();
         try {
             setupBesa();
+            
             createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 4,0, new Vector3f(0, 0, 1));
-            createAgentHostage(0, 4,1, new Vector3f(0, 0, 1));
+            createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 4,1, new Vector3f(0, 0, 1));
+            //*/
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
-            createAgentEnemy(0, 4,3, new Vector3f(0, 0, 1));
-            createAgentProtector(0, 3,3, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 4,3, new Vector3f(0, 0, 1));
+            createAgentHostage(0, 3,3, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 0,5, new Vector3f(0, 0, 1));
             
             createAgentProtector(0, 7,7, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 8,7, new Vector3f(0, 0, 1));
             createAgentHostage(0, 7,8, new Vector3f(0, 0, 1));
-            createAgentEnemy(0, 5,7, new Vector3f(0, 0, 1));
+            createAgentEnemy(0, 6,6, new Vector3f(0, 0, 1));
             createAgentProtector(0, 6,7, new Vector3f(0, 0, 1));
             
             
@@ -267,7 +273,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         nFloors=Const.nFloors;
         mEdifice=new ModelEdifice(width, length, nFloors);
         for (int i=0;i<nFloors;i++){
-            mEdifice.setPostGridFloor(i,6 ,0, -2);
+            //mEdifice.setPostGridFloor(i,6 ,0, -2);
+            mEdifice.setPostGridFloor(i,9,0, -2);
+            mEdifice.setPostGridFloor(i,7 ,1, -2);
             mEdifice.setPostGridFloor(i,0,0, -2);            
             mEdifice.setPostGridFloor(i,0,1, -2);            
             mEdifice.setPostGridFloor(i,1,1, -2);            
@@ -286,6 +294,18 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             mEdifice.setPostGridFloor(i,2,4, -2);
             mEdifice.setPostGridFloor(i,1,4, -2);
             mEdifice.setPostGridFloor(i,0,4, -2);
+            mEdifice.setPostGridFloor(i,0,6, -2);
+            mEdifice.setPostGridFloor(i,1,6, -2);
+            mEdifice.setPostGridFloor(i,1,7, -2);
+            mEdifice.setPostGridFloor(i,1,8, -2);
+            mEdifice.setPostGridFloor(i,2,8, -2);
+            mEdifice.setPostGridFloor(i,3,8, -2);
+            mEdifice.setPostGridFloor(i,4,8, -2);
+            mEdifice.setPostGridFloor(i,5,8, -2);
+            mEdifice.setPostGridFloor(i,5,6, -2);
+            mEdifice.setPostGridFloor(i,5,7, -2);
+            mEdifice.setPostGridFloor(i,3,5, -2);
+            mEdifice.setPostGridFloor(i,3,6, -2);
         }
         System.out.println(mEdifice);
         createVirtualEdifice();
@@ -402,6 +422,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     }
     
     private void setupBesa() throws ExceptionBESA{
+        this.startAPP=false;
         passwdAg = 0.91;
         SmaaatApp.admLocal = AdmBESA.getInstance();
         WorldStateJME ws=new WorldStateJME(this);
@@ -417,9 +438,10 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         
         wrlStruct.addBehavior("SubscribeGuardJME");
         wrlStruct.addBehavior("SensorsAgentGuardJME");
+        wrlStruct.addBehavior("simulationStartJME");
         wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
         wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
-        
+        wrlStruct.bindGuard("simulationStartJME", SimulationStartJME.class);
         //*/
         wrlStruct.addBehavior("UpdateGuardJME");
         wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
@@ -444,8 +466,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         inputManager.addListener(this, "KEY_1");
         inputManager.addMapping("KEY_2", new KeyTrigger(KeyInput.KEY_2));
         inputManager.addListener(this, "KEY_2");
-        inputManager.addMapping("KEY_3", new KeyTrigger(KeyInput.KEY_3));
-        inputManager.addListener(this, "KEY_3");
+        inputManager.addMapping("KEY_SPACE", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addListener(this, "KEY_SPACE");
     }
 
     public void onAction(String name, boolean isPressed, float tpf) {
@@ -459,9 +481,12 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             cam.setLocation(position.add(new Vector3f(3, 0, 0)));
             cam.lookAt(position, Vector3f.UNIT_Y);
         }
-        if(name.equals("KEY_3"))
-        {
-            
+        if(name.equals("KEY_SPACE"))
+        {   
+            if(!this.startAPP){
+                Agent.sendMessage(SimulationStartJME.class, Const.World, new ActionData());
+                this.startAPP=true;
+            }
         }
     }
     

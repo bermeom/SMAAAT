@@ -81,7 +81,7 @@ public class ModelFloor {
         String floorS="";
         for (int i=0;i<width;i++){
             for (int j=0;j<length;j++){
-                floorS+=floor[i][j]+" ";
+                floorS+="\t"+floor[i][j];
             }
             floorS+="\n";
         }
