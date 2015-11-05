@@ -40,7 +40,7 @@ public class AgentState extends  StateBESA{
         this.sightRange = 4;
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors);
-        this.speed=3;
+        this.speed=2;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
         this.contMessagesOld=0;

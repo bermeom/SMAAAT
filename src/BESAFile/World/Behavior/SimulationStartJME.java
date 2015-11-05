@@ -27,7 +27,7 @@ public class SimulationStartJME extends GuardBESA{
             for(ModelAgentWorld maw:ws.getListAgents()){
                 answer(true, maw.getAlias());
             }
-            
+            //ws.getApp().getBulletAppState().setDebugEnabled(false);
         } catch (Exception e) {
             ReportBESA.error(e);
         }
