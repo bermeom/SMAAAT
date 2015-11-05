@@ -114,19 +114,10 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
         
-        
-        //Spatial floorSpatial = assetManager.loadModel("Models/floor.j3o");
-        //rootNode.attachChild(machineSpatial);
-        
-        //cam.setLocation(floorSpatial.getWorldTranslation().add(0, 10, 10));
-        //cam.lookAt(floorSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
+
         cam.setLocation(new Vector3f(0, 20, -10));
         cam.lookAt(new Vector3f(0, -10, 3), Vector3f.UNIT_Y);
-        //*/
-        /*
-        cam.setLocation(floor.getWorldTranslation());
-        cam.lookAt(floor.getWorldTranslation(), Vector3f.UNIT_Y);
-        //*/
+        
         setupLighting();
         setupKeys();
 
@@ -138,8 +129,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
         ediffice.addControl(floorRigidBody);
         bulletAppState.getPhysicsSpace().add(floorRigidBody);
-        //*/
-        //createAgent();
         
         characterNode = new Node();
         try {
@@ -161,46 +150,15 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             createAgentProtector(0, 6,7, new Vector3f(0, 0, 1));
             createAgentEnemy(0, 7,6, new Vector3f(0, 0, 1));
             
-            
-            /*
-            createAgentProtector(1, 7,7, new Vector3f(0, 0, 1));
-            createAgentExplorer(1, 8,7, new Vector3f(0, 0, 1));
-            createAgentHostage(1, 7,8, new Vector3f(0, 0, 1));
-            createAgentEnemy(1, 6,6, new Vector3f(0, 0, 1));
-            createAgentProtector(1, 6,7, new Vector3f(0, 0, 1));
-            createAgentEnemy(1, 7,6, new Vector3f(0, 0, 1));
-            
-            
-            //*/
         } catch (ExceptionBESA ex) {
             Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
         }
         //Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
         
         rootNode.attachChild(characterNode);
-        //sendEventAgentMove();
+
     }
     
-    
-    
-    private void sendEventSuscribeAgent() {
-        
-        SubscribeDataJME actionData=new SubscribeDataJME(0, 0, 0, "Agent", new Vector3D(1, 0, 0), 1, 0.75f);
-        EventBESA event = new EventBESA(SubscribeGuardJME.class.getName(), actionData);
-        AgHandlerBESA ah;
-        boolean sw=true;
-        do{
-            try {
-                ah =AdmBESA.getInstance().getHandlerByAlias("WORLD");
-                ah.sendEvent(event);
-                sw=false;
-            } catch (ExceptionBESA e) {
-                ReportBESA.error(e);
-                sw=true;
-            }
-        }while(sw);
-        System.out.println("   -------------------------- SUCRIBE Agent --------------- ");
-    }
     
     
     private void createAgentProtector(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
@@ -216,14 +174,11 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
         agent.start();
         consecutiveAgenProtector++;
-       
-        //*/
+    
     }
     
      private void createAgentEnemy(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        //EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy(),admLocal);
-        //EnemyAgent agente=new EnemyAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenEnemy,0.75f,createModelEnemy());
         AgentEnemyState state = new AgentEnemyState(i,j,idFloor,Const.EnemyAgent+consecutiveAgenEnemy,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.45f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
@@ -246,14 +201,11 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         
         AgentHostage agent = new AgentHostage(state.getAlias(), state, struct, passwdAg);
         agent.start();
-        
         consecutiveAgenHostage++;
      }
      
      private void createAgentExplorer(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-        //ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer(),admLocal);
-        //ExplorerAgent agente=new ExplorerAgent(this, getPositionVirtiul(idFloor, i, j), direction,""+consecutiveAgenExplorer,0.75f,createModelExplorer());
         AgentExplorerState state = new AgentExplorerState(i,j,idFloor,Const.ExplorerAgent+consecutiveAgenExplorer,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.45f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
@@ -352,83 +304,11 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         
     }
     
-    private void createAgent(){
-        //bulletAppState.setDebugEnabled(true);
-        float radius = 1f;
-        float height = radius*2;
-        Node agentNode = new Node("Agent");
-        ((Spatial)(agentNode)).setUserData("radius", radius);
-        ((Spatial)(agentNode)).setUserData("height", height);
-        Box box = new Box(1, 1, 1);
-        Geometry cube = new Geometry("AgentCube", box);
-        //cube.setLocalTranslation(x+width-post(i), y+1.2f, z+length-post(j));
-        Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat1.setTexture("ColorMap", 
-              assetManager.loadTexture("Textures/texture3.jpg"));
-        mat1.setColor("Color", ColorRGBA.Blue);
-        cube.setMaterial(mat1);
-        
-        agentNode.attachChild(createModelExplorer());
-        agentNode.setLocalTranslation(new Vector3f(4, 1, 2));
-        BetterCharacterControl physicsCharacter = new BetterCharacterControl(radius, height, 1.0f);
-        agentNode.addControl(physicsCharacter);
-        bulletAppState.getPhysicsSpace().add(physicsCharacter);
-        WalkerNavControl wNavControl = new WalkerNavControl(inputManager, assetManager, ediffice);
-        agentNode.addControl(wNavControl);
-
-        rootNode.attachChild(agentNode);
-    
-    }
-    
-    private Spatial createModelProtector(){
-        Spatial machineSpatial = assetManager.loadModel("Models/AgentProtector/ED-209.j3o");
-        machineSpatial.scale(.3f);
-        //machineSpatial.rotate(0, FastMath.PI, 0);
-        //machineSpatial.setLocalTranslation(1.5f, 1.5f, 0);
-        //machineSpatial.setMaterial(mat1);
-        return machineSpatial;
-    }
-
-    private Spatial createModelExplorer(){
-        Spatial machineSpatial = assetManager.loadModel("Models/AgentExplorer/Drone/Drone.j3o");
-        machineSpatial.scale(.25f);
-        //machineSpatial.rotate(0, 2*FastMath.PI, 0);
-        machineSpatial.setLocalTranslation(0f, 1.5f, 0);
-        //machineSpatial.setMaterial(mat1);
-        return machineSpatial;
-    }
-
-    private Spatial createModelHostage(){
-        Spatial machineSpatial = assetManager.loadModel("Models/AgentHostage/Android/android.j3o");
-        machineSpatial.scale(0.3f);
-        //machineSpatial.scale(.15f);
-        //machineSpatial.rotate(0, -FastMath.PI/2, 0);
-        machineSpatial.setLocalTranslation(0, 0.5f, 0);
-        //machineSpatial.setMaterial(mat1);
-        return machineSpatial;
-    }
-    
-    private Spatial createModelEnemy(){
-        Spatial machineSpatial = assetManager.loadModel("Models/AgentEnemy/Marvin_Firefighter/Marvin_Firefighter.j3o");
-        machineSpatial.scale(.5f);
-        //machineSpatial.scale(.15f);
-        //machineSpatial.rotate(0, -FastMath.PI/2, 0);
-        //machineSpatial.setLocalTranslation(0, 1.2f, 0);
-        //machineSpatial.setMaterial(mat1);
-        return machineSpatial;
-    }
-    
     public void setupLighting() {
         cameraLight = new DirectionalLight();
         cameraLight.setColor(ColorRGBA.White);
         cameraLight.setDirection(cam.getDirection().normalizeLocal());
         rootNode.addLight(cameraLight);
-        /*
-        DirectionalLight sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(0f, -1f, 0f));
-        //sun.setColor(ColorRGBA.White);
-        rootNode.addLight(sun); 
-        //*/
     }
     
     private void setupBesa() throws ExceptionBESA{
@@ -437,14 +317,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         SmaaatApp.admLocal = AdmBESA.getInstance();
         WorldStateJME ws=new WorldStateJME(this);
         StructBESA wrlStruct = new StructBESA();
-        /*wrlStruct.addBehavior("WorldBehavior");
-        wrlStruct.bindGuard("WorldBehavior", GameGuard.class);
-        */
-        /*
-        wrlStruct.addBehavior("ChangeBehavior");
-        wrlStruct.bindGuard("ChangeBehavior", SubscribeGuardJME.class);
-        wrlStruct.bindGuard("ChangeBehavior", SensorsAgentGuardJME.class);
-        //*/
         
         wrlStruct.addBehavior("SubscribeGuardJME");
         wrlStruct.addBehavior("SensorsAgentGuardJME");
@@ -516,10 +388,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         return this.characterNode;
     }
 
-    /*
-    public AssetManager getAssetManager(){
-    return this.assetManager;
-    } */
     public Node getEdiffice() {
         return ediffice;
     }
