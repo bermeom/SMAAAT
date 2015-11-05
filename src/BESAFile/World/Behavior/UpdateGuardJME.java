@@ -111,7 +111,7 @@ public class UpdateGuardJME extends GuardBESA{
     
      public void moveACK(ActionData data, WorldStateJME state) {
          boolean sw=false; 
-         do{
+         //do{
             try {
                    //ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId());
                    if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
@@ -129,7 +129,7 @@ public class UpdateGuardJME extends GuardBESA{
                     ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE ACKxxxxxxxxxxxxxxxxxxxxxxxxxxx");
                     sw=false;
                }
-         }while(!sw);
+         //}while(!sw);
      }
      
       public void moveNACK(ActionData data, WorldStateJME state) {
@@ -145,12 +145,12 @@ public class UpdateGuardJME extends GuardBESA{
                   }
                   if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
+                      state.getListAgents().get(data.getId()-1).setPosition(data.getPosition());
                       ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"NACK",data.getAlias(),data.getPosition());
                       Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
-                      state.getListAgents().get(data.getId()-1).setPosition(data.getPosition());
                   }
 
-                  sw=false;
+                  sw=true;
               } catch (Exception e) {
                    ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE NACK xxxxxxxxxxxxxxxxxxxxxxxxxxx");
                    sw=false;

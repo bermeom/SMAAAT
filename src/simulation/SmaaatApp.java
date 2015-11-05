@@ -162,6 +162,15 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             createAgentEnemy(0, 7,6, new Vector3f(0, 0, 1));
             
             
+            /*
+            createAgentProtector(1, 7,7, new Vector3f(0, 0, 1));
+            createAgentExplorer(1, 8,7, new Vector3f(0, 0, 1));
+            createAgentHostage(1, 7,8, new Vector3f(0, 0, 1));
+            createAgentEnemy(1, 6,6, new Vector3f(0, 0, 1));
+            createAgentProtector(1, 6,7, new Vector3f(0, 0, 1));
+            createAgentEnemy(1, 7,6, new Vector3f(0, 0, 1));
+            
+            
             //*/
         } catch (ExceptionBESA ex) {
             Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
