@@ -62,9 +62,10 @@ public class PositionController extends AbstractControl implements ActionListene
     protected int reply_with;
     protected int in_reply_to;
     protected ActionData data;
-
+    protected boolean enable;
   
     public PositionController(Node node,String alias) {
+        this.enable=false;
         this.node=node;
 //        this.data=actionData;
     }
@@ -89,6 +90,7 @@ public class PositionController extends AbstractControl implements ActionListene
         this.move=false;
         moveCharacter(modelForwardDir,0 );
         this.limitContOut=1000;
+        this.enable=false;
     }
 
     @Override
@@ -125,7 +127,7 @@ public class PositionController extends AbstractControl implements ActionListene
     
     @Override
     protected void controlUpdate(float tpf) {
-        if (spatial.getParent() != null) {
+        if (spatial.getParent() != null && this.enable) {
             //System.out.println(contOut+" ---> "+alias+" :  "+validationPosition+" "+this.spatial.getLocalTranslation()+" "+ validationPosition()+" "+this.believedPosition);
             if (validationPosition()){
                 if (!validationPosition){
@@ -199,6 +201,7 @@ public class PositionController extends AbstractControl implements ActionListene
 
     @Override
     public void setEnabled(boolean enabled) {
+        this.enable=enabled;
         super.setEnabled(enabled);
     }
 

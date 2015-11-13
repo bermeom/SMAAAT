@@ -56,6 +56,10 @@ public class UpdateGuardJME extends GuardBESA{
             case "moveNACK":
                 moveNACK(data, state);
                 break;
+            case "disableController":
+                disableController(data, state);
+                break;
+                
 
         }
 
@@ -163,6 +167,14 @@ public class UpdateGuardJME extends GuardBESA{
     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
         return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()/Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getLength()/Const.kGrid-Const.post(j));
+        
+    }
+
+    private void disableController(ActionData data, WorldStateJME state) {
+        PositionController pc=state.getAgentController(data.getAlias());
+        if (pc != null){
+            pc.setEnabled(false);    
+        }
         
     }
     

@@ -31,7 +31,13 @@ public class ActionData extends DataBESA{
     public ActionData() {
     }
     
-    
+    public ActionData(int reply_with,int in_reply_to,int type, String alias, String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
+        this.type = type;
+        this.alias = alias;
+        this.action = action;
+    }
 
     public ActionData(int reply_with,int in_reply_to,int type, String alias, float speed, Motion motion, Position position, String action) {
         this.reply_with=reply_with;

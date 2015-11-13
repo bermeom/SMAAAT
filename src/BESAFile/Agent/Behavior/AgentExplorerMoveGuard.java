@@ -189,7 +189,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             }
             
             //System.out.println(state.getPosition());
-            //System.out.println(state.getEdifice());
+            System.out.println(state.getEdifice());
             
             /*
             if(!state.getHostages().isEmpty()){
@@ -207,7 +207,12 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             if (state.nextMotion(movements)){
                 moveAgent(reply_with, in_reply_to, state.getMotion());
             }else{
-                msnSensor(reply_with, in_reply_to);
+                if (state.isFullExplorationMap()){
+                    disableController(reply_with, in_reply_to);
+                }else{
+                    msnSensor(reply_with, in_reply_to);
+                    }
+                
             }
             
         } catch (Exception e) {
@@ -240,6 +245,22 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         //}while(!sw);
     }
 
+    private void disableController(int reply_with,int in_reply_to) {
+        boolean sw=false;
+        //do{
+            try {
+                AgentState state = (AgentState) this.getAgent().getState();
+                ActionData actionData = new ActionData(reply_with,in_reply_to,state.getType(), state.getAlias(), "disableController");
+                Agent.sendMessage(UpdateGuardJME.class,Const.World, actionData);
+                sw=true;
+            } catch (Exception e) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                ReportBESA.error(e);
+                sw=false;
+            }
+        //}while(!sw);
+    }
+    
     private void nack(ActionDataAgent data, AgentState state) {
         //ReportBESA.info("-------------------NAK :(--------- ");
         state.setPosition(data.getPosition());

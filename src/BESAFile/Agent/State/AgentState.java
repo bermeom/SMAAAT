@@ -41,6 +41,7 @@ public class AgentState extends  StateBESA{
     protected int movX[]={1,0, 0,-1,-1,1,-1, 1};
     protected int movY[]={0,1,-1, 0,-1,1, 1,-1};
     protected ModelFloor gridWeights;
+    protected boolean fullExplorationMap;
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
         this.position=new Position(xpos, ypos, idfloor);
@@ -59,7 +60,7 @@ public class AgentState extends  StateBESA{
         this.contMessagesOld=0;
         this.limitContMessagesOld=5;
         this.motion=new Motion();
-        
+        this.fullExplorationMap=false;
     }
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
@@ -80,6 +81,7 @@ public class AgentState extends  StateBESA{
         this.contMessagesOld=0;
         this.limitContMessagesOld=5;
         this.motion=new Motion();
+        this.fullExplorationMap=false;
      }
 
     public ModelEdifice getEdifice() {
@@ -234,6 +236,32 @@ public class AgentState extends  StateBESA{
     public void setContMessagesOld(int contMessagesOld) {
         this.contMessagesOld = contMessagesOld;
     }
+
+    public Position getGoal() {
+        return goal;
+    }
+
+    public void setGoal(Position goal) {
+        this.goal = goal;
+    }
+
+    public ModelFloor getGridWeights() {
+        return gridWeights;
+    }
+
+    public void setGridWeights(ModelFloor gridWeights) {
+        this.gridWeights = gridWeights;
+    }
+
+    public boolean isFullExplorationMap() {
+        return fullExplorationMap;
+    }
+
+    public void setFullExplorationMap(boolean fullExplorationMap) {
+        this.fullExplorationMap = fullExplorationMap;
+    }
+    
+    
     
     protected Motion getMovementsRandom(List<Motion> motions){
             if(motions.size()>0){
@@ -262,7 +290,7 @@ public class AgentState extends  StateBESA{
                    if(!this.goal.isIsNull()){
                        findMotion(movements); 
                     }else{
-                       this.motion=getMovementsRandom(movements);
+                       //this.motion=getMovementsRandom(movements);
                    }
                    //System.out.println("2--------------"+this.motion);
 
@@ -312,7 +340,9 @@ public class AgentState extends  StateBESA{
                     if (minDisctane!=-1){
                         this.goal=p;
                         waveFront(); 
-                        System.out.println(this.goal);
+                        //System.out.println(this.goal);
+                    }else{
+                        this.fullExplorationMap=true;
                     }
                    
     
