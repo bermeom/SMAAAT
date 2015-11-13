@@ -13,11 +13,17 @@ public class Motion {
     protected  int xpos;
     protected  int ypos;
     protected  int idfloor;
+    protected  boolean  isNull;
 
+    public Motion() {
+        this.isNull=true;
+    }
+     
     public Motion(int xpos, int ypos, int idfloor) {
         this.xpos = xpos;
         this.ypos = ypos;
         this.idfloor = idfloor;
+        this.isNull=false;
     }
 
     public int getXpos() {
@@ -43,6 +49,16 @@ public class Motion {
     public void setIdfloor(int idfloor) {
         this.idfloor = idfloor;
     }
+
+    public boolean isIsNull() {
+        return isNull;
+    }
+
+    public void setIsNull(boolean isNull) {
+        this.isNull = isNull;
+    }
+    
+    
 
     @Override
     public String toString() {

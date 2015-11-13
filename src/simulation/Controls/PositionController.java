@@ -138,7 +138,7 @@ public class PositionController extends AbstractControl implements ActionListene
                     moveCharacter(modelForwardDir,0 );
                     
                 }else if(contOut>=this.limitContOut){
-                    //System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
+                    System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
                     if (this.data!=null){
                         this.data.setAction("moveACK");
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);
@@ -154,7 +154,7 @@ public class PositionController extends AbstractControl implements ActionListene
                 }else{
                     contOut++;
                     if (contOut>=this.limitContOut){
-                        //System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
+                        System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);
                         if (this.data!=null){
                             this.data.setAction("moveNACK");

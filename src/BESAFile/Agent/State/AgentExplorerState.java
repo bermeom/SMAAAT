@@ -18,12 +18,14 @@ public class AgentExplorerState extends AgentState{
         super(xpos, ypos, idfloor, alias, direction, radius, width, length, nFlooors);
         this.type=2;
         this.speed=4;
+        this.sightRange=4;
     }
 
     public AgentExplorerState(int xpos, int ypos, int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
         super(xpos, ypos, idfloor, alias, direction, radius, height, width, length, nFlooors);
         this.type=2;
-        this.speed=5;
+        this.speed=4;
+        this.sightRange=4;
     }
 
     

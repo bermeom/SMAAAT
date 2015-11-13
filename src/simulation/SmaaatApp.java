@@ -134,14 +134,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         try {
             setupBesa();
             
-            createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
-            createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
+            //createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
+            //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 4,1, new Vector3f(0, 0, 1));
-            //*/
+            //createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
+            
+            /*
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 4,3, new Vector3f(0, 0, 1));
             createAgentHostage(0, 3,3, new Vector3f(0, 0, 1));
-            createAgentProtector(0, 0,5, new Vector3f(0, 0, 1));
+            createAgentProtector(0,  4,3, new Vector3f(0, 0, 1));
             
             createAgentProtector(0, 7,7, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 8,7, new Vector3f(0, 0, 1));
@@ -149,7 +151,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             createAgentEnemy(0, 6,6, new Vector3f(0, 0, 1));
             createAgentProtector(0, 6,7, new Vector3f(0, 0, 1));
             createAgentEnemy(0, 7,6, new Vector3f(0, 0, 1));
-            
+            //*/
         } catch (ExceptionBESA ex) {
             Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -163,7 +165,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     
     private void createAgentProtector(int idFloor,int i,int j,Vector3f direction) throws ExceptionBESA{
     
-       AgentProtectorState state = new AgentProtectorState(i,j,idFloor,Const.GuardianAgent+consecutiveAgenProtector,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.45f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
+        AgentProtectorState state = new AgentProtectorState(i,j,idFloor,Const.GuardianAgent+consecutiveAgenProtector,new Vector3D(direction.getX(), direction.getY(), direction.getZ()),0.45f,mEdifice.getWidth(),mEdifice.getLength(),mEdifice.getnFlooors());
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
@@ -233,7 +235,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         y=Const.y;
         z=Const.z;
         nFloors=Const.nFloors;
-        mEdifice=new ModelEdifice(width, length, nFloors);
+        mEdifice=new ModelEdifice(width, length, nFloors,false);
         for (int i=0;i<nFloors;i++){
             //mEdifice.setPostGridFloor(i,6 ,0, -2);
             mEdifice.setPostGridFloor(i,9,0, -2);

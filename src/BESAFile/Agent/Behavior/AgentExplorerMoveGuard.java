@@ -99,7 +99,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     }
     
     private boolean[][] border(boolean [][]mat, Position p, int width,int length ,int tam){
-        if(p.getYpos()+1>=width){
+        /*if(p.getYpos()+1>=width){
             for(int i=0;i<tam;i++){
                 mat[i][1+(int)(tam/2)]=false;
             }
@@ -119,6 +119,8 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 mat[(int)(tam/2)-1][i]=false;
             }
         }
+        
+        //*/
         int x=tam/2;
         
         if(!mat[x-1][x]){
@@ -155,34 +157,41 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             boolean [][]mat=new boolean[tam][tam];
             for (int i=0;i<tam;i++){
                 for (int j=0;j<tam;j++){
-                    mat[i][j]=true;
+                    mat[i][j]=false;
                 }
             }
             state.setPosition(data.getPosition());
             for (SeenObject so:data.getSeenObjects()){
                 switch(so.getType()){
                     case(-1):state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); break;//Walls
+                    case(0):mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=true; break;//Protector
                     case(1):break;//Protector
                     case(2):break;//Exprorator
                     case(3):break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
                 }
-                mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=false;
+                if (so.getType()!=-1){
+                    state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(),0);
+                }
             }
             mat=border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
             mat[tam/2][tam/2]=false;
-            List<Motion> motions=new ArrayList<>();
+            List<Motion> movements=new ArrayList<>();
             int offset=(int)(tam/2)-1;
             for (int i=offset;i<offset+3;i++){
                 for (int j=offset;j<offset+3;j++){
                     if (mat[i][j]){
-                       motions.add(new Motion(state.getXpos()+i-1-offset, state.getYpos()+j-1-offset, state.getIdfloor()));
+                       movements.add(new Motion(state.getXpos()+i-1-offset, state.getYpos()+j-1-offset, state.getIdfloor()));
+                       state.setModelEdiffice(state.getIdfloor(), movements.get(movements.size()-1).getXpos(), movements.get(movements.size()-1).getYpos(),0);
                     }
                 }
                 
             }
-            /*
+            
+            //System.out.println(state.getPosition());
             //System.out.println(state.getEdifice());
+            
+            /*
             if(!state.getHostages().isEmpty()){
                 callHostages();
             }
@@ -191,25 +200,18 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 shootEnemies();
             }
             */
-            Motion motion;
             state.marckConsecutive(data.getIn_reply_to());
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
-            if (motions.size()>0){
-                Random random=new Random(System.currentTimeMillis());
-                int n=0;
-                do{
-                    n= random.nextInt(motions.size());
-                }while(n<0 || n>=motions.size());
-                motion=motions.get(n);
-               
-                moveAgent(reply_with, in_reply_to, motion);
+            
+            if (state.nextMotion(movements)){
+                moveAgent(reply_with, in_reply_to, state.getMotion());
             }else{
                 msnSensor(reply_with, in_reply_to);
             }
             
         } catch (Exception e) {
-            System.out.println(" xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxx ERROR ACK SENSOR");
+            System.out.println(" xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxx ERROR ACK SENSOR "+e);
         }
             
     }
@@ -267,5 +269,8 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
          }
          msnSensor(data.getIn_reply_to(),data.getReply_with());
     }
+    
+    
+    
     
 }

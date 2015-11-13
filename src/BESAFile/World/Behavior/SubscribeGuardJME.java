@@ -63,6 +63,7 @@ public class SubscribeGuardJME extends GuardBESA {
             //*/
             ws.getApp().getCharacterNode().attachChild(node); 
             PositionController controller=new PositionController(node,direction,position,data.getAlias(),data.getType(),0,data.getRadius(),data.getHeight(),new Position(data.getXpos(), data.getYpos(),data.getIdfloor()) );
+            controller.setEnabled(false);
             ws.addAgent(data.getAlias(),controller,data);
             node.addControl(controller);
             //answer(true, data.getAlias());

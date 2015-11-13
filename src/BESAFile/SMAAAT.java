@@ -108,7 +108,7 @@ public class SMAAAT {
     }
     
     public static ModelEdifice createEdifice(){
-        ModelEdifice edifice=new ModelEdifice(10, 10, 1);
+        ModelEdifice edifice=new ModelEdifice(10, 10, 1,false);
         edifice.setPostGridFloor(0,4 ,0, 'H');
         edifice.setPostGridFloor(0,4 ,1, 'H');
         edifice.setPostGridFloor(0,4 ,2, 'H');

@@ -7,7 +7,14 @@ package BESAFile.Agent.State;
 import BESA.Kernell.Agent.StateBESA;
 import BESAFile.Data.Vector3D;
 import BESAFile.World.Model.ModelEdifice;
+import BESAFile.World.Model.ModelFloor;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.Queue;
+import java.util.Random;
+import java.util.Stack;
 
 /**
  *
@@ -29,41 +36,50 @@ public class AgentState extends  StateBESA{
     protected int nextConsecutive;
     protected int contMessagesOld;
     protected int limitContMessagesOld;
+    protected Position goal;
+    protected Motion motion; 
+    protected int movX[]={1,0, 0,-1,-1,1,-1, 1};
+    protected int movY[]={0,1,-1, 0,-1,1, 1,-1};
+    protected ModelFloor gridWeights;
     
-
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
         this.position=new Position(xpos, ypos, idfloor);
+        this.goal=new Position();
         this.alias = alias;
         this.direction = direction;
         this.radius = radius;
         this.height = radius*2;
-        this.sightRange = 4;
+        this.sightRange = 2;
         this.type=0;
-        this.edifice=new ModelEdifice(width, length, nFlooors);
+        this.edifice=new ModelEdifice(width, length, nFlooors,true);
+        this.edifice.setPostGridFloor(idfloor,xpos,ypos,0);
         this.speed=3;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
         this.contMessagesOld=0;
         this.limitContMessagesOld=5;
-        
+        this.motion=new Motion();
         
     }
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
         this.position=new Position(xpos, ypos, idfloor);
+        this.goal=new Position();
         this.alias = alias;
         this.direction = direction;
         this.radius = radius;
         this.height = height;
         this.sightRange = 2;
         this.type=0;
-        this.edifice=new ModelEdifice(width, length, nFlooors);
+        this.edifice=new ModelEdifice(width, length, nFlooors,true);
+        this.edifice.setPostGridFloor(idfloor,xpos,ypos,0);
         this.speed=1;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
          this.nextConsecutive=0;
         this.contMessagesOld=0;
         this.limitContMessagesOld=5;
+        this.motion=new Motion();
      }
 
     public ModelEdifice getEdifice() {
@@ -173,6 +189,14 @@ public class AgentState extends  StateBESA{
     public void setPosition(Position position) {
         this.position = position;
     }
+
+    public Motion getMotion() {
+        return motion;
+    }
+
+    public void setMotion(Motion motion) {
+        this.motion = motion;
+    }
     
     public int getNextConsecutive(){
         this.nextConsecutive++;
@@ -210,5 +234,124 @@ public class AgentState extends  StateBESA{
     public void setContMessagesOld(int contMessagesOld) {
         this.contMessagesOld = contMessagesOld;
     }
-     
+    
+    protected Motion getMovementsRandom(List<Motion> motions){
+            if(motions.size()>0){
+                Random random=new Random(System.currentTimeMillis());
+                int n=0;
+                do{
+                    n= random.nextInt(motions.size());
+                }while(n<0 || n>=motions.size());
+                return  motions.get(n);
+            }
+            return new Motion();
+    }
+    
+    protected boolean  intervalValidation(int n,int limit){
+        return n>=0&&n<limit;
+    }
+    
+    public boolean nextMotion(List<Motion> movements){
+           
+           if (!this.goal.isIsNull()&&this.edifice.getPostGridFloor(this.goal.getIdfloor(), this.goal.getXpos(), this.goal.getYpos())==ModelFloor.null_){
+               findMotion(movements);
+               //System.out.println("1--------------"+this.motion);
+            }else{
+                   this.motion=new Motion(); 
+                   goalSeek();
+                   if(!this.goal.isIsNull()){
+                       findMotion(movements); 
+                    }else{
+                       this.motion=getMovementsRandom(movements);
+                   }
+                   //System.out.println("2--------------"+this.motion);
+
+           }
+           //
+            return !this.motion.isIsNull();
+           
+    }
+    
+    protected void goalSeek(){
+                    this.goal=new Position();
+                    List<Position> goalsPosibles=new ArrayList<Position>();
+                    Deque<Position> bfs = new ArrayDeque<Position>();
+                    bfs.add(this.position);
+                    Position p=new Position();
+                    int newX,newY;
+                    this.gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
+                    this.gridWeights.set(this.position.getXpos(), this.position.getYpos(), 0);
+                    while (!bfs.isEmpty()){
+                        p=bfs.pop();
+                        for(int i=0;i<8;i++){
+                            newX=movX[i]+p.getXpos();
+                            newY=movY[i]+p.getYpos();
+                            if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&(this.gridWeights.get(newX, newY)!=0 && this.gridWeights.get(newX, newY)!=-1)){
+                                if (this.edifice.getPostGridFloor(this.position.getIdfloor(), newX, newY)==ModelFloor.null_){
+                                   goalsPosibles.add(new Position(newX, newY, this.position.getIdfloor()));
+                                   this.gridWeights.set(newX, newY, -1);
+                                }else if (this.edifice.getPostGridFloor(this.position.getIdfloor(), newX, newY)==0){
+                                            bfs.add(new Position(newX, newY, this.position.getIdfloor()));
+                                            this.gridWeights.set(newX, newY, 0);
+                                        } 
+                                }
+                        }
+
+
+                    }
+                    double minDisctane=-1,de;
+                    for(Position p1:goalsPosibles){
+                        de=this.position.euclideanDistance(p1);
+                        if(minDisctane==-1||minDisctane>de){
+                            minDisctane=de;
+                            p=p1;
+                        }
+                    }
+                    
+                    
+                    if (minDisctane!=-1){
+                        this.goal=p;
+                        waveFront(); 
+                        System.out.println(this.goal);
+                    }
+                   
+    
+    }
+
+    private void waveFront() {
+                    Deque<Position> bfs = new ArrayDeque<Position>();
+                    Position p=new Position();
+                    bfs.add(this.goal);
+                    this.gridWeights.set(this.goal.getXpos(), this.goal.getYpos(), 1);
+                    int newX,newY;
+                    while (!bfs.isEmpty()){
+                        p=bfs.pop();
+                        for(int i=0;i<8;i++){
+                            newX=movX[i]+p.getXpos();
+                            newY=movY[i]+p.getYpos();
+                            if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&(this.gridWeights.get(newX, newY)==0)){
+                                bfs.add(new Position(newX, newY, this.position.getIdfloor()));
+                                this.gridWeights.set(newX, newY, this.gridWeights.get(p.getXpos(), p.getYpos())+1);
+                            }
+                        }
+                    }
+                    //System.out.println(this.gridWeights);
+        
+    }
+
+    private void findMotion(List<Motion> movements) {
+            double de,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
+            
+            for(Motion m:movements){
+                 de=this.gridWeights.get(m.getXpos(), m.getYpos());
+                 //System.out.println("->> "+de+" "+m);
+                 if(minDisctane==-1||minDisctane>de){
+                     minDisctane=de;
+                     this.motion=m;
+                     }
+             }
+            //System.out.println(this.motion);
+    }
+    
+    
 }

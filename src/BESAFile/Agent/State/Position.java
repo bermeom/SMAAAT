@@ -13,11 +13,18 @@ public class Position {
     protected  int xpos;
     protected  int ypos;
     protected  int idfloor;
+    protected  boolean  isNull;
+
+    public Position() {
+        this.isNull=true;
+    }
+     
 
     public Position(int xpos, int ypos, int idfloor) {
         this.xpos = xpos;
         this.ypos = ypos;
         this.idfloor = idfloor;
+        this.isNull=false;
     }
 
     public int getXpos() {
@@ -46,6 +53,22 @@ public class Position {
     
     public boolean equals(Position p){
         return p.getIdfloor()==this.idfloor && p.getXpos()== this.xpos && p.getYpos()==this.ypos;
+    }
+
+    public boolean isIsNull() {
+        return isNull;
+    }
+
+    public void setIsNull(boolean isNull) {
+        this.isNull = isNull;
+    }
+    
+    public double euclideanDistance(Position p){
+        return Math.sqrt((double)(this.xpos-p.getXpos())*(this.xpos-p.getXpos())+(double)(this.ypos-p.getYpos())-(this.ypos-p.getYpos()));
+    }
+    
+    public double euclideanDistance(Motion p){
+        return Math.sqrt((double)(this.xpos-p.getXpos())*(this.xpos-p.getXpos())+(double)(this.ypos-p.getYpos())-(this.ypos-p.getYpos()));
     }
     
     @Override

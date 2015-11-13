@@ -19,14 +19,19 @@ public class ModelFloor {
     private List<ModelObjectWorld> objects;
     private int width;
     private int length;
-        
-    public ModelFloor(int width,int length){
+    public static final int null_=(1<<32-2);  
+    
+    public ModelFloor(int width,int length,boolean withNull){
         this.width=width;
         this.length=length;
         floor=new int[width][length];
         for (int i=0;i<width;i++){
             for(int j=0;j<length;j++){
-                floor[i][j]=0;
+                if(withNull){
+                    floor[i][j]=null_;
+                }else {
+                        floor[i][j]=0;
+                }
             }
         }
         objects=new ArrayList<ModelObjectWorld>();
@@ -77,11 +82,17 @@ public class ModelFloor {
         this.length = length;
     }
     
+    
+    
     public String toString(){
         String floorS="";
         for (int i=0;i<width;i++){
             for (int j=0;j<length;j++){
-                floorS+="\t"+floor[i][j];
+                if(floor[i][j]==null_)
+                    floorS+="\tn";
+                else    
+                    floorS+="\t"+floor[i][j];
+            
             }
             floorS+="\n";
         }

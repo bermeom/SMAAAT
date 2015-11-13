@@ -28,13 +28,13 @@ public class ModelEdifice {
     
     
     
-    public ModelEdifice(int width,int length,int nFlooors){
+    public ModelEdifice(int width,int length,int nFlooors,boolean withNull){
             this.nFlooors=nFlooors;
             this.width=width;
             this.length=length;
             floors=new ModelFloor[nFlooors];
             for (int i=0;i<nFlooors;i++){
-                floors[i]=new ModelFloor(width, length);
+                floors[i]=new ModelFloor(width, length,withNull);
             }
     }
     
