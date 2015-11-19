@@ -90,6 +90,15 @@ public class ModelAgentWorld {
     public void setPosition(Position position) {
         this.position = position;
     }
+
+    @Override
+    public String toString() {
+        return "ModelAgentWorld{" + "id=" + id + ", position=" + position + ", type=" + type + ", alias=" + alias + '}';
+    }
+    
+    
+    
+    
     
     
     

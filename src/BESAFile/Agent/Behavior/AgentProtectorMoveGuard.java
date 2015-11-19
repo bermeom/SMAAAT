@@ -13,7 +13,6 @@ import BESAFile.Agent.Agent;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
 import BESAFile.Agent.State.AgentStateTest;
-import BESAFile.Agent.State.MotionN;
 import BESAFile.Agent.State.Motion;
 import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;

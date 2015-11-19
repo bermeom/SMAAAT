@@ -14,10 +14,10 @@ import java.util.List;
  */
 public class ModelEdifice {
     
-    private ModelFloor[] floors;
-    private int nFlooors;
-    private int width;
-    private int length;
+    protected ModelFloor[] floors;
+    protected int nFlooors;
+    protected int width;
+    protected int length;
 
     public ModelEdifice(ModelEdifice me) {
         this.floors=me.getFloors().clone();

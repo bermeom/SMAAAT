@@ -59,16 +59,15 @@ public class WorldStateJME extends StateBESA{
     
     public void addAgent(String agent,PositionController pc,SubscribeDataJME data){
         agents.put(agent,pc);
-        ModelAgentWorld maw=new ModelAgentWorld(data.getXpos(), data.getYpos(), data.getIdfloor(), data.getAlias(), consecutiveAgent,data.getType());
+        ModelAgentWorld maw=new ModelAgentWorld(data.getXpos(), data.getYpos(), data.getIdfloor(), data.getAlias(),data.getType(), consecutiveAgent);
         this.listAgents.add(maw);
-        
         mEdifice.setPostGridFloor(data.getIdfloor(), data.getXpos(), data.getYpos(), consecutiveAgent);
         consecutiveAgent++;
        
     }
     
     public boolean moveAgent(Position p,Motion m,int idAgent){
-        if (this.listAgents.get(idAgent).getPosition().equals(p)){
+        if (this.listAgents.get(idAgent).getPosition().isEquals(p)){
             this.listAgents.get(idAgent).setPos(m.getXpos(), m.getYpos(), m.getIdfloor());
             return true;
         }

@@ -107,6 +107,12 @@ public class SubscribeDataJME extends DataBESA {
     public void setHeight(double height) {
         this.height = height;
     }
+
+    @Override
+    public String toString() {
+        return "SubscribeDataJME{" + "xpos=" + xpos + ", ypos=" + ypos + ", idfloor=" + idfloor + ", type=" + type + ", alias=" + alias + ", direction=" + direction + ", radius=" + radius + ", height=" + height + '}';
+    }
+    
     
     
 }

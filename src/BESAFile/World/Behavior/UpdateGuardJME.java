@@ -70,6 +70,7 @@ public class UpdateGuardJME extends GuardBESA{
             int reply_with=data.getIn_reply_to();
             int in_reply_to=data.getReply_with();
             //ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
+            
             int id=state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos());
             //System.out.println("<><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< "+ id);
             
@@ -83,9 +84,10 @@ public class UpdateGuardJME extends GuardBESA{
                          return;
                          }else if (!state.moveAgent(data.getPosition(), data.getMotion(), id-1)){
                                     ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
-                                    Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
+                                    //Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
                                     return;
                                     }
+            
             data.setId(id);
             state.getmEdifice().setPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos(), id);
             state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), id);
@@ -127,7 +129,7 @@ public class UpdateGuardJME extends GuardBESA{
                        ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
                        Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                    }
-                   
+                   //System.out.println(state.getmEdifice());
                    sw=true;
             } catch (Exception e) {
                     ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE ACKxxxxxxxxxxxxxxxxxxxxxxxxxxx");

@@ -5,7 +5,10 @@
 package BESAFile.Agent.State;
 
 import BESA.Kernell.Agent.StateBESA;
+import BESAFile.Data.NegotiationData;
 import BESAFile.Data.Vector3D;
+import BESAFile.Model.DesiredGoal;
+import BESAFile.Model.SeenObject;
 import BESAFile.World.Model.ModelEdifice;
 import BESAFile.World.Model.ModelFloor;
 import java.util.ArrayDeque;
@@ -36,16 +39,20 @@ public class AgentState extends  StateBESA{
     protected int nextConsecutive;
     protected int contMessagesOld;
     protected int limitContMessagesOld;
-    protected Position goal;
+    //
+    protected Deque<DesiredGoal> desiredGoals;
     protected Motion motion; 
     protected int movX[]={1,0, 0,-1,-1,1,-1, 1};
     protected int movY[]={0,1,-1, 0,-1,1, 1,-1};
-    protected ModelFloor gridWeights;
     protected boolean fullExplorationMap;
+    protected boolean deadLock;
+    protected boolean winNegotiation;
+    protected NegotiationData negotiationData;
+    
+    
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
         this.position=new Position(xpos, ypos, idfloor);
-        this.goal=new Position();
         this.alias = alias;
         this.direction = direction;
         this.radius = radius;
@@ -61,11 +68,13 @@ public class AgentState extends  StateBESA{
         this.limitContMessagesOld=5;
         this.motion=new Motion();
         this.fullExplorationMap=false;
+        this.deadLock=false;
+        this.negotiationData=new NegotiationData();
+        this.desiredGoals=new ArrayDeque<DesiredGoal>();
     }
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
         this.position=new Position(xpos, ypos, idfloor);
-        this.goal=new Position();
         this.alias = alias;
         this.direction = direction;
         this.radius = radius;
@@ -82,7 +91,10 @@ public class AgentState extends  StateBESA{
         this.limitContMessagesOld=5;
         this.motion=new Motion();
         this.fullExplorationMap=false;
-     }
+        this.deadLock=false;
+        this.negotiationData=new NegotiationData();
+        this.desiredGoals=new ArrayDeque<DesiredGoal>();
+    }
 
     public ModelEdifice getEdifice() {
         return edifice;
@@ -171,11 +183,22 @@ public class AgentState extends  StateBESA{
     public void setType(int type) {
         this.type = type;
     }
+     
     
+    public void setModelEdiffice(int idFloor,int i,int j,int value){
+            this.edifice.setPostGridFloor(idFloor, i, j, value);
+    }
+    
+    /*
+    public void isOpenPosModelEdiffice(int idFloor,int i,int j,int value){
+            this.edifice.setPostGridFloor(idFloor, i, j, value);
+    }
+    
+   
     public void setModelEdiffice(int idFloor,int i,int j,int value){
         this.edifice.setPostGridFloor(idFloor, i, j, value);
     }
-
+    */
     public double getSpeed() {
         return speed;
     }
@@ -238,19 +261,12 @@ public class AgentState extends  StateBESA{
     }
 
     public Position getGoal() {
-        return goal;
+        return this.desiredGoals.getFirst().getGoal();
     }
 
-    public void setGoal(Position goal) {
-        this.goal = goal;
-    }
-
+ 
     public ModelFloor getGridWeights() {
-        return gridWeights;
-    }
-
-    public void setGridWeights(ModelFloor gridWeights) {
-        this.gridWeights = gridWeights;
+        return this.desiredGoals.getFirst().getGridWeights();
     }
 
     public boolean isFullExplorationMap() {
@@ -259,6 +275,30 @@ public class AgentState extends  StateBESA{
 
     public void setFullExplorationMap(boolean fullExplorationMap) {
         this.fullExplorationMap = fullExplorationMap;
+    }
+
+    public boolean isDeadLock() {
+        return deadLock;
+    }
+
+    public void setDeadLock(boolean deadLock) {
+        this.deadLock = deadLock;
+    }
+    
+    public NegotiationData getNegotiationData() {
+        return negotiationData;
+    }
+
+    public void setNegotiationData(NegotiationData negotiationData) {
+        this.negotiationData = negotiationData;
+    }
+
+    public boolean isWinNegotiation() {
+        return winNegotiation;
+    }
+
+    public void setWinNegotiation(boolean winNegotiation) {
+        this.winNegotiation = winNegotiation;
     }
     
     
@@ -280,108 +320,166 @@ public class AgentState extends  StateBESA{
     }
     
     public boolean nextMotion(List<Motion> movements){
-           
-           if (!this.goal.isIsNull()&&this.edifice.getPostGridFloor(this.goal.getIdfloor(), this.goal.getXpos(), this.goal.getYpos())==ModelFloor.null_){
+           this.motion.setIsNull(true); 
+           if (!this.desiredGoals.isEmpty()&&this.edifice.getPostGridFloor(this.desiredGoals.getFirst().getGoal().getIdfloor(), this.desiredGoals.getFirst().getGoal().getXpos(), this.desiredGoals.getFirst().getGoal().getYpos())==ModelFloor.null_){
                findMotion(movements);
-               //System.out.println("1--------------"+this.motion);
             }else{
-                   this.motion=new Motion(); 
+                   if(!this.desiredGoals.isEmpty()){
+                       this.desiredGoals.pop();
+                   }
                    goalSeek();
-                   if(!this.goal.isIsNull()){
+                   if(!this.desiredGoals.isEmpty()){
                        findMotion(movements); 
                     }else{
                        //this.motion=getMovementsRandom(movements);
                    }
-                   //System.out.println("2--------------"+this.motion);
-
+                   
            }
            //
+           
             return !this.motion.isIsNull();
            
     }
     
     protected void goalSeek(){
-                    this.goal=new Position();
-                    List<Position> goalsPosibles=new ArrayList<Position>();
-                    Deque<Position> bfs = new ArrayDeque<Position>();
-                    bfs.add(this.position);
-                    Position p=new Position();
-                    int newX,newY;
-                    this.gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
-                    this.gridWeights.set(this.position.getXpos(), this.position.getYpos(), 0);
-                    while (!bfs.isEmpty()){
-                        p=bfs.pop();
-                        for(int i=0;i<8;i++){
-                            newX=movX[i]+p.getXpos();
-                            newY=movY[i]+p.getYpos();
-                            if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&(this.gridWeights.get(newX, newY)!=0 && this.gridWeights.get(newX, newY)!=-1)){
-                                if (this.edifice.getPostGridFloor(this.position.getIdfloor(), newX, newY)==ModelFloor.null_){
-                                   goalsPosibles.add(new Position(newX, newY, this.position.getIdfloor()));
-                                   this.gridWeights.set(newX, newY, -1);
-                                }else if (this.edifice.getPostGridFloor(this.position.getIdfloor(), newX, newY)==0){
-                                            bfs.add(new Position(newX, newY, this.position.getIdfloor()));
-                                            this.gridWeights.set(newX, newY, 0);
-                                        } 
-                                }
-                        }
-
-
-                    }
-                    double minDisctane=-1,de;
-                    for(Position p1:goalsPosibles){
-                        de=this.position.euclideanDistance(p1);
-                        if(minDisctane==-1||minDisctane>de){
-                            minDisctane=de;
-                            p=p1;
-                        }
-                    }
-                    
-                    
-                    if (minDisctane!=-1){
-                        this.goal=p;
-                        waveFront(); 
-                        //System.out.println(this.goal);
-                    }else{
-                        this.fullExplorationMap=true;
-                    }
+            if (!this.fullExplorationMap){
+                exploringFloorMapGoal();
+            }else{
+                // -> Explorin region Goal <-
+                
+            }        
                    
     
     }
+    
+    private void exploringFloorMapGoal(){
+            Deque<Position> goalsPosibles=new ArrayDeque<Position>();
+            Deque<Position> bfs = new ArrayDeque<Position>();
+            bfs.add(this.position);
+            Position p=new Position();
+            int newX,newY;
+            ModelFloor gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
+            gridWeights.set(this.position.getXpos(), this.position.getYpos(), 0);
+            while (!bfs.isEmpty()){
+                p=bfs.pop();
+                for(int i=0;i<8;i++){
+                    newX=movX[i]+p.getXpos();
+                    newY=movY[i]+p.getYpos();
+                    if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&(gridWeights.get(newX, newY)!=0 && gridWeights.get(newX, newY)!=-1)){
+                        if (this.edifice.getPostGridFloor(this.position.getIdfloor(), newX, newY)==ModelFloor.null_){
+                           goalsPosibles.add(new Position(newX, newY, this.position.getIdfloor()));
+                           gridWeights.set(newX, newY, -1);
+                        }else if (this.edifice.getPostGridFloor(this.position.getIdfloor(), newX, newY)==0){
+                                    bfs.add(new Position(newX, newY, this.position.getIdfloor()));
+                                    gridWeights.set(newX, newY, 0);
+                                } 
+                        }
+                }
 
-    private void waveFront() {
+
+            }
+            double minDisctane=-1,de;
+            for(Position p1:goalsPosibles){
+                de=this.position.euclideanDistance(p1);
+                if(minDisctane==-1||minDisctane>de){
+                    minDisctane=de;
+                    p=p1;
+                }
+            }
+
+
+            if (minDisctane!=-1){
+                gridWeights=waveFront(p,gridWeights); 
+                this.desiredGoals.addLast(new DesiredGoal(p,gridWeights,true));
+                //System.out.println(this.goal);
+            }else{
+                this.fullExplorationMap=true;
+                this.motion.setIsNull(true); 
+            }
+    
+    } 
+    
+    private ModelFloor waveFront(Position goal,ModelFloor gridWeights) {
                     Deque<Position> bfs = new ArrayDeque<Position>();
                     Position p=new Position();
-                    bfs.add(this.goal);
-                    this.gridWeights.set(this.goal.getXpos(), this.goal.getYpos(), 1);
+                    bfs.add(goal);
+                    gridWeights.set(goal.getXpos(), goal.getYpos(), 1);
                     int newX,newY;
                     while (!bfs.isEmpty()){
                         p=bfs.pop();
                         for(int i=0;i<8;i++){
                             newX=movX[i]+p.getXpos();
                             newY=movY[i]+p.getYpos();
-                            if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&(this.gridWeights.get(newX, newY)==0)){
+                            if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&(gridWeights.get(newX, newY)==0)){
                                 bfs.add(new Position(newX, newY, this.position.getIdfloor()));
-                                this.gridWeights.set(newX, newY, this.gridWeights.get(p.getXpos(), p.getYpos())+1);
+                                gridWeights.set(newX, newY, gridWeights.get(p.getXpos(), p.getYpos())+1);
                             }
                         }
                     }
                     //System.out.println(this.gridWeights);
+                    return gridWeights;
         
     }
 
     private void findMotion(List<Motion> movements) {
             double de,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
-            
+            this.motion.setIsNull(true); 
             for(Motion m:movements){
-                 de=this.gridWeights.get(m.getXpos(), m.getYpos());
+                 de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
                  //System.out.println("->> "+de+" "+m);
-                 if(minDisctane==-1||minDisctane>de){
+                 if(minDisctane==-1||(minDisctane>de&&this.desiredGoals.getFirst().isAttraction())||(minDisctane<de&&!this.desiredGoals.getFirst().isAttraction())){
                      minDisctane=de;
                      this.motion=m;
                      }
              }
+            int p1,p2;
+            p1=this.desiredGoals.getFirst().getGridWeights().get(this.position.getXpos(),this.position.getYpos());
+            p2=this.desiredGoals.getFirst().getGridWeights().get(this.motion.getXpos(),this.motion.getYpos());
+            
+            if (movements.size()==1 && ((p1<p2&&this.desiredGoals.getFirst().isAttraction())||(p1>p2&&!this.desiredGoals.getFirst().isAttraction()))){
+                this.motion.setIsNull(true);
+                this.deadLock=true;
+                
+            }
+            //*/
             //System.out.println(this.motion);
     }
+    
+    
+    public SeenObject  solutionDeadLock(List<SeenObject> seenOs, int [][]mat){
+        int tam=(int)this.sightRange*2+1;
+        int x,y;
+        SeenObject agent=null;
+        for(int i=0;i<4;i++){
+            x=movX[i]+this.position.getXpos();
+            y=movY[i]+this.position.getYpos();
+            if (intervalValidation(x,this.edifice.getWidth())&&intervalValidation(y,this.edifice.getLength())&&(this.desiredGoals.getFirst().getGridWeights().get(x, y)>0&& this.desiredGoals.getFirst().getGridWeights().get(x, y)<this.desiredGoals.getFirst().getGridWeights().get(position.getXpos(), position.getYpos()))){
+                agent=seenOs.get(mat[tam/2+movX[i]][tam/2+movY[i]]-1);
+                break;
+            }
+        }
+        return agent;
+    
+    }
+
+    public void addGoal(Position goal,boolean attraction,boolean first){
+        
+        ModelFloor gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
+        gridWeights.copyFloorArry(this.edifice.getFloor(goal.getIdfloor()).getFloor());
+        gridWeights=waveFront(goal,gridWeights); 
+        if(first){
+            this.desiredGoals.addFirst(new DesiredGoal(goal, gridWeights, attraction));
+        }else{
+            this.desiredGoals.addLast(new DesiredGoal(goal, gridWeights, attraction));
+        }
+    }
+    
+    public DesiredGoal getDesiredGoal(){
+        return this.desiredGoals.getFirst();
+    }
+    
+   
+    
     
     
 }

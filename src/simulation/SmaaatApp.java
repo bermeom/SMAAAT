@@ -28,6 +28,7 @@ import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
 import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
 import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
+import BESAFile.Agent.Behavior.AgentNegotiationGuard;
 import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
@@ -138,6 +139,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 4,1, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
+            //createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
             
             /*
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
@@ -214,6 +216,10 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("agentMove", AgentExplorerMoveGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        struct.addBehavior("AgentNegotiationGuard");
+        struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
+        
+        
         
         AgentExplorer agent = new AgentExplorer(state.getAlias(), state, struct, passwdAg);
         agent.start();

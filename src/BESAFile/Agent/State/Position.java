@@ -51,7 +51,11 @@ public class Position {
         this.idfloor = idfloor;
     }
     
-    public boolean equals(Position p){
+    public boolean isEquals(Position p){
+        return p.getIdfloor()==this.idfloor && p.getXpos()== this.xpos && p.getYpos()==this.ypos;
+    }
+
+    public boolean isEquals(Motion p){
         return p.getIdfloor()==this.idfloor && p.getXpos()== this.xpos && p.getYpos()==this.ypos;
     }
 

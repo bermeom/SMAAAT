@@ -15,10 +15,9 @@ import java.util.List;
 public class ModelFloor {
     
     
-    private int[][]floor;
-    private List<ModelObjectWorld> objects;
-    private int width;
-    private int length;
+    protected int[][]floor;
+    protected int width;
+    protected int length;
     public static final int null_=(1<<32-2);  
     
     public ModelFloor(int width,int length,boolean withNull){
@@ -34,7 +33,6 @@ public class ModelFloor {
                 }
             }
         }
-        objects=new ArrayList<ModelObjectWorld>();
     }
     
     public int get(int i,int j){
@@ -47,7 +45,6 @@ public class ModelFloor {
     
     public void addObject(int i,int j,char value){
         floor[i][j]=value;
-        objects.add(new ModelObjectWorld(j, j, value));
     }
     
     public void copyFloorArry(int [][] f){
