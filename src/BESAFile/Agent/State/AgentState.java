@@ -448,12 +448,17 @@ public class AgentState extends  StateBESA{
     
     public SeenObject  solutionDeadLock(List<SeenObject> seenOs, int [][]mat){
         int tam=(int)this.sightRange*2+1;
-        int x,y;
+        int x,y,p1,p2;
         SeenObject agent=null;
         for(int i=0;i<4;i++){
             x=movX[i]+this.position.getXpos();
             y=movY[i]+this.position.getYpos();
-            if (intervalValidation(x,this.edifice.getWidth())&&intervalValidation(y,this.edifice.getLength())&&(this.desiredGoals.getFirst().getGridWeights().get(x, y)>0&& this.desiredGoals.getFirst().getGridWeights().get(x, y)<this.desiredGoals.getFirst().getGridWeights().get(position.getXpos(), position.getYpos()))){
+            if (intervalValidation(x,this.edifice.getWidth())&&intervalValidation(y,this.edifice.getLength())&&
+                 (this.desiredGoals.getFirst().getGridWeights().get(x, y)>0&& 
+                      ((this.desiredGoals.getFirst().getGridWeights().get(x, y)<this.desiredGoals.getFirst().getGridWeights().get(position.getXpos(), position.getYpos())&&this.desiredGoals.getFirst().isAttraction())
+                        ||(this.desiredGoals.getFirst().getGridWeights().get(x, y)>this.desiredGoals.getFirst().getGridWeights().get(position.getXpos(), position.getYpos())&&!this.desiredGoals.getFirst().isAttraction())
+                        )
+                    )){
                 agent=seenOs.get(mat[tam/2+movX[i]][tam/2+movY[i]]-1);
                 break;
             }

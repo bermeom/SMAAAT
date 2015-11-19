@@ -53,7 +53,7 @@ public class DesiredGoal {
 
     @Override
     public String toString() {
-        return "DesiredGoal{" + "goal=" + goal + ", gridWeights=" + gridWeights + ", attraction=" + attraction + '}';
+        return "DesiredGoal{" + "goal=" + goal + ", attraction=" + attraction + ", gridWeights=\n" + gridWeights  + '}';
     }
     
     

@@ -62,6 +62,7 @@ public class AgentNegotiationGuard extends GuardBESA  {
                 //System.out.println("------------- Winner ->"+data.getAlias());
                 state.addGoal(new Position(state.getGoal().getXpos(), state.getGoal().getYpos(), state.getGoal().getIdfloor()), false, true);
                 state.addGoal(data.getGoal(), false, true);
+                System.out.println(state.getDesiredGoal());
             }
             state.setWinNegotiation(ganador);
             ActionDataAgent ad=new ActionDataAgent(data.getIn_reply_to(), data.getReply_with(), "ACK_NEGOTIATION");
