@@ -464,9 +464,12 @@ public class AgentState extends  StateBESA{
             p2=this.desiredGoals.getFirst().getGridWeights().get(this.motion.getXpos(),this.motion.getYpos());
             
             if (movements.size()==1 && ((p1<p2&&this.desiredGoals.getFirst().isAttraction())||(p1>p2&&!this.desiredGoals.getFirst().isAttraction()))){
-                this.motion.setIsNull(true);
-                this.deadLock=true;
-                
+                //Solucion sofisticada
+                //this.motion.setIsNull(true);
+                //this.deadLock=true;
+                //*/Solucion simple
+                this.motion=getMovementsRandom(movements); 
+                //*/
             }
             //*/
             //System.out.println(this.motion);
