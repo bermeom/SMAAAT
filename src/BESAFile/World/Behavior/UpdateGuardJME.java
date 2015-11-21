@@ -165,10 +165,9 @@ public class UpdateGuardJME extends GuardBESA{
             
       }
     
-    
-    private Vector3f getPositionVirtiul(int idFloor,int i,int j){
+     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
-        return new Vector3f(ws.getApp().getX()+ws.getApp().getWidth()/Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getLength()/Const.kGrid-Const.post(j));
+        return new Vector3f(ws.getApp().getX()+ws.getApp().getLength()/Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getWidth()/Const.kGrid-Const.post(j));
         
     }
 

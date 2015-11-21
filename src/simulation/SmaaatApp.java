@@ -137,7 +137,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             
             //createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 4,1, new Vector3f(0, 0, 1));
+            //createAgentExplorer(0, 0,1, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
             //createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
             
@@ -243,39 +243,40 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         nFloors=Const.nFloors;
         mEdifice=new ModelEdifice(width, length, nFloors,false);
         for (int i=0;i<nFloors;i++){
-            //mEdifice.setPostGridFloor(i,6 ,0, -2);
-            mEdifice.setPostGridFloor(i,9,0, -2);
-            mEdifice.setPostGridFloor(i,7 ,1, -2);
-            mEdifice.setPostGridFloor(i,0,0, -2);            
-            mEdifice.setPostGridFloor(i,0,1, -2);            
-            mEdifice.setPostGridFloor(i,1,1, -2);            
-            mEdifice.setPostGridFloor(i,0,2, -2);            
-            mEdifice.setPostGridFloor(i,1,0, -2);
-            mEdifice.setPostGridFloor(i,2,0, -2);
-            mEdifice.setPostGridFloor(i,3,1, -2);
-            mEdifice.setPostGridFloor(i,3,0, -2);
-            mEdifice.setPostGridFloor(i,4,4, -2);
-            mEdifice.setPostGridFloor(i,3,4, -2);
-            mEdifice.setPostGridFloor(i,5,4, -2);
-            mEdifice.setPostGridFloor(i,6,4, -2);
-            mEdifice.setPostGridFloor(i,6,3, -2);
-            mEdifice.setPostGridFloor(i,6,2, -2);
-            mEdifice.setPostGridFloor(i,6,1, -2);
-            mEdifice.setPostGridFloor(i,2,4, -2);
-            mEdifice.setPostGridFloor(i,1,4, -2);
-            mEdifice.setPostGridFloor(i,0,4, -2);
-            mEdifice.setPostGridFloor(i,0,6, -2);
-            mEdifice.setPostGridFloor(i,1,6, -2);
-            mEdifice.setPostGridFloor(i,1,7, -2);
-            mEdifice.setPostGridFloor(i,1,8, -2);
-            mEdifice.setPostGridFloor(i,2,8, -2);
-            mEdifice.setPostGridFloor(i,3,8, -2);
-            mEdifice.setPostGridFloor(i,4,8, -2);
-            mEdifice.setPostGridFloor(i,5,8, -2);
-            mEdifice.setPostGridFloor(i,5,6, -2);
-            mEdifice.setPostGridFloor(i,5,7, -2);
-            mEdifice.setPostGridFloor(i,3,5, -2);
-            mEdifice.setPostGridFloor(i,3,6, -2);
+            mEdifice.setPostGridFloor(i,9,0, -1);
+            mEdifice.setPostGridFloor(i,7 ,1, -1);
+            mEdifice.setPostGridFloor(i,0,0, -1);            
+            mEdifice.setPostGridFloor(i,0,1, -1);            
+            mEdifice.setPostGridFloor(i,1,1, -1);            
+            mEdifice.setPostGridFloor(i,0,2, -1);            
+            mEdifice.setPostGridFloor(i,1,0, -1);
+            mEdifice.setPostGridFloor(i,2,0, -1);
+            mEdifice.setPostGridFloor(i,3,1, -1);
+            mEdifice.setPostGridFloor(i,3,0, -1);
+            mEdifice.setPostGridFloor(i,4,4, -1);
+            mEdifice.setPostGridFloor(i,3,4, -1);
+            mEdifice.setPostGridFloor(i,5,4, -1);
+            mEdifice.setPostGridFloor(i,6,4, -1);
+            mEdifice.setPostGridFloor(i,6,3, -1);
+            mEdifice.setPostGridFloor(i,6,2, -1);
+            mEdifice.setPostGridFloor(i,6,1, -1);
+            mEdifice.setPostGridFloor(i,2,4, -1);
+            mEdifice.setPostGridFloor(i,1,4, -1);
+            mEdifice.setPostGridFloor(i,0,4, -1);
+            mEdifice.setPostGridFloor(i,0,6, -1);
+            mEdifice.setPostGridFloor(i,1,6, -1);
+            mEdifice.setPostGridFloor(i,1,7, -1);
+            mEdifice.setPostGridFloor(i,1,8, -1);
+            mEdifice.setPostGridFloor(i,2,8, -1);
+            mEdifice.setPostGridFloor(i,3,8, -1);
+            mEdifice.setPostGridFloor(i,4,8, -1);
+            mEdifice.setPostGridFloor(i,5,8, -1);
+            mEdifice.setPostGridFloor(i,5,6, -1);
+            mEdifice.setPostGridFloor(i,5,7, -1);
+            mEdifice.setPostGridFloor(i,3,5, -1);
+            mEdifice.setPostGridFloor(i,3,6, -1);
+            
+            //*/
         }
         System.out.println(mEdifice);
         createVirtualEdifice();
@@ -299,8 +300,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             for (int i=0;i<width;i++){
                 for (int j=0;j<length;j++){
                      switch(mf.get(i, j)){
-                         case -1:walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, j, i,0.3f)); break;
-                         case -2:walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, j, i)); break;
+                         case -1:walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, i, j)); break;
+                         case -2:walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
+                              
                      }
                 }
             }

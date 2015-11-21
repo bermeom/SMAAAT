@@ -204,7 +204,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             }
             
             //System.out.println(state.getPosition());
-            //System.out.println(state.getEdifice());
+            System.out.println(state.getEdifice());
             
             /*
             if(!state.getHostages().isEmpty()){
