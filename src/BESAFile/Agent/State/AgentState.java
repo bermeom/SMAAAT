@@ -468,6 +468,7 @@ public class AgentState extends  StateBESA{
                 //this.motion.setIsNull(true);
                 //this.deadLock=true;
                 //*/Solucion simple
+                //movements.add(new Motion(this.position.getXpos(),this.position.getXpos(),this.position.getIdfloor()));
                 this.motion=getMovementsRandom(movements); 
                 //*/
             }

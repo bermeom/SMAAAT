@@ -20,7 +20,7 @@ public final class Const {
     public static final float x=0;
     public static final float y=0;
     public static final float z=0;
-    public static final int width=20;
+    public static final int width=10;
     public static final int length=10;
     public static final int nFloors=1;
     public static final long sleep=300;

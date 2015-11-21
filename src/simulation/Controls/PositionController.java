@@ -227,6 +227,7 @@ public class PositionController extends AbstractControl implements ActionListene
     public void setBelievedPosition(Vector3f believedPosition) {
         this.believedPosition = believedPosition;
         this.validationPosition=false;
+        this.contOut=0;
                 
     }
 
@@ -358,6 +359,8 @@ public class PositionController extends AbstractControl implements ActionListene
 
     public void setMotion(Motion motion) {
         this.motion = motion;
+        this.validationPosition=false;
+        this.contOut=0;
     }
 
     public int getReply_with() {

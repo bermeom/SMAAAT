@@ -69,7 +69,7 @@ public class UpdateGuardJME extends GuardBESA{
         //try {
             int reply_with=data.getIn_reply_to();
             int in_reply_to=data.getReply_with();
-            //ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
+            ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
             
             int id=state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos());
             //System.out.println("<><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< "+ id);
@@ -99,12 +99,10 @@ public class UpdateGuardJME extends GuardBESA{
             pc.setSpeed(data.getSpeed());
             pc.setData(data);
             Vector3f believedPosition=getPositionVirtiul(data.getMotion().getIdfloor(),data.getMotion().getYpos(),data.getMotion().getXpos());
-            Vector3f position=getPositionVirtiul(data.getPosition().getIdfloor(),data.getPosition().getYpos(),data.getPosition().getXpos());
             pc.setBelievedPosition(believedPosition);
             //System.out.println(data.getAlias()+" "+data.getPosition());
             //System.out.println(state.getmEdifice());
             pc.setEnabled(true);
-            
        /* } catch (Exception e) {
               ReportBESA.info("xxxxxxxxxxxxxxxxxxx ERROR UPDATE MOVE xxxxxxxxxxxxxxxxxxxxxxxxxxx"+e );
               
