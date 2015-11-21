@@ -268,6 +268,9 @@ public class AgentState extends  StateBESA{
 
  
     public ModelFloor getGridWeights() {
+        if(this.desiredGoals.isEmpty()){
+            return null;
+        }
         return this.desiredGoals.getFirst().getGridWeights();
     }
 
@@ -391,6 +394,8 @@ public class AgentState extends  StateBESA{
 
 
             if (minDisctane!=-1){
+                gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
+                gridWeights.copyFloorArry(this.edifice.getFloor(p.getIdfloor()).getFloor());
                 gridWeights=waveFront(p,gridWeights); 
                 this.desiredGoals.addLast(new DesiredGoal(p,gridWeights,true));
                 //System.out.println(this.goal);
@@ -424,16 +429,29 @@ public class AgentState extends  StateBESA{
     }
 
     private void findMotion(List<Motion> movements) {
-            double de,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
+            int de=ModelFloor.null_,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
             this.motion.setIsNull(true); 
             List<Motion> lm=new ArrayList<Motion>();
             for(Motion m:movements){
                  de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
-                 //System.out.println("->> "+de+" "+m);
                  if(minDisctane==-1||(minDisctane>de&&this.desiredGoals.getFirst().isAttraction())||(minDisctane<de&&!this.desiredGoals.getFirst().isAttraction())){
                      minDisctane=de;
                      }
              }
+            if(minDisctane!=-1&&de==ModelFloor.null_){
+                Position goal=this.desiredGoals.getFirst().getGoal();
+                boolean atractionTem=this.desiredGoals.getFirst().isAttraction();
+                ModelFloor gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
+                gridWeights.copyFloorArry(this.edifice.getFloor(goal.getIdfloor()).getFloor());
+                gridWeights=waveFront(this.desiredGoals.getFirst().getGoal(), gridWeights);
+                this.desiredGoals.pop();
+                this.desiredGoals.addFirst(new DesiredGoal(goal, gridWeights,atractionTem ));
+                System.out.println(gridWeights);
+                //System.out.println(this.edifice);
+                findMotion(movements);
+                return;
+            }
+            
             for(Motion m:movements){
                  de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
                  if(minDisctane==de){

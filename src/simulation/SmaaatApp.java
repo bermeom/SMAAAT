@@ -139,7 +139,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
             //createAgentExplorer(0, 0,1, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
-            //createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
             
             /*
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
