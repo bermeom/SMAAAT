@@ -14,7 +14,9 @@ import BESAFile.World.Model.ModelFloor;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
@@ -385,7 +387,7 @@ public class AgentState extends  StateBESA{
                     minDisctane=de;
                     p=p1;
                 }
-            }
+            }   
 
 
             if (minDisctane!=-1){
@@ -424,14 +426,21 @@ public class AgentState extends  StateBESA{
     private void findMotion(List<Motion> movements) {
             double de,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
             this.motion.setIsNull(true); 
+            List<Motion> lm=new ArrayList<Motion>();
             for(Motion m:movements){
                  de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
                  //System.out.println("->> "+de+" "+m);
                  if(minDisctane==-1||(minDisctane>de&&this.desiredGoals.getFirst().isAttraction())||(minDisctane<de&&!this.desiredGoals.getFirst().isAttraction())){
                      minDisctane=de;
-                     this.motion=m;
                      }
              }
+            for(Motion m:movements){
+                 de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
+                 if(minDisctane==de){
+                     lm.add(m);
+                     }
+              }
+            this.motion=getMovementsRandom(lm); 
             int p1,p2;
             p1=this.desiredGoals.getFirst().getGridWeights().get(this.position.getXpos(),this.position.getYpos());
             p2=this.desiredGoals.getFirst().getGridWeights().get(this.motion.getXpos(),this.motion.getYpos());
