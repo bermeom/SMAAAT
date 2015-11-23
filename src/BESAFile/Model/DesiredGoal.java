@@ -46,7 +46,6 @@ public class DesiredGoal {
     public boolean isAttraction() {
         return attraction;
     }
-
     public void setAttraction(boolean attraction) {
         this.attraction = attraction;
     }

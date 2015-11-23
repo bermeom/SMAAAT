@@ -11,6 +11,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
+import java.sql.Time;
+import java.util.GregorianCalendar;
+import java.util.Random;
 
 public class Utils {
 
@@ -68,6 +71,15 @@ public class Utils {
     public static int randomInteger(int min, int max) {
         XSRandom rand = new XSRandom();
         int randomNum = rand.nextInt((max - min) + 1) + min;
+        return randomNum;
+    }
+    
+    public static int randomIntegerMA(int min, int max) {
+        Random random=new Random(System.currentTimeMillis());
+        int randomNum =0;
+        do{
+            randomNum = random.nextInt((max - min) + 1) + min;
+        }while(randomNum<min||randomNum>max);
         return randomNum;
     }
     

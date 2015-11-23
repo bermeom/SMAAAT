@@ -107,9 +107,11 @@ public class PositionController extends AbstractControl implements ActionListene
        return Math.sqrt((a.getX()-b.getX())*(a.getX()-b.getX())+(a.getZ()-b.getZ())*(a.getZ()-b.getZ()));
     
     }
+    
+    
     private boolean validationPosition(){
         Vector3f pos=node.getLocalTranslation(); 
-        return euclidesDistance(pos, this.believedPosition)<=delta;
+        return (euclidesDistance(pos, this.believedPosition)<=delta)||this.poistion.isEquals(this.motion);
     }
     
     
@@ -138,9 +140,9 @@ public class PositionController extends AbstractControl implements ActionListene
                     }
                     validationPosition=true;
                     moveCharacter(modelForwardDir,0 );
-                    
+                    this.poistion=new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor());
                 }else if(contOut>=this.limitContOut){
-                    System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
+                    System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+" 1<<<<<<<<<<<<<<<<<<<<<<"+this.poistion);
                     if (this.data!=null){
                         this.data.setAction("moveACK");
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);
@@ -156,7 +158,7 @@ public class PositionController extends AbstractControl implements ActionListene
                 }else{
                     contOut++;
                     if (contOut>=this.limitContOut){
-                        System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+"<<<<<<<<<<<<<<<<<<<<<<");
+                        System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+" 2<<<<<<<<<<<<<<<<<<<<<<");
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);
                         if (this.data!=null){
                             this.data.setAction("moveNACK");

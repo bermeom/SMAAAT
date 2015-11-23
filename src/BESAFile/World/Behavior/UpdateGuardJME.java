@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import simulation.Controls.PositionController;
 import simulation.utils.Const;
+import simulation.utils.Utils;
 
 /**
  *
@@ -69,22 +70,25 @@ public class UpdateGuardJME extends GuardBESA{
         //try {
             int reply_with=data.getIn_reply_to();
             int in_reply_to=data.getReply_with();
-            ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
+            //ReportBESA.info("-------------------Move World:D--------- "+data.getAlias());
             
             int id=state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos());
             //System.out.println("<><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< "+ id);
             
             if (id<=0 || !state.getListAgents().get(id-1).getAlias().equals(data.getAlias())){
+                System.out.println("ERROR NAK 1 "+data.getAlias()+" "+data.getMotion()+" "+data.getPosition()+" "+id+" - "/*+state.getListAgents().get(id-1).getAlias()*/+" == "+ data.getAlias());
                 ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
                 Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
                 return;
-                }else if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())!=0){
+                }else if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())!=0&&state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())!=id){
+                         System.out.println("ERROR NAK 2 "+data.getAlias()+" "+data.getMotion()+" "+data.getPosition()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos()));
                          ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
                          Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
                          return;
                          }else if (!state.moveAgent(data.getPosition(), data.getMotion(), id-1)){
+                                    System.out.println("ERROR NAK 3 "+data.getAlias()+" "+data.getMotion()+" "+data.getPosition()+" "+state.moveAgent(data.getPosition(), data.getMotion(), id-1));
                                     ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
-                                    //Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
+                                    Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
                                     return;
                                     }
             
@@ -117,13 +121,15 @@ public class UpdateGuardJME extends GuardBESA{
          boolean sw=false; 
          //do{
             try {
-                   //ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId());
-                   if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()){
-                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
+                   ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId());
+                   if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()&&!data.getPosition().isEquals(data.getMotion())){
+                       System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
                        state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), 0);
+                   }else if(data.getPosition().isEquals(data.getMotion())){
+                                Thread.sleep(Utils.randomIntegerMA(0,50));
                    }
                    if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())==data.getId()){
-                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
+                       System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
                        ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
                        Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                    }

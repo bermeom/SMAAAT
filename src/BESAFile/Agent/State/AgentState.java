@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
+import simulation.utils.Utils;
 
 /**
  *
@@ -310,11 +311,7 @@ public class AgentState extends  StateBESA{
     
     protected Motion getMovementsRandom(List<Motion> motions){
             if(motions.size()>0){
-                Random random=new Random(System.currentTimeMillis());
-                int n=0;
-                do{
-                    n= random.nextInt(motions.size());
-                }while(n<0 || n>=motions.size());
+                int n=Utils.randomIntegerMA(0, motions.size()-1);
                 return  motions.get(n);
             }
             return new Motion();
@@ -468,7 +465,7 @@ public class AgentState extends  StateBESA{
                 //this.motion.setIsNull(true);
                 //this.deadLock=true;
                 //*/Solucion simple
-                //movements.add(new Motion(this.position.getXpos(),this.position.getXpos(),this.position.getIdfloor()));
+                movements.add(new Motion(this.position.getXpos(),this.position.getYpos(),this.position.getIdfloor()));
                 this.motion=getMovementsRandom(movements); 
                 //*/
             }

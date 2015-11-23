@@ -36,7 +36,7 @@ public class SimulationStartJME extends GuardBESA{
     public void answer(boolean ack,String alias){
         int reply_with=1;
         int in_reply_to=-1;
-        ActionDataAgent actionData=new ActionDataAgent(reply_with,in_reply_to,"NAK");
+        ActionDataAgent actionData=new ActionDataAgent(reply_with,in_reply_to,alias,"NAK");
         if (ack){
             actionData.setAction("ACK");
         }

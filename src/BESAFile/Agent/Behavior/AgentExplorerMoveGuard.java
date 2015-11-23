@@ -49,6 +49,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         try {
             AgentState state = (AgentState) this.getAgent().getState();
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
+            if(!state.getAlias().equals(data.getAlias())){
+                return;
+            }
             switch (data.getAction()) {
                 case "move":
                     //ReportBESA.info("-------------------Move:D--------- "+((AgentState) this.getAgent().getState()).getAlias());

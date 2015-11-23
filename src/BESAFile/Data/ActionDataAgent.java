@@ -90,12 +90,13 @@ public class ActionDataAgent extends DataBESA {
         this.position=position;
     }
     
-    public ActionDataAgent(int reply_with,int in_reply_to,String action) {
+    public ActionDataAgent(int reply_with,int in_reply_to,String alias,String action) {
         this.reply_with=reply_with;
         this.in_reply_to=in_reply_to;
         this.reply_with=reply_with;
         this.in_reply_to=in_reply_to;
         this.action = action;
+        this.alias=alias;
     }
 
     //Response 

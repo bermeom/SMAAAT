@@ -65,7 +65,7 @@ public class AgentNegotiationGuard extends GuardBESA  {
                 System.out.println(state.getDesiredGoal());
             }
             state.setWinNegotiation(ganador);
-            ActionDataAgent ad=new ActionDataAgent(data.getIn_reply_to(), data.getReply_with(), "ACK_NEGOTIATION");
+            ActionDataAgent ad=new ActionDataAgent(data.getIn_reply_to(), data.getReply_with(),data.getAlias(), "ACK_NEGOTIATION");
             Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
         } catch (Exception e) {
             System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR NEGOTIATION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");

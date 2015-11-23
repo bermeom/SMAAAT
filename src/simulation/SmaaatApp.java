@@ -97,6 +97,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         app.setShowSettings(false);
         app.setDisplayStatView(false);
         AppSettings settings = new AppSettings(true);
+        settings.setWidth(800);
+        settings.setHeight(600);
         settings.setTitle("SMAAAT");
         app.setSettings(settings);
         app.start();
