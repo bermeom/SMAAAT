@@ -50,29 +50,21 @@ public class ActionData extends DataBESA{
         this.position = position;
     }
     
-    
-    
-    
-    public ActionData(int reply_with,int in_reply_to,int type,String alias,Vector3D direction,Position position, float speed,double radius,double height) {
-        this.reply_with=reply_with;
-        this.in_reply_to=in_reply_to;
-        this.alias = alias;
-        this.position = position;
-        this.speed=speed;
-        this.radius=radius;
-        this.height=height;
-        this.type=type;
-        
-    }
-    
-    
     public ActionData(int reply_with,int in_reply_to,int xpos, int ypos, int idfloor, String alias, String action) {
         this.reply_with=reply_with;
         this.in_reply_to=in_reply_to;
         this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.action = action;
-        this.speed=speed;
+    }
+    
+    public ActionData(int reply_with,int in_reply_to,int type,Position position, String alias, String action) {
+        this.reply_with=reply_with;
+        this.in_reply_to=in_reply_to;
+        this.type=type;
+        this.position=position;
+        this.alias = alias;
+        this.action = action;
     }
     
     
@@ -84,7 +76,6 @@ public class ActionData extends DataBESA{
         this.action = action;
         this.speed=speed;
         this.type=type;
- 
     }
     
     public int getXpos() {

@@ -1,5 +1,6 @@
 package simulation.utils;
 
+import BESAFile.Agent.State.Position;
 import BESAFile.Data.Vector3D;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -70,12 +71,16 @@ public class Utils {
 
     public static int randomInteger(int min, int max) {
         XSRandom rand = new XSRandom();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
+        int randomNum ;
+        do{
+            randomNum = rand.nextInt((max - min) + 1) + min;
+        }while(randomNum<min||randomNum>max);
         return randomNum;
     }
     
     public static int randomIntegerMA(int min, int max) {
-        Random random=new Random(System.currentTimeMillis());
+        
+        Random random=new Random(System.currentTimeMillis()*randomInteger(0, 100));
         int randomNum =0;
         do{
             randomNum = random.nextInt((max - min) + 1) + min;
@@ -115,6 +120,64 @@ public class Utils {
             return (new Vector3D(x, 0, z));
         
     }
+    
+    public static int[][] border(int [][]mat, Position p, int width,int length ,int tam){
+        
+        int x=tam/2;
+        /*
+        if(p.getYpos()+1>=width){
+            for(int i=0;i<tam;i++){
+                if(mat[i][x+1]==0)
+                    mat[i][x+1]=-1;
+            }
+        }
+        if(p.getYpos()-1<0){
+            for(int i=0;i<tam;i++){
+                if(mat[i][x-1]==0)
+                    mat[i][x-1]=-1;
+            }
+        }
+        if(p.getXpos()+1>=length){
+            for(int i=0;i<tam;i++){
+                if(mat[x+1][i]==0)
+                    mat[x+1][i]=-1;
+            }
+        }
+        if(p.getXpos()-1<0){
+            for(int i=0;i<tam;i++){
+                if(mat[x-1][i]==0)
+                    mat[x-1][i]=-1;
+            }
+        }
+        */
+        
+        if(mat[x-1][x]!=0){
+            for(int i=0;i<tam;i++){
+                if(mat[x-1][i]==0)
+                    mat[x-1][i]=-1;
+            }
+        }
+        if(mat[x+1][x]!=0){
+            for(int i=0;i<tam;i++){
+                if(mat[x+1][i]==0)
+                    mat[x+1][i]=-1;
+            }
+        }
+        if(mat[x][x-1]!=0){
+            for(int i=0;i<tam;i++){
+                if(mat[i][x-1]==0)
+                    mat[i][x-1]=-1;
+            }
+        }
+        if(mat[x][x+1]!=0){
+            for(int i=0;i<tam;i++){
+                if(mat[i][x+1]==0)
+                    mat[i][x+1]=-1;
+            }
+        }
+        return mat;
+    }
+    
     
     
 }

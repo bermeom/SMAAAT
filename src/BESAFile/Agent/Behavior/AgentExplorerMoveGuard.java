@@ -61,6 +61,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 case "NACK":
                     nack(data,state);
                     break;
+                case "NACK_DC"://disable controles
+                    nack_dc(data,state);
+                    break;
                 case "ACK":
                      ack(data,state);
                      break;
@@ -105,60 +108,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         
     }
     
-    private int[][] border(int [][]mat, Position p, int width,int length ,int tam){
-        /*if(p.getYpos()+1>=width){
-            for(int i=0;i<tam;i++){
-                mat[i][1+(int)(tam/2)]=false;
-            }
-        }
-        if(p.getYpos()-1<0){
-            for(int i=0;i<tam;i++){
-                mat[i][(int)(tam/2)-1]=false;
-            }
-        }
-        if(p.getXpos()+1>=length){
-            for(int i=0;i<tam;i++){
-                mat[1+(int)(tam/2)][i]=false;
-            }
-        }
-        if(p.getXpos()-1<0){
-            for(int i=0;i<tam;i++){
-                mat[(int)(tam/2)-1][i]=false;
-            }
-        }
-        
-        //*/
-        int x=tam/2;
-        
-        if(mat[x-1][x]!=0){
-            for(int i=0;i<tam;i++){
-                if(mat[x-1][i]==0)
-                    mat[x-1][i]=-1;
-            }
-        }
-        if(mat[x+1][x]!=0){
-            for(int i=0;i<tam;i++){
-                if(mat[x+1][i]==0)
-                    mat[x+1][i]=-1;
-            }
-        }
-        if(mat[x][x-1]!=0){
-            for(int i=0;i<tam;i++){
-                if(mat[i][x-1]==0)
-                    mat[i][x-1]=-1;
-            }
-        }
-        if(mat[x][x+1]!=0){
-            for(int i=0;i<tam;i++){
-                if(mat[i][x+1]==0)
-                    mat[i][x+1]=-1;
-            }
-        }
-        return mat;
-    }
     
     
-    private void ackSensor(ActionDataAgent data){
+    private void ackSensor(ActionDataAgent data) throws InterruptedException{
         //try {
             //System.out.println("-------------------ACK_SENSOR :D--------- "+data.getAlias());
             AgentExplorerState state = (AgentExplorerState) this.getAgent().getState();
@@ -192,7 +144,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 }
                 k++;
             }
-            mat=border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
+            mat=Utils.border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
             mat[tam/2][tam/2]=-1;
             List<Motion> movements=new ArrayList<>();
             int offset=(int)(tam/2)-1;
@@ -223,7 +175,13 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             int in_reply_to=data.getReply_with();
             
             if (state.nextMotion(movements)){
-                moveAgent(reply_with, in_reply_to, state.getMotion());
+                if (state.getPosition().isEquals(state.getMotion())){
+                    disableController(reply_with, in_reply_to);
+                    Thread.sleep(Utils.randomIntegerMA(0,100));
+                    msnSensor(reply_with, in_reply_to);
+                }else{
+                    moveAgent(reply_with, in_reply_to, state.getMotion());
+                }
             }else{
                 if(state.isDeadLock()){
                     System.out.println("------------------------- DEADLOCK --------------------------- "+state.getAlias()+" "+state.getDesiredGoal());
@@ -275,7 +233,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         //do{
             try {
                 AgentState state = (AgentState) this.getAgent().getState();
-                ActionData actionData = new ActionData(reply_with,in_reply_to,state.getType(), state.getAlias(), "disableController");
+                ActionData actionData = new ActionData(reply_with,in_reply_to,state.getType(),state.getPosition(), state.getAlias(), "disableController");
                 Agent.sendMessage(UpdateGuardJME.class,Const.World, actionData);
                 sw=true;
             } catch (Exception e) {
@@ -352,6 +310,21 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         //}while(!sw);
     
     
+    }
+
+    private void nack_dc(ActionDataAgent data, AgentState state) {
+        //ReportBESA.info("-------------------NAK_DC :(--------- ");
+        state.setPosition(data.getPosition());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             System.out.println("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------NAK_DC :D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
+         
     }
 
     

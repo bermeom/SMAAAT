@@ -182,12 +182,7 @@ public class AgentState extends  StateBESA{
     public int getType() {
         return type;
     }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-     
-    
+  
     public void setModelEdiffice(int idFloor,int i,int j,int value){
             this.edifice.setPostGridFloor(idFloor, i, j, value);
     }
@@ -443,7 +438,7 @@ public class AgentState extends  StateBESA{
                 gridWeights=waveFront(this.desiredGoals.getFirst().getGoal(), gridWeights);
                 this.desiredGoals.pop();
                 this.desiredGoals.addFirst(new DesiredGoal(goal, gridWeights,atractionTem ));
-                System.out.println(gridWeights);
+                //System.out.println(gridWeights);
                 //System.out.println(this.edifice);
                 findMotion(movements);
                 return;

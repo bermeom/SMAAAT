@@ -28,27 +28,29 @@ import simulation.utils.Const;
 public class WorldStateJME extends StateBESA{
     
     private int consecutiveAgent;
-    private Map<String,PositionController> agents;
+    private List<PositionController> agents;
     protected ModelEdifice mEdifice;
     protected SmaaatApp app;
     private List<ModelAgentWorld> listAgents;
 
     public WorldStateJME(SmaaatApp app) {
         this.app=app;
-        agents=new HashMap<String, PositionController>();
+        agents=new ArrayList< PositionController>();
         this.mEdifice=app.getmEdifice();
         this.consecutiveAgent=1;
         this.listAgents=new ArrayList<ModelAgentWorld>();
+        
     }
 
-    public Map<String, PositionController> getAgents() {
+    public List<PositionController> getAgents() {
         return agents;
     }
 
-    public void setAgents(Map<String, PositionController> agents) {
+    public void setAgents(List<PositionController> agents) {
         this.agents = agents;
     }
 
+    
     public SmaaatApp getApp() {
         return app;
     }
@@ -58,7 +60,7 @@ public class WorldStateJME extends StateBESA{
     }
     
     public void addAgent(String agent,PositionController pc,SubscribeDataJME data){
-        agents.put(agent,pc);
+        agents.add(pc);
         ModelAgentWorld maw=new ModelAgentWorld(data.getXpos(), data.getYpos(), data.getIdfloor(), data.getAlias(),data.getType(), consecutiveAgent);
         this.listAgents.add(maw);
         mEdifice.setPostGridFloor(data.getIdfloor(), data.getXpos(), data.getYpos(), consecutiveAgent);
@@ -67,15 +69,15 @@ public class WorldStateJME extends StateBESA{
     }
     
     public boolean moveAgent(Position p,Motion m,int idAgent){
-        if (this.listAgents.get(idAgent).getPosition().isEquals(p)){
+        if (this.listAgents.get(idAgent).getPosition().isEquals(p)/*&&(this.agents.get(idAgent).isValidationPosition()||!this.agents.get(idAgent).isEnabledPS())/**/){
             this.listAgents.get(idAgent).setPos(m.getXpos(), m.getYpos(), m.getIdfloor());
             return true;
         }
         return false;
     }
     
-    public PositionController getAgentController(String agent){
-        return agents.get(agent);
+    public PositionController getAgentController(int idAgent){
+        return agents.get(idAgent);
     }
 
     public int getConsecutiveAgent() {

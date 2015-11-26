@@ -4,6 +4,7 @@ import BESAFile.Agent.Behavior.AgentEnemyMoveGuard;
 import BESAFile.Agent.Behavior.AgentProtectorMoveGuard;
 import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
 import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
+import com.jme3.math.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +21,11 @@ public final class Const {
     public static final float x=0;
     public static final float y=0;
     public static final float z=0;
-    public static final int width=10;
-    public static final int length=10;
+    public static final int width=50;
+    public static final int length=50;
     public static final int nFloors=1;
     public static final long sleep=300;
-    public static final int  kGrid=2;
+    public static final float  kGrid=2;
     
     public static int getType(String name) {
         if(name.contains(Const.GuardianAgent)){
@@ -55,8 +56,13 @@ public final class Const {
     }
     
     public static  float post(int i){
-        return (i*2)/Const.kGrid+1/Const.kGrid+0.5f;
+        return ((float)i*2)/Const.kGrid+1/Const.kGrid;
     }
+    
+    public static  Vector3f getPositionVirtiul(int idFloor,int i,int j,float length, float width,float x,float y,float z,float distBetweenFloors){
+        return new Vector3f(x+length/(float)Const.kGrid-Const.post(j), y-distBetweenFloors*idFloor+0.23f, z+width/(float)Const.kGrid-Const.post(i));
+    }
+
     
     //x'=x+width-post(i) 
     public static  int coordModel(float xV,float x, float k){

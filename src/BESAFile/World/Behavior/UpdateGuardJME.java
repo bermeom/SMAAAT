@@ -77,6 +77,7 @@ public class UpdateGuardJME extends GuardBESA{
             
             if (id<=0 || !state.getListAgents().get(id-1).getAlias().equals(data.getAlias())){
                 System.out.println("ERROR NAK 1 "+data.getAlias()+" "+data.getMotion()+" "+data.getPosition()+" "+id+" - "/*+state.getListAgents().get(id-1).getAlias()*/+" == "+ data.getAlias());
+                //System.out.println(state.getmEdifice());
                 ActionDataAgent ad =new ActionDataAgent(reply_with,in_reply_to,data.getType(),"NACK",data.getAlias(),data.getPosition());
                 Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(), ad);
                 return;
@@ -94,15 +95,17 @@ public class UpdateGuardJME extends GuardBESA{
             
             data.setId(id);
             state.getmEdifice().setPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos(), id);
-            state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), id);
-            PositionController pc=state.getAgentController(data.getAlias());
+            PositionController pc=state.getAgentController(id-1);
             pc.setReply_with(reply_with);
             pc.setIn_reply_to(in_reply_to);
             pc.setPoistion(data.getPosition());
             pc.setMotion(data.getMotion());
             pc.setSpeed(data.getSpeed());
             pc.setData(data);
-            Vector3f believedPosition=getPositionVirtiul(data.getMotion().getIdfloor(),data.getMotion().getYpos(),data.getMotion().getXpos());
+            
+            Vector3f believedPosition=Const.getPositionVirtiul(data.getMotion().getIdfloor(),data.getMotion().getXpos(),data.getMotion().getYpos(),state.getmEdifice().getLength(),state.getmEdifice().getWidth(),state.getApp().getX(),state.getApp().getY(),state.getApp().getZ(),state.getApp().getDistBetweenFloors());
+                        //getPositionVirtiul(data.getMotion().getIdfloor(),data.getMotion().getYpos(),data.getMotion().getXpos());
+            
             pc.setBelievedPosition(believedPosition);
             //System.out.println(data.getAlias()+" "+data.getPosition());
             //System.out.println(state.getmEdifice());
@@ -121,15 +124,13 @@ public class UpdateGuardJME extends GuardBESA{
          boolean sw=false; 
          //do{
             try {
-                   ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId());
+                   //ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId());
                    if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()&&!data.getPosition().isEquals(data.getMotion())){
-                       System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
+                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
                        state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), 0);
-                   }else if(data.getPosition().isEquals(data.getMotion())){
-                                Thread.sleep(Utils.randomIntegerMA(0,50));
                    }
                    if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())==data.getId()){
-                       System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
+                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
                        ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
                        Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                    }
@@ -168,17 +169,23 @@ public class UpdateGuardJME extends GuardBESA{
           }while(!sw);
             
       }
-    
-     private Vector3f getPositionVirtiul(int idFloor,int i,int j){
+    /*
+    private Vector3f getPositionVirtiul(int idFloor,int i,int j){
         WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
-        return new Vector3f(ws.getApp().getX()+ws.getApp().getLength()/Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getWidth()/Const.kGrid-Const.post(j));
+        return new Vector3f(ws.getApp().getX()+ws.getApp().getLength()/(float)Const.kGrid-Const.post(i), ws.getApp().getY()-ws.getApp().getDistBetweenFloors()*idFloor+0.23f, ws.getApp().getZ()+ws.getApp().getWidth()/(float)Const.kGrid-Const.post(j));
         
     }
-
+    //*/
     private void disableController(ActionData data, WorldStateJME state) {
-        PositionController pc=state.getAgentController(data.getAlias());
-        if (pc != null){
+        int id=state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos());
+        PositionController pc=state.getAgentController(id-1);
+        if (pc != null && pc.isValidationPosition()){
             pc.setEnabled(false);    
+        }else{
+            ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"NACK_DC",data.getAlias(),data.getPosition());
+            //System.out.println(" ==============================> "+data.getAlias()+" "+data.getType()+" "+Const.getGuardMove(data.getType()));
+            //Agent.sendMessage(Const.getGuardMove(Const.getType(data.getAlias())),data.getAlias(),ad);
+            Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
         }
         
     }

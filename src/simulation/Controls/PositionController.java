@@ -40,8 +40,6 @@ import simulation.utils.Utils;
 
 public class PositionController extends AbstractControl implements ActionListener {
 
-    private boolean forward, backward, left, right, turnLeft, turnRight;
-    private Vector3f walkDirection;
     private Vector3f viewDirection;
     private Vector3f believedPosition ;
     private Node node;
@@ -62,10 +60,10 @@ public class PositionController extends AbstractControl implements ActionListene
     protected int reply_with;
     protected int in_reply_to;
     protected ActionData data;
-    protected boolean enable;
+    protected boolean enabledPS;
   
     public PositionController(Node node,String alias) {
-        this.enable=false;
+        this.enabledPS=false;
         this.node=node;
 //        this.data=actionData;
     }
@@ -80,7 +78,6 @@ public class PositionController extends AbstractControl implements ActionListene
         this.height=height;
         super.setSpatial(node);
         this.viewDirection=viewDirectio;
-        this.walkDirection=viewDirectio;
         this.believedPosition=believedPosition;
         this.validationPosition=false;
         this.delta=0.035f;
@@ -90,7 +87,7 @@ public class PositionController extends AbstractControl implements ActionListene
         this.move=false;
         moveCharacter(modelForwardDir,0 );
         this.limitContOut=1000;
-        this.enable=false;
+        this.enabledPS=false;
     }
 
     @Override
@@ -129,7 +126,7 @@ public class PositionController extends AbstractControl implements ActionListene
     
     @Override
     protected void controlUpdate(float tpf) {
-        if (spatial.getParent() != null && this.enable) {
+        if (spatial.getParent() != null && this.enabledPS) {
             //System.out.println(contOut+" ---> "+alias+" :  "+validationPosition+" "+this.spatial.getLocalTranslation()+" "+ validationPosition()+" "+this.believedPosition);
             if (validationPosition()){
                 if (!validationPosition){
@@ -203,7 +200,7 @@ public class PositionController extends AbstractControl implements ActionListene
 
     @Override
     public void setEnabled(boolean enabled) {
-        this.enable=enabled;
+        this.enabledPS=enabled;
         super.setEnabled(enabled);
     }
 
@@ -212,14 +209,6 @@ public class PositionController extends AbstractControl implements ActionListene
         this.viewDirection = dir;
         BetterCharacterControl control = spatial.getControl(BetterCharacterControl.class);
         control.setViewDirection(viewDirection);
-    }
-
-    public Vector3f getWalkDirection() {
-        return walkDirection;
-    }
-
-    public void setWalkDirection(Vector3f walkDirection) {
-        this.walkDirection = walkDirection;
     }
 
     public Vector3f getBelievedPosition() {
@@ -233,53 +222,6 @@ public class PositionController extends AbstractControl implements ActionListene
                 
     }
 
-    public boolean isForward() {
-        return forward;
-    }
-
-    public void setForward(boolean forward) {
-        this.forward = forward;
-    }
-
-    public boolean isBackward() {
-        return backward;
-    }
-
-    public void setBackward(boolean backward) {
-        this.backward = backward;
-    }
-
-    public boolean isLeft() {
-        return left;
-    }
-
-    public void setLeft(boolean left) {
-        this.left = left;
-    }
-
-    public boolean isRight() {
-        return right;
-    }
-
-    public void setRight(boolean right) {
-        this.right = right;
-    }
-
-    public boolean isTurnLeft() {
-        return turnLeft;
-    }
-
-    public void setTurnLeft(boolean turnLeft) {
-        this.turnLeft = turnLeft;
-    }
-
-    public boolean isTurnRight() {
-        return turnRight;
-    }
-
-    public void setTurnRight(boolean turnRight) {
-        this.turnRight = turnRight;
-    }
 
     public Node getNode() {
         return node;
@@ -388,6 +330,14 @@ public class PositionController extends AbstractControl implements ActionListene
 
     public void setData(ActionData data) {
         this.data = data;
+    }
+
+    public boolean isEnabledPS() {
+        return enabledPS;
+    }
+
+    public void setEnabledPS(boolean enable) {
+        this.enabledPS = enable;
     }
     
     

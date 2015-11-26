@@ -107,6 +107,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
     @Override
     public void simpleInitApp() {
+        viewPort.setBackgroundColor(ColorRGBA.LightGray);
         distBetweenFloors= Const.distBetweenFloors;
         consecutiveAgenProtector=0;
         consecutiveAgenEnemy=0;
@@ -114,12 +115,17 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         consecutiveAgenHostage=0;
         wallsFloors=new ArrayList<Node>();
         createEdifice();
-        viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1f));
         flyCam.setMoveSpeed(20);
         
-
+        
+        /*
         cam.setLocation(new Vector3f(0, 20, -10));
         cam.lookAt(new Vector3f(0, -10, 3), Vector3f.UNIT_Y);
+        //*/
+        
+        cam.setLocation(new Vector3f(0, 20, 0));
+        cam.lookAt(new Vector3f(0, -10, 0), Vector3f.UNIT_Y);
+        //*
         
         setupLighting();
         setupKeys();
@@ -141,7 +147,13 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
-            //createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
+           
+            for(int i=10;i<49;i++){
+                for(int j=10;j<13;j++){
+                    createAgentExplorer(0, i,j, new Vector3f(0, 0, 1));
+                }
+            }
             
             /*
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
@@ -289,18 +301,20 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         ediffice =new Node("Edifice");//*/
         for (int n=0;n<mEdifice.getnFlooors();n++){
             ModelFloor mf= mEdifice.getFloor(n);
-            WorldFloor we=new WorldFloor(assetManager, width, length, x, y-distBetweenFloors*n, z);
+            WorldFloor we=new WorldFloor(assetManager, this.mEdifice.getWidth(), this.mEdifice.getLength(), x, y-distBetweenFloors*n, z);
             Node floor=new Node("Floor"+n);
             Node walls=new Node("Walls"+n);
             ediffice.attachChild(floor);
             floor.attachChild(we.makeFloor());
             floor.attachChild(we.makeGridFloor(ColorRGBA.Blue));
+            
             floor.attachChild(we.makeWallFloor1());
             floor.attachChild(we.makeWallFloor2());
             floor.attachChild(we.makeWallFloor3());
             floor.attachChild(we.makeWallFloor4());
-            for (int i=0;i<width;i++){
-                for (int j=0;j<length;j++){
+            //*/
+            for (int i=0;i<this.mEdifice.getWidth();i++){
+                for (int j=0;j<this.mEdifice.getLength();j++){
                      switch(mf.get(i, j)){
                          case -1:walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, i, j)); break;
                          case -2:walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
