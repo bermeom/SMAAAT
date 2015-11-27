@@ -98,6 +98,7 @@ public class UpdateGuardJME extends GuardBESA{
             try {
                 data.setId(id);
                 PositionController pc=state.getAgentController(id-1);
+                pc.setEnabled(false);
                 pc.setReply_with(reply_with);
                 pc.setIn_reply_to(in_reply_to);
                 pc.setPoistion(data.getPosition());
@@ -126,13 +127,13 @@ public class UpdateGuardJME extends GuardBESA{
          boolean sw=false; 
          //do{
             try {
-                   ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId()+" "+data.getPosition()+" "+data.getMotion()+" "+data.getIn_reply_to()+" "+data.getReply_with());
+                   //ReportBESA.info("-------------------+++++++++++  MoveACK World:D--------- "+data.getAlias()+" "+state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId()+" "+data.getPosition()+" "+data.getMotion()+" "+data.getIn_reply_to()+" "+data.getReply_with());
                    if (state.getmEdifice().getPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos())==data.getId()&&!data.getPosition().isEquals(data.getMotion())){
-                       System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
+                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO1 "+data.getAlias());
                        state.getmEdifice().setPostGridFloor(data.getPosition().getIdfloor(),data.getPosition().getXpos(), data.getPosition().getYpos(), 0);
                    }
                    if (state.getmEdifice().getPostGridFloor(data.getMotion().getIdfloor(),data.getMotion().getXpos(), data.getMotion().getYpos())==data.getId()){
-                       System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
+                       //System.out.println("----------------------------+++++++++++++++++++++++++++++++ PASO2 "+data.getAlias());
                        ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
                        Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                    }else{

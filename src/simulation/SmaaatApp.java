@@ -132,7 +132,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        //bulletAppState.setDebugEnabled(true);
+        bulletAppState.setDebugEnabled(true);
 
         CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) ediffice);
         RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
@@ -149,8 +149,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
-           /*
-            for(int i=10;i<49;i++){
+           
+            for(int i=10;i<50;i++){
                 for(int j=10;j<13;j++){
                     createAgentExplorer(0, i,j, new Vector3f(0, 0, 1));
                 }
