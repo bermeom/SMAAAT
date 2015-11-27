@@ -130,12 +130,12 @@ public class PositionController extends AbstractControl implements ActionListene
             //System.out.println(contOut+" ---> "+alias+" :  "+validationPosition+" "+this.spatial.getLocalTranslation()+" "+ validationPosition()+" "+this.believedPosition);
             if (validationPosition()){
                 if (!validationPosition){
+                    validationPosition=true;
                     this.contOut=0;
                     if (this.data!=null){
                         this.data.setAction("moveACK");
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);
                     }
-                    validationPosition=true;
                     moveCharacter(modelForwardDir,0 );
                     this.poistion=new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor());
                 }else if(contOut>=this.limitContOut){
