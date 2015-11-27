@@ -139,7 +139,7 @@ public class PositionController extends AbstractControl implements ActionListene
                     moveCharacter(modelForwardDir,0 );
                     this.poistion=new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor());
                 }else if(contOut>=this.limitContOut){
-                    System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+" 1<<<<<<<<<<<<<<<<<<<<<<"+this.poistion);
+                    System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+" 1<<<<<<<<<<<<<<<<<<<<<<"+this.poistion+" - "+this.data.getPosition()+" "+this.data.getMotion()+" "+this.data.getReply_with());
                     if (this.data!=null){
                         this.data.setAction("moveACK");
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);

@@ -188,7 +188,7 @@ public class WorldFloor {
       cube.setLocalTranslation(x+length-Const.post(j), y+1.2f, z+width-Const.post(i));
       //System.out.println(" "+i+" "+j+" "+cube.getLocalTranslation());
       Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-      TextureKey key = new TextureKey("Textures/texture4.jpg");
+      TextureKey key = new TextureKey("Textures/texture6.jpg");
       key.setGenerateMips(true);
       key.setTextureTypeHint(Texture.Type.CubeMap);
       Texture tex = assetManager.loadTexture(key);

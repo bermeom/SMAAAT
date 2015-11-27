@@ -26,6 +26,9 @@ import BESAFile.Model.SeenWall;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Model.ModelEdifice;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,7 +113,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     
     
     
-    private void ackSensor(ActionDataAgent data) throws InterruptedException{
+    private void ackSensor(ActionDataAgent data) throws InterruptedException, IOException{
         //try {
             //System.out.println("-------------------ACK_SENSOR :D--------- "+data.getAlias());
             AgentExplorerState state = (AgentExplorerState) this.getAgent().getState();
@@ -180,6 +183,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                     Thread.sleep(Utils.randomIntegerMA(0,100));
                     msnSensor(reply_with, in_reply_to);
                 }else{
+                    //disableController(reply_with, in_reply_to);
+                    //printMatANDMotion(mat,state.getMotion());
+                    //stop();
                     moveAgent(reply_with, in_reply_to, state.getMotion());
                 }
             }else{
@@ -280,7 +286,6 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
 
     private void ack(ActionDataAgent data, AgentState state) {
         //ReportBESA.info("-------------------ACK:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
-        state.setPosition(data.getPosition());
          if (!state.getIdConsecutive(data.getIn_reply_to())){
              state.plusPlusContMsOld();
              ReportBESA.info("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
@@ -288,7 +293,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                  ReportBESA.info("-------------------ACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
                  return ;
              }
-
+             state.setPosition(data.getPosition());
+         }else{
+             state.setPosition(data.getPosition());
          }
          msnSensor(data.getIn_reply_to(),data.getReply_with());
     }
@@ -311,6 +318,11 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
     
     
     }
+    
+    private void stop() throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String linea=br.readLine();
+    }
 
     private void nack_dc(ActionDataAgent data, AgentState state) {
         //ReportBESA.info("-------------------NAK_DC :(--------- ");
@@ -325,6 +337,18 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
 
          }
          
+    }
+
+    private void printMatANDMotion(int[][] mat, Motion motion) {
+        System.out.println(motion);
+        mat[mat.length/2][mat.length/2]=-2;
+        for (int i=0;i<mat.length;i++){
+                for (int j=0;j<mat[i].length;j++){
+                    System.out.print("\t"+mat[i][j]);
+                }
+                System.out.println("");
+                
+            }
     }
 
     
