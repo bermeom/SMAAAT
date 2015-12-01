@@ -48,7 +48,7 @@ public class AgentExplorer extends AgentBESA{
         EventBESA event = new EventBESA(SubscribeGuardJME.class.getName(), actionData);
         
         try {
-            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(Const.World);
+            AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(Const.World+state.getIdfloor());
             ah.sendEvent(event);
         } catch (ExceptionBESA ex) {
             Logger.getLogger(AgentExplorer.class.getName()).log(Level.SEVERE, null, ex);

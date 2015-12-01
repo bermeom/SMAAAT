@@ -5,6 +5,7 @@
  */
 package BESAFile.World.Model;
 
+import BESAFile.Agent.State.Position;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +46,20 @@ public class ModelEdifice {
     public int getPostGridFloor(int idFloor,int i,int j){
             return floors[idFloor].get(i, j);
     } 
+    
+    public int getPostGridFloor(Position p){
+            return floors[p.getIdfloor()].get(p.getXpos(), p.getYpos());
+    } 
 
     public void setFloor(int idFloor,ModelFloor floor){
-            floors[idFloor].copyFloorArry(floor.getFloor());
+        floors[idFloor].copyFloorArry(floor.getFloor());
+        /*    
+        for (int i=0;i<width;i++){
+            for(int j=0;j<length;j++){
+                System.out.println(floor.get(i, j));
+                floors[idFloor].set(i, j, floor.get(i, j));
+            }
+        }*/
     }
     
     public void setFloorArry(int idFloor,int [][]floor){

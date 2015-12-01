@@ -30,6 +30,8 @@ import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
 import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
 import BESAFile.Agent.Behavior.AgentNegotiationGuard;
 import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
+import BESAFile.World.Behavior.AddAgenteFloorGuardJME;
+import BESAFile.World.Behavior.ChangeFloorGuardJME;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
@@ -68,6 +70,7 @@ import simulation.Agent.ExplorerAgent;
 import simulation.Agent.GuardianAgent;
 import simulation.Agent.HostageAgent;
 import simulation.utils.Const;
+import simulation.utils.UtilitiesEdificeFactory;
 import simulation.world.Exit;
 
 public class SmaaatApp extends SimpleApplication implements ActionListener {
@@ -114,42 +117,25 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         consecutiveAgenExplorer=0;
         consecutiveAgenHostage=0;
         wallsFloors=new ArrayList<Node>();
-        createEdifice();
-        flyCam.setMoveSpeed(20);
-        
-        
-        /*
-        cam.setLocation(new Vector3f(0, 20, -10));
-        cam.lookAt(new Vector3f(0, -10, 3), Vector3f.UNIT_Y);
-        //*/
-        
-        cam.setLocation(new Vector3f(0, 20, 0));
-        cam.lookAt(new Vector3f(0, -10, 0), Vector3f.UNIT_Y);
-        //*
-        
-        setupLighting();
-        setupKeys();
-
-        bulletAppState = new BulletAppState();
-        stateManager.attach(bulletAppState);
-        bulletAppState.setDebugEnabled(true);
-
-        CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) ediffice);
-        RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
-        ediffice.addControl(floorRigidBody);
-        bulletAppState.getPhysicsSpace().add(floorRigidBody);
-        
-        characterNode = new Node();
         try {
             setupBesa();
-            
+            createEdifice();
+            setupCam();
+            setupLighting();
+            setupKeys();
+            setupBulletPhysics();
+            characterNode = new Node();
+        
             //createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 5,5, new Vector3f(0, 0, 1));
+            //createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
+            /*createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
             
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
-           /*
+            
+            /*
             for(int i=10;i<50;i++){
                 for(int j=10;j<13;j++){
                     createAgentExplorer(0, i,j, new Vector3f(0, 0, 1));
@@ -173,7 +159,6 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             Logger.getLogger(SmaaatApp.class.getName()).log(Level.SEVERE, null, ex);
         }
         //Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
-        
         rootNode.attachChild(characterNode);
 
     }
@@ -234,75 +219,49 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.addBehavior("AgentNegotiationGuard");
         struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
         
-        
-        
         AgentExplorer agent = new AgentExplorer(state.getAlias(), state, struct, passwdAg);
         agent.start();
         consecutiveAgenExplorer++;
      }
+  
+      private void createAgentWord(int idFloor) throws ExceptionBESA{
+        WorldStateJME ws=new WorldStateJME(this,idFloor);
+        StructBESA wrlStruct = new StructBESA();
+        wrlStruct.addBehavior("SubscribeGuardJME");
+        wrlStruct.addBehavior("SensorsAgentGuardJME");
+        wrlStruct.addBehavior("simulationStartJME");
+        wrlStruct.addBehavior("ChangeFloorGuardJME");
+        wrlStruct.addBehavior("AddAgenteFloorGuardJME");
+        wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
+        wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
+        wrlStruct.bindGuard("simulationStartJME", SimulationStartJME.class);
+        wrlStruct.bindGuard("ChangeFloorGuardJME", ChangeFloorGuardJME.class);
+        wrlStruct.bindGuard("AddAgenteFloorGuardJME", AddAgenteFloorGuardJME.class);
+        //*/ChangeFloorGuardJME
+        wrlStruct.addBehavior("UpdateGuardJME");
+        wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
+        WorldAgentJME wa = new WorldAgentJME(Const.World+idFloor, ws, wrlStruct, passwdAg);
+        wa.start();
+     }
+     
     
-    public Vector3f getPositionVirtiul(int idFloor,int i,int j){
-        return new Vector3f(x+width-Const.post(i), y-distBetweenFloors*idFloor+1, z+length-Const.post(j));
-        
-    }
-    
-    public int post(int i){
-        return i*2+1;
-    }
-    private void createEdifice(){
+    private void createEdifice() throws ExceptionBESA{
         width=Const.width;
         length=Const.length;
         x=Const.x;
         y=Const.y;
         z=Const.z;
         nFloors=Const.nFloors;
-        mEdifice=new ModelEdifice(width, length, nFloors,false);
-        for (int i=0;i<nFloors;i++){
-            mEdifice.setPostGridFloor(i,9,0, -1);
-            mEdifice.setPostGridFloor(i,7 ,1, -1);
-            mEdifice.setPostGridFloor(i,0,0, -1);            
-            mEdifice.setPostGridFloor(i,0,1, -1);            
-            mEdifice.setPostGridFloor(i,1,1, -1);            
-            mEdifice.setPostGridFloor(i,0,2, -1);            
-            mEdifice.setPostGridFloor(i,1,0, -1);
-            mEdifice.setPostGridFloor(i,2,0, -1);
-            mEdifice.setPostGridFloor(i,3,1, -1);
-            mEdifice.setPostGridFloor(i,3,0, -1);
-            mEdifice.setPostGridFloor(i,4,4, -1);
-            mEdifice.setPostGridFloor(i,3,4, -1);
-            mEdifice.setPostGridFloor(i,5,4, -1);
-            mEdifice.setPostGridFloor(i,6,4, -1);
-            mEdifice.setPostGridFloor(i,6,3, -1);
-            mEdifice.setPostGridFloor(i,6,2, -1);
-            mEdifice.setPostGridFloor(i,6,1, -1);
-            mEdifice.setPostGridFloor(i,2,4, -1);
-            mEdifice.setPostGridFloor(i,1,4, -1);
-            mEdifice.setPostGridFloor(i,0,4, -1);
-            mEdifice.setPostGridFloor(i,0,6, -1);
-            mEdifice.setPostGridFloor(i,1,6, -1);
-            mEdifice.setPostGridFloor(i,1,7, -1);
-            mEdifice.setPostGridFloor(i,1,8, -1);
-            mEdifice.setPostGridFloor(i,2,8, -1);
-            mEdifice.setPostGridFloor(i,3,8, -1);
-            mEdifice.setPostGridFloor(i,4,8, -1);
-            mEdifice.setPostGridFloor(i,5,8, -1);
-            mEdifice.setPostGridFloor(i,5,6, -1);
-            mEdifice.setPostGridFloor(i,5,7, -1);
-            mEdifice.setPostGridFloor(i,3,5, -1);
-            mEdifice.setPostGridFloor(i,3,6, -1);
-            
-            //*/
-        }
-        System.out.println(mEdifice);
+        mEdifice= UtilitiesEdificeFactory.createEdifice(width, length, nFloors);
         createVirtualEdifice();
     }
     
     
-    private void createVirtualEdifice(){
+    private void createVirtualEdifice() throws ExceptionBESA{
         ediffice =new Node("Edifice");//*/
         for (int n=0;n<mEdifice.getnFlooors();n++){
             ModelFloor mf= mEdifice.getFloor(n);
-            WorldFloor we=new WorldFloor(assetManager, this.mEdifice.getWidth(), this.mEdifice.getLength(), x, y-distBetweenFloors*n, z);
+            WorldFloor we=new WorldFloor(assetManager, this.mEdifice.getWidth(), this.mEdifice.getLength(), x, y+distBetweenFloors*n, z);
             Node floor=new Node("Floor"+n);
             Node walls=new Node("Walls"+n);
             ediffice.attachChild(floor);
@@ -319,6 +278,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
                      switch(mf.get(i, j)){
                          case -1:walls.attachChild(we.makeCubeB("B-"+n+"-"+i+"-"+j, i, j)); break;
                          case -2:walls.attachChild(we.makeCubeb("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
+                         case -3:walls.attachChild(we.makeDoorUp("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
+                         case -4:walls.attachChild(we.makeDoorDown("b-"+n+"-"+i+"-"+j, i, j,0.3f)); break;
                               
                      }
                 }
@@ -326,6 +287,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             
             floor.attachChild(walls);
             wallsFloors.add(walls);
+            createAgentWord(n);
         }
         rootNode.attachChild(   ediffice );
         
@@ -340,25 +302,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     
     private void setupBesa() throws ExceptionBESA{
         this.startAPP=false;
-        passwdAg = 0.91;
+        passwdAg = Const.passwdAg;
         SmaaatApp.admLocal = AdmBESA.getInstance();
-        WorldStateJME ws=new WorldStateJME(this);
-        StructBESA wrlStruct = new StructBESA();
-        
-        wrlStruct.addBehavior("SubscribeGuardJME");
-        wrlStruct.addBehavior("SensorsAgentGuardJME");
-        wrlStruct.addBehavior("simulationStartJME");
-        wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
-        wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
-        wrlStruct.bindGuard("simulationStartJME", SimulationStartJME.class);
-        //*/
-        wrlStruct.addBehavior("UpdateGuardJME");
-        wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
-        
-        WorldAgentJME wa = new WorldAgentJME(Const.World, ws, wrlStruct, passwdAg);
-        wa.start();
-
-    }
+   }
 
     @Override
     public void simpleUpdate(float tpf) {
@@ -393,7 +339,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         if(name.equals("KEY_SPACE"))
         {   
             if(!this.startAPP){
-                Agent.sendMessage(SimulationStartJME.class, Const.World, new ActionData());
+                for(int i=0;i<nFloors;i++){
+                    Agent.sendMessage(SimulationStartJME.class, Const.World+i, new ActionData());
+                }
                 this.startAPP=true;
             }
         }
@@ -472,6 +420,27 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         }
         super.destroy();
         //System.exit(0);
+    }
+
+    private void setupBulletPhysics() {
+        bulletAppState = new BulletAppState();
+        stateManager.attach(bulletAppState);
+        bulletAppState.setDebugEnabled(true);
+        CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) ediffice);
+        RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
+        ediffice.addControl(floorRigidBody);
+        bulletAppState.getPhysicsSpace().add(floorRigidBody); 
+    }
+
+    private void setupCam() {
+        flyCam.setMoveSpeed(20);
+        /*
+        cam.setLocation(new Vector3f(0, 20, -10));
+        cam.lookAt(new Vector3f(0, -10, 3), Vector3f.UNIT_Y);
+        //*/
+        cam.setLocation(new Vector3f(0, 20, 0));
+        cam.lookAt(new Vector3f(0, -10, 0), Vector3f.UNIT_Y);
+        //*
     }
    
    

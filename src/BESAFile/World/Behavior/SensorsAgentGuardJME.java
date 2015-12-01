@@ -58,12 +58,13 @@ public class SensorsAgentGuardJME extends GuardBESA{
                         i=movX[k]*q+data.getPosition().getXpos();
                         j=movY[k]*q+data.getPosition().getYpos();
                         if (validationPosition(i,state.getmEdifice().getWidth())&&validationPosition(j, state.getmEdifice().getLength())){
-                            id=state.getmEdifice().getPostGridFloor(data.getIdfloor(), i, j);
+                            //id=state.getmEdifice().getPostGridFloor(data.getIdfloor(), i, j);
+                            id=state.getmEdifice().getPostGridFloor(0, i, j);
                             if (id > 0){
                                  seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), state.getListAgents().get(id-1).getAlias(), state.getListAgents().get(id-1).getType()));
                                  break;
                             }else if(id < 0){
-                                    seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), "B", -1));
+                                    seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), "W", id));
                                     break;
                             }else {
                                     seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), "0", 0));
@@ -75,11 +76,12 @@ public class SensorsAgentGuardJME extends GuardBESA{
                     i=movX[k]+data.getPosition().getXpos();
                     j=movY[k]+data.getPosition().getYpos();
                     if (validationPosition(i,state.getmEdifice().getWidth())&&validationPosition(j, state.getmEdifice().getLength())){
-                        id=state.getmEdifice().getPostGridFloor(data.getIdfloor(), i, j);
+                        //id=state.getmEdifice().getPostGridFloor(data.getIdfloor(), i, j);
+                        id=state.getmEdifice().getPostGridFloor(0, i, j);
                         if (id > 0){
                              seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), state.getListAgents().get(id-1).getAlias(), state.getListAgents().get(id-1).getType()));
                         }else if(id < 0){
-                                seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), "B", -1));
+                                seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), "W", id));
                         }else {
                                 seenObjects.add(new SeenObject(new Position(i, j,data.getIdfloor()), "0", 0));
                                 seenObjects=diagonalSensor(seenObjects, state, movX[k], movY[k], data.getSightRange()-1,new Position(i, j, data.getIdfloor()));
@@ -114,13 +116,14 @@ public class SensorsAgentGuardJME extends GuardBESA{
             i=q*x+p.getXpos();
             j=p.getYpos();
             if (validationPosition(i,state.getmEdifice().getWidth())&&validationPosition(j, state.getmEdifice().getLength())){
-                id=state.getmEdifice().getPostGridFloor(p.getIdfloor(), i, j);
+                //id=state.getmEdifice().getPostGridFloor(p.getIdfloor(), i, j);
+                id=state.getmEdifice().getPostGridFloor(0, i, j);
                 if (id > 0){
                      seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), state.getListAgents().get(id-1).getAlias(), state.getListAgents().get(id-1).getType()));
                      k=q;
                      break;
                 }else if(id < 0){
-                        seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "B", -1));
+                        seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "W", id));
                         k=q;
                         break;
                 }else {
@@ -137,12 +140,13 @@ public class SensorsAgentGuardJME extends GuardBESA{
             i=p.getXpos();
             j=q*y+p.getYpos();
             if (validationPosition(i,state.getmEdifice().getWidth())&&validationPosition(j, state.getmEdifice().getLength())){
-                id=state.getmEdifice().getPostGridFloor(p.getIdfloor(), i, j);
+                //id=state.getmEdifice().getPostGridFloor(p.getIdfloor(), i, j);
+                id=state.getmEdifice().getPostGridFloor(0, i, j);
                 if (id > 0){
                      seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), state.getListAgents().get(id-1).getAlias(), state.getListAgents().get(id-1).getType()));
                      break;
                 }else if(id < 0){
-                        seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "B", -1));
+                        seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "W", id));
                         break;
                 }else {
                         seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "0", 0));
@@ -156,11 +160,12 @@ public class SensorsAgentGuardJME extends GuardBESA{
         i=x+p.getXpos();
         j=y+p.getYpos();
         if ((!(!s1&&!s2))&&validationPosition(i,state.getmEdifice().getWidth())&&validationPosition(j, state.getmEdifice().getLength())){
-                id=state.getmEdifice().getPostGridFloor(p.getIdfloor(), i, j);
+                //id=state.getmEdifice().getPostGridFloor(p.getIdfloor(), i, j);
+                id=state.getmEdifice().getPostGridFloor(0, i, j);
                 if (id > 0){
                      seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), state.getListAgents().get(id-1).getAlias(), state.getListAgents().get(id-1).getType()));
                 }else if(id < 0){
-                        seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "B", -1));
+                        seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "W", id));
                 }else {
                         seenObjects.add(new SeenObject(new Position(i, j,p.getIdfloor()), "0", 0));
                         sw=true;

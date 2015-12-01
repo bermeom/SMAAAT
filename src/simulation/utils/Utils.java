@@ -151,25 +151,25 @@ public class Utils {
         }
         */
         
-        if(mat[x-1][x]!=0){
+        if(mat[x-1][x]!=0&&mat[x-1][x]!=-4&&mat[x-1][x]!=-3){
             for(int i=0;i<tam;i++){
                 if(mat[x-1][i]==0)
                     mat[x-1][i]=-1;
             }
         }
-        if(mat[x+1][x]!=0){
+        if(mat[x+1][x]!=0&&mat[x+1][x]!=-4&&mat[x+1][x]!=-3){
             for(int i=0;i<tam;i++){
                 if(mat[x+1][i]==0)
                     mat[x+1][i]=-1;
             }
         }
-        if(mat[x][x-1]!=0){
+        if(mat[x][x-1]!=0&&mat[x][x-1]!=-4&&mat[x][x-1]!=-3){
             for(int i=0;i<tam;i++){
                 if(mat[i][x-1]==0)
                     mat[i][x-1]=-1;
             }
         }
-        if(mat[x][x+1]!=0){
+        if(mat[x][x+1]!=0&&mat[x][x+1]!=-4&&mat[x][x+1]!=-3){
             for(int i=0;i<tam;i++){
                 if(mat[i][x+1]==0)
                     mat[i][x+1]=-1;

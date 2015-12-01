@@ -19,6 +19,13 @@ public class Motion {
         this.isNull=true;
     }
      
+    public Motion(Position p) {
+        this.xpos = p.getXpos();
+        this.ypos = p.getYpos();
+        this.idfloor = p.getIdfloor();
+        this.isNull=false;
+    }
+    
     public Motion(int xpos, int ypos, int idfloor) {
         this.xpos = xpos;
         this.ypos = ypos;

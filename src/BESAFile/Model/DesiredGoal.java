@@ -18,9 +18,11 @@ public class DesiredGoal {
     protected Position goal;
     protected ModelFloor gridWeights;
     protected boolean attraction;
+    protected int type;
 
-    public DesiredGoal(Position goal, ModelFloor gridWeights, boolean attraction) {
+    public DesiredGoal(Position goal, ModelFloor gridWeights, boolean attraction,int type) {
         this.goal = goal;
+        this.type=type;
         this.gridWeights = gridWeights;
         this.attraction = attraction;
     }
@@ -50,10 +52,20 @@ public class DesiredGoal {
         this.attraction = attraction;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
-        return "DesiredGoal{" + "goal=" + goal + ", attraction=" + attraction + ", gridWeights=\n" + gridWeights  + '}';
+        return "DesiredGoal{" + "goal=" + goal + ", gridWeights=" + gridWeights + ", attraction=" + attraction + ", type=" + type + '}';
     }
+
+    
     
     
     

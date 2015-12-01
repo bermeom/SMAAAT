@@ -11,14 +11,14 @@ import BESA.Kernell.Agent.Event.DataBESA;
  * @author berme_000
  */
 public class SubscribeDataJME extends DataBESA {
-    private int xpos;
-    private int ypos;
-    private int idfloor;
-    private int type;
-    private String alias;
-    private Vector3D direction;
-    private double radius;
-    private double height;
+    protected int xpos;
+    protected int ypos;
+    protected int idfloor;
+    protected int type;
+    protected String alias;
+    protected Vector3D direction;
+    protected double radius;
+    protected double height;
     
     public SubscribeDataJME(int xpos, int ypos, int idfloor, String alias, Vector3D direction,int type,double radius) {
         this.xpos = xpos;

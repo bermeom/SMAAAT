@@ -20,6 +20,14 @@ public class Position {
     }
      
 
+    public Position(Motion m) {
+        this.xpos = m.getXpos();
+        this.ypos = m.getYpos();
+        this.idfloor = m.getIdfloor();
+        this.isNull=false;
+    }
+    
+
     public Position(int xpos, int ypos, int idfloor) {
         this.xpos = xpos;
         this.ypos = ypos;

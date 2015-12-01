@@ -182,6 +182,31 @@ public class WorldFloor {
       return cube;
     }
     
+    public Geometry makeDoorUp(String name,int i,int j,float highb) {
+      Box box = new Box((float)1/Const.kGrid, .01f, (float)1/Const.kGrid);
+      Geometry cube = new Geometry(name, box);
+      cube.setLocalTranslation(x+length-Const.post(j), y+.899999f-(1-highb), z+width-Const.post(i));
+      Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+      mat1.setTexture("ColorMap", 
+            assetManager.loadTexture("Textures/texture6.jpg"));
+      mat1.setColor("Color", ColorRGBA.Green);
+      cube.setMaterial(mat1);
+      return cube;
+    }
+    
+    public Geometry makeDoorDown(String name,int i,int j,float highb) {
+      Box box = new Box((float)1/Const.kGrid, .01f, (float)1/Const.kGrid);
+      Geometry cube = new Geometry(name, box);
+      cube.setLocalTranslation(x+length-Const.post(j), y+.899f-(1-highb), z+width-Const.post(i));
+      Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+      mat1.setTexture("ColorMap", 
+            assetManager.loadTexture("Textures/texture6.jpg"));
+      mat1.setColor("Color", ColorRGBA.Red);
+      cube.setMaterial(mat1);
+      return cube;
+    }
+    
+    
     public Geometry makeCubeB(String name,int i,int j) {
       Box box = new Box((float)1/Const.kGrid, (float)high-0.2f,(float)1/Const.kGrid);
       Geometry cube = new Geometry(name, box);

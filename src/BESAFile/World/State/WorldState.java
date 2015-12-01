@@ -29,7 +29,7 @@ public class WorldState extends StateBESA{
     }
     
     public void  addAgent(int xpos, int ypos, int idfloor, String alias){
-        agents.put(alias,new ModelAgentWorld(xpos, ypos, idfloor, alias));
+        //agents.put(alias,new ModelAgentWorld(xpos, ypos, idfloor, alias));
     }
     
     public void  removeAgent(String alias){

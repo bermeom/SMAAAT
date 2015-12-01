@@ -16,18 +16,22 @@ public class ModelAgentWorld {
     private Position position;
     private int type;
     private String alias;
+    private int idGridP;
+    private int idGridM;
     
-    public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias,int type,int id) {
+    public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias,int type,int id, int idGrid) {
         this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
         this.id=id;
         this.type=type;
+        this.idGridP=idGrid;
     }
 
 
-    public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias) {
+    public ModelAgentWorld(int xpos, int ypos, int idfloor, String alias, int idGrid) {
         this.position=new Position(xpos, ypos, idfloor);
         this.alias = alias;
+        this.idGridP=idGrid;
     }
     
     public void setPos(int xpos, int ypos, int idfloor) {
@@ -91,6 +95,25 @@ public class ModelAgentWorld {
         this.position = position;
     }
 
+    public int getIdGridP() {
+        return idGridP;
+    }
+
+    public void setIdGridP(int idGridP) {
+        this.idGridP = idGridP;
+    }
+
+    public int getIdGridM() {
+        return idGridM;
+    }
+
+    public void setIdGridM(int idGridM) {
+        this.idGridM = idGridM;
+    }
+    
+    
+
+    
     @Override
     public String toString() {
         return "ModelAgentWorld{" + "id=" + id + ", position=" + position + ", type=" + type + ", alias=" + alias + '}';

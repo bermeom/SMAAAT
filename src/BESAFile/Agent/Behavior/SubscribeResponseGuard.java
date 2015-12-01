@@ -24,7 +24,7 @@ public class SubscribeResponseGuard extends GuardBESA {
         EventBESA event = new EventBESA(SensorsAgentGuardJME.class.getName(), actionData);
         AgHandlerBESA ah;
         try {
-            ah = getAgent().getAdmLocal().getHandlerByAlias(Const.World);
+            ah = getAgent().getAdmLocal().getHandlerByAlias(Const.World+state.getIdfloor());
             ah.sendEvent(event);
         } catch (ExceptionBESA e) {
             ReportBESA.error(e);

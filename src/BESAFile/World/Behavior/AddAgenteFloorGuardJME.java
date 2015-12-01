@@ -14,6 +14,7 @@ import BESAFile.Agent.Behavior.SubscribeResponseGuard;
 import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
+import BESAFile.Data.AddAgentDataJME;
 import BESAFile.Data.SubscribeDataJME;
 import BESAFile.Data.Vector3D;
 import BESAFile.World.State.WorldStateJME;
@@ -36,14 +37,19 @@ import simulation.utils.Const;
  *
  * @author berme_000
  */
-public class SubscribeGuardJME extends GuardBESA {
+public class AddAgenteFloorGuardJME extends GuardBESA {
 
     @Override
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        SubscribeDataJME data = (SubscribeDataJME)ebesa.getData();
+        AddAgentDataJME data = (AddAgentDataJME)ebesa.getData();
         try {
             WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
+            if(!validationPosition(ws.getmEdifice().getPostGridFloor(0, data.getXpos(), data.getYpos()))){
+                 Agent.sendMessage(AddAgenteFloorGuardJME.class, Const.World+data.getIdfloor(), data);
+                 return;
+            }
+            
             Spatial model=createSpatialGeometry(data.getAlias(),(float)data.getRadius(),(float)data.getHeight(),1);
             Vector3f position=Const.getPositionVirtiul(data.getIdfloor(), data.getXpos(), data.getYpos(),ws.getmEdifice().getLength(),ws.getmEdifice().getWidth(),ws.getApp().getX(),ws.getApp().getY(),ws.getApp().getZ(),ws.getApp().getDistBetweenFloors());
             Vector3f direction=new Vector3f((float)data.getDirection().getX(),(float) data.getDirection().getY(),(float) data.getDirection().getZ());
@@ -71,12 +77,17 @@ public class SubscribeGuardJME extends GuardBESA {
             controller.setEnabled(false);
             ws.addAgent(data.getAlias(),controller,data);
             node.addControl(controller);
-            //answer(true, data.getAlias());
+            System.out.println("---------------------------------------------++++++++++++++++++++");
+            answer(true, data.getAlias(),data.getType(),data.getReply_with(),data.getIn_reply_to(),new Position(data.getXpos(), data.getYpos(), data.getIdfloor()));
         } catch (Exception e) {
             ReportBESA.error(e);
-            answer(false, data.getAlias());
+            answer(false, data.getAlias(),data.getType(),data.getReply_with(),data.getIn_reply_to(),new Position(data.getXpos(), data.getYpos(), data.getIdfloor()));
         }
     
+    }
+    
+    private boolean validationPosition(int id){
+        return id==-3||id==-4;
     }
     
     private void subcribeInApp(final BetterCharacterControl physicsCharacter,final Node node,final SmaaatApp app ){
@@ -162,13 +173,11 @@ public class SubscribeGuardJME extends GuardBESA {
         return g;
     }
  
-     public void answer(boolean ack,String alias){
-        int reply_with=1;
-        int in_reply_to=-1;
-        ActionDataAgent actionData=new ActionDataAgent(reply_with,in_reply_to,alias,"NAK");
+     public void answer(boolean ack,String alias,int type,int reply_with,int in_reply_to,Position p){
+       ActionDataAgent actionData=new ActionDataAgent(reply_with,in_reply_to,"NACK_CHANGE_FLOOR",alias,p);
         if (ack){
-            actionData.setAction("ACK");
+            actionData.setAction("ACK_CHANGE_FLOOR");
         }
-        Agent.sendMessage((SubscribeResponseGuard.class), alias, actionData);
+        Agent.sendMessage((Const.getGuardMove(type)), alias, actionData);
     }
 }

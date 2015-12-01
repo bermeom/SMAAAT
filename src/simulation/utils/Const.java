@@ -23,9 +23,10 @@ public final class Const {
     public static final float z=0;
     public static final int width=10;
     public static final int length=10;
-    public static final int nFloors=1;
+    public static final int nFloors=3;
     public static final long sleep=300;
     public static final float  kGrid=2;
+    public static final float  passwdAg=0.91f;
     
     public static int getType(String name) {
         if(name.contains(Const.GuardianAgent)){
@@ -60,7 +61,7 @@ public final class Const {
     }
     
     public static  Vector3f getPositionVirtiul(int idFloor,int i,int j,float length, float width,float x,float y,float z,float distBetweenFloors){
-        return new Vector3f(x+length/(float)Const.kGrid-Const.post(j), y-distBetweenFloors*idFloor+0.23f, z+width/(float)Const.kGrid-Const.post(i));
+        return new Vector3f(x+length/(float)Const.kGrid-Const.post(j), y+distBetweenFloors*idFloor+0.23f, z+width/(float)Const.kGrid-Const.post(i));
     }
 
     
@@ -70,4 +71,7 @@ public final class Const {
         return (int)((-(xV-x-k)-1)/2);
     }
      
+    public static boolean validationIdGrid(int id){
+        return id==0||id==-3||id==-4;
+    }
 }

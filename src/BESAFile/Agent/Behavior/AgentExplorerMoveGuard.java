@@ -19,10 +19,12 @@ import BESAFile.Agent.State.Motion;
 import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
+import BESAFile.Data.ChangeFloorData;
 import BESAFile.Data.NegotiationData;
 import BESAFile.Data.Vector3D;
 import BESAFile.Model.SeenObject;
 import BESAFile.Model.SeenWall;
+import BESAFile.World.Behavior.ChangeFloorGuardJME;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Model.ModelEdifice;
@@ -59,7 +61,6 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 case "move":
                     //ReportBESA.info("-------------------Move:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
                     moveAgent(data.getReply_with(),data.getIn_reply_to(),data.getMotion());
-
                     break;
                 case "NACK":
                     nack(data,state);
@@ -76,10 +77,16 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 case("ACK_NEGOTIATION"):
                     ackNegotiation(data,state);
                     break;
+                case("NACK_CHANGE_FLOOR"):
+                    nack_change_floor(data,state);
+                    break;
+                case("ACK_CHANGE_FLOOR"):
+                    ackChangeFloor(data,state);
+                    break;
 
             }
         } catch (Exception e) {
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: MAIN xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx " +e);
             Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, e);
  
         }
@@ -89,9 +96,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
         try {
             AgentState state = (AgentState) this.getAgent().getState();
             ActionData ad = new ActionData(reply_with,in_reply_to,state.getType(), state.getAlias(),(float)state.getSpeed(),motion,state.getPosition(), "move");
-            Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
+            Agent.sendMessage(UpdateGuardJME.class,Const.World+state.getIdfloor(), ad);
         } catch (Exception e) {
-               System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+               System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR:  moveAgent xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
 
         }
         
@@ -118,7 +125,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             //System.out.println("-------------------ACK_SENSOR :D--------- "+data.getAlias());
             AgentExplorerState state = (AgentExplorerState) this.getAgent().getState();
             state.resetContMsOld();
-            List<SeenObject> enemies=new ArrayList<>();
+            List<SeenObject> enemies=new ArrayList<SeenObject>();
+            List<Motion> climbStairs=new ArrayList<Motion>();
+            List<Motion> downStairs=new ArrayList<Motion>();
             int tam=(int)state.getSightRange()*2+1;
             int [][]mat=new int[tam][tam];
             for (int i=0;i<tam;i++){
@@ -130,6 +139,15 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             int k=1;
             for (SeenObject so:data.getSeenObjects()){
                 switch(so.getType()){
+                    case(-4):downStairs.add(new Motion(so.getPosition())); 
+                            state.addDownStairs(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos());
+                            state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); 
+                            break;//Walls
+                    case(-3):climbStairs.add(new Motion(so.getPosition())); 
+                            state.addClimbtairs(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos());    
+                            state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); 
+                            break;//Walls
+                    case(-2):state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); break;//Walls
                     case(-1):state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); break;//Walls
                     case(0):break;//Protector
                     case(1):break;//Protector
@@ -142,20 +160,27 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 }else{
                     mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=so.getType();
                 }
-                if (so.getType()!=-1){
+                if (so.getType()!=-1&&so.getType()!=-4&&so.getType()!=-3){
                     state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(),0);
                 }
                 k++;
             }
+            if(state.getPosition().getIdfloor()==0&&climbStairs.size()>0&&!state.getDesiredGoals().isEmpty()&&state.getGoalType()!=-3){
+                Motion m=state.getMovementsRandom(climbStairs);
+                System.out.println(">>>>>>>>>>>>>>>> "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+                state.addGoal(new Position(m), true, true, state.getEdifice().getPostGridFloor(new Position(m)));
+                //System.out.println("ENTRO");
+            }
+            
             mat=Utils.border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
             mat[tam/2][tam/2]=-1;
             List<Motion> movements=new ArrayList<>();
             int offset=(int)(tam/2)-1;
             for (int i=offset;i<offset+3;i++){
                 for (int j=offset;j<offset+3;j++){
-                    if (mat[i][j]==0){
+                    if (mat[i][j]==0||mat[i][j]==-4||mat[i][j]==-3){
                        movements.add(new Motion(state.getXpos()+i-1-offset, state.getYpos()+j-1-offset, state.getIdfloor()));
-                       state.setModelEdiffice(state.getIdfloor(), movements.get(movements.size()-1).getXpos(), movements.get(movements.size()-1).getYpos(),0);
+                       //state.setModelEdiffice(state.getIdfloor(), movements.get(movements.size()-1).getXpos(), movements.get(movements.size()-1).getYpos(),0);
                     }
                 }
                 
@@ -189,14 +214,17 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                     moveAgent(reply_with, in_reply_to, state.getMotion());
                 }
             }else{
-                if(state.isDeadLock()){
-                    System.out.println("------------------------- DEADLOCK --------------------------- "+state.getAlias()+" "+state.getDesiredGoal());
-                    SeenObject agent=state.solutionDeadLock(data.getSeenObjects(), mat);
-                    if (agent!=null){
-                        sendMessageNegotiation(reply_with, in_reply_to,agent);
-                    }
+                if (state.isChangeFloor()){
                     disableController(reply_with, in_reply_to);
-                }else if (state.isFullExplorationMap()){
+                    sendChangeFloor(reply_with, in_reply_to);
+                }else if(state.isDeadLock()){
+                        System.out.println("------------------------- DEADLOCK --------------------------- "+state.getAlias()+" "+state.getDesiredGoal());
+                        SeenObject agent=state.solutionDeadLock(data.getSeenObjects(), mat);
+                        if (agent!=null){
+                            sendMessageNegotiation(reply_with, in_reply_to,agent);
+                        }
+                        disableController(reply_with, in_reply_to);
+                }else if (state.isFullExplorationMap(state.getPosition().getIdfloor())){
                             disableController(reply_with, in_reply_to);
                         }else{
                             msnSensor(reply_with, in_reply_to);
@@ -224,10 +252,10 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             try {
                 AgentState state = (AgentState) this.getAgent().getState();
                 ActionDataAgent actionData = new ActionDataAgent(reply_with,in_reply_to,state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
-                Agent.sendMessage(SensorsAgentGuardJME.class,Const.World, actionData);
+                Agent.sendMessage(SensorsAgentGuardJME.class,Const.World+state.getIdfloor(), actionData);
                 sw=true;
             } catch (Exception e) {
-                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR:  msnSensor xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
                 ReportBESA.error(e);
                 sw=false;
             }
@@ -240,10 +268,27 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             try {
                 AgentState state = (AgentState) this.getAgent().getState();
                 ActionData actionData = new ActionData(reply_with,in_reply_to,state.getType(),state.getPosition(), state.getAlias(), "disableController");
-                Agent.sendMessage(UpdateGuardJME.class,Const.World, actionData);
+                Agent.sendMessage(UpdateGuardJME.class,Const.World+state.getIdfloor(), actionData);
                 sw=true;
             } catch (Exception e) {
-                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: disableController  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
+                ReportBESA.error(e);
+                sw=false;
+            }
+        //}while(!sw);
+    }
+    
+    
+    private void sendChangeFloor(int reply_with,int in_reply_to) {
+        boolean sw=false;
+        //do{
+            try {
+                AgentState state = (AgentState) this.getAgent().getState();
+                ChangeFloorData actionData = new ChangeFloorData(reply_with, in_reply_to, state.getGoalType(),state.getType(), state.getPosition(),state.getAlias());
+                Agent.sendMessage(ChangeFloorGuardJME.class,Const.World+state.getIdfloor(), actionData);
+                sw=true;
+            } catch (Exception e) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: sendChangeFloor xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
                 ReportBESA.error(e);
                 sw=false;
             }
@@ -299,6 +344,25 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
          }
          msnSensor(data.getIn_reply_to(),data.getReply_with());
     }
+    
+    
+    private void ackChangeFloor(ActionDataAgent data, AgentState state) {
+        ReportBESA.info("-------------------ACK CHANGE FLOOR:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             ReportBESA.info("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------ACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+             state.setPosition(data.getPosition());
+         }else{
+             state.setPosition(data.getPosition());
+         }
+         state.getDesiredGoals().pop();
+         state.setChangeFloor(false);
+         msnSensor(data.getIn_reply_to(),data.getReply_with());
+    }
 
     private void sendMessageNegotiation(int reply_with, int in_reply_to, SeenObject agent) {
         boolean sw=false;
@@ -310,7 +374,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 sw=true;
                 state.setNegotiationData(actionData);
             } catch (Exception e) {
-                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: sendMessageNegotiation xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
                 ReportBESA.error(e);
                 sw=false;
             }
@@ -349,6 +413,20 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
                 System.out.println("");
                 
             }
+    }
+
+    private void nack_change_floor(ActionDataAgent data, AgentState state) {
+        ReportBESA.info("-------------------NACK_CHANGE_FLOOR :(--------- ");
+        state.setPosition(data.getPosition());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             System.out.println("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------NAK_DC :D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
     }
 
     

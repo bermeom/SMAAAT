@@ -134,7 +134,7 @@ public class PositionController extends AbstractControl implements ActionListene
                     this.contOut=0;
                     if (this.data!=null){
                         this.data.setAction("moveACK");
-                        sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                        sendMessage(UpdateGuardJME.class,Const.World+this.data.getPosition().getIdfloor(), this.data);
                     }
                     moveCharacter(modelForwardDir,0 );
                     this.poistion=new Position(this.motion.getXpos(), this.motion.getYpos(), this.motion.getIdfloor());
@@ -142,7 +142,7 @@ public class PositionController extends AbstractControl implements ActionListene
                     System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+" 1<<<<<<<<<<<<<<<<<<<<<<"+this.poistion+" - "+this.data.getPosition()+" "+this.data.getMotion()+" "+this.data.getReply_with());
                     if (this.data!=null){
                         this.data.setAction("moveACK");
-                        sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                        sendMessage(UpdateGuardJME.class,Const.World+this.data.getPosition().getIdfloor(), this.data);
                     }
                 }
                 this.contOut++;
@@ -159,7 +159,7 @@ public class PositionController extends AbstractControl implements ActionListene
                         sendMessage(UpdateGuardJME.class,Const.World, this.data);
                         if (this.data!=null){
                             this.data.setAction("moveNACK");
-                            sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                            sendMessage(UpdateGuardJME.class,Const.World+this.data.getPosition().getIdfloor(), this.data);
                         }
                     }
                 }
@@ -340,7 +340,7 @@ public class PositionController extends AbstractControl implements ActionListene
         this.enabledPS = enable;
     }
     
-    
+   
     
     
     
