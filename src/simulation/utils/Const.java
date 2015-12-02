@@ -15,6 +15,7 @@ public final class Const {
     public static final String HostageAgent = "HostageAgent";
     public static final String GuardianAgent = "GuardianAgent";
     public static final String Character = "Character";
+    public static final String Bullet = "Bullet";
     public static final String Exit = "Exit";
     public static final String World = "WORLD";
     public static final float distBetweenFloors=10;

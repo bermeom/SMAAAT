@@ -33,6 +33,7 @@ import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
 import BESAFile.World.Behavior.AddAgenteFloorGuardJME;
 import BESAFile.World.Behavior.ChangeFloorGuardJME;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
+import BESAFile.World.Behavior.ShootAgentJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Behavior.SimulationStartJME;
@@ -95,6 +96,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private static AdmBESA admLocal;
     private double passwdAg;
     private boolean startAPP;
+    private Node bulletsNode;
+    
     public static void main(String[] args) {
         SmaaatApp app = new SmaaatApp();
         app.setShowSettings(false);
@@ -124,14 +127,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             setupLighting();
             setupKeys();
             setupBulletPhysics();
+            
             characterNode = new Node();
+            this.bulletsNode=new Node();
         
             //createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 5,5, new Vector3f(0, 0, 1));
-            //createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
-            /*createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
-            
+            //createAgentProtector(0, 9,9, new Vector3f(0, 0, 1));
+            createAgentEnemy(0, 6,9, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
+            /*
             createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
             
@@ -160,6 +165,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         }
         //Exit e = new Exit(this, getPositionVirtiul(0, 7, 0), new Vector3f(0.5f,1,0.1f));
         rootNode.attachChild(characterNode);
+        rootNode.attachChild(this.bulletsNode);
+        
 
     }
     
@@ -174,6 +181,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("agentMove", HELPAgentProtectorGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        struct.addBehavior("AgentNegotiationGuard");
+        struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
         
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -189,6 +198,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("agentMove", AgentEnemyMoveGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        struct.addBehavior("AgentNegotiationGuard");
+        struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
         
         AgentEnemy agent = new AgentEnemy(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -202,6 +213,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("agentMove", AgentHostageMoveGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
+        struct.addBehavior("AgentNegotiationGuard");
+        struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
         
         AgentHostage agent = new AgentHostage(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -232,11 +245,13 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         wrlStruct.addBehavior("simulationStartJME");
         wrlStruct.addBehavior("ChangeFloorGuardJME");
         wrlStruct.addBehavior("AddAgenteFloorGuardJME");
+        wrlStruct.addBehavior("ShootAgentJME");
         wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
         wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
         wrlStruct.bindGuard("simulationStartJME", SimulationStartJME.class);
         wrlStruct.bindGuard("ChangeFloorGuardJME", ChangeFloorGuardJME.class);
         wrlStruct.bindGuard("AddAgenteFloorGuardJME", AddAgenteFloorGuardJME.class);
+        wrlStruct.bindGuard("ShootAgentJME", ShootAgentJME.class);
         //*/ChangeFloorGuardJME
         wrlStruct.addBehavior("UpdateGuardJME");
         wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
@@ -267,12 +282,17 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             ediffice.attachChild(floor);
             floor.attachChild(we.makeFloor());
             floor.attachChild(we.makeGridFloor(ColorRGBA.Blue));
-            
+            /*
             floor.attachChild(we.makeWallFloor1());
             floor.attachChild(we.makeWallFloor2());
             floor.attachChild(we.makeWallFloor3());
             floor.attachChild(we.makeWallFloor4());
             //*/
+            ediffice.attachChild(we.makeWallFloor1());
+            ediffice.attachChild(we.makeWallFloor2());
+            ediffice.attachChild(we.makeWallFloor3());
+            ediffice.attachChild(we.makeWallFloor4());
+            
             for (int i=0;i<this.mEdifice.getWidth();i++){
                 for (int j=0;j<this.mEdifice.getLength();j++){
                      switch(mf.get(i, j)){
@@ -285,11 +305,15 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
                 }
             }
             
-            floor.attachChild(walls);
+            //floor.attachChild(walls);
+            ediffice.attachChild(walls);
             wallsFloors.add(walls);
             createAgentWord(n);
+            
+            
         }
         rootNode.attachChild(   ediffice );
+      
         
     }
     
@@ -346,6 +370,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             }
         }
     }
+
+    public Node getBulletsNode() {
+        return bulletsNode;
+    }
+
+    public void setBulletsNode(Node bulletsNode) {
+        this.bulletsNode = bulletsNode;
+    }
+    
+    
     
     public BulletAppState getBulletAppState() {
         return this.bulletAppState;
@@ -425,8 +459,9 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
     private void setupBulletPhysics() {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        bulletAppState.setDebugEnabled(true);
-        CollisionShape floorShape = CollisionShapeFactory.createMeshShape((Node) ediffice);
+        //bulletAppState.setDebugEnabled(true);
+        
+        CollisionShape floorShape = CollisionShapeFactory.createMeshShape(ediffice);
         RigidBodyControl floorRigidBody = new RigidBodyControl(floorShape, 0);
         ediffice.addControl(floorRigidBody);
         bulletAppState.getPhysicsSpace().add(floorRigidBody); 

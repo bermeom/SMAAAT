@@ -50,23 +50,19 @@ public class ChangeFloorGuardJME  extends GuardBESA {
                     return;
                 }
                 if (data.getTypeChange()==-3){
-                    System.out.println("LLego-------------------"+data.getType());
                     PositionController pc=ws.getAgentController(id-1);
                     AddAgentDataJME dataJME=new AddAgentDataJME(reply_with,in_reply_to,data.getPosition().getXpos(), data.getPosition().getYpos(), data.getPosition().getIdfloor()+1, data.getAlias(), new Vector3D(0, 0, 1), pc.getType(), pc.getRadius(), pc.getHeight());
                     pc.setEnabled(false);
                     removeAgentJME(pc.getNode(), ws.getApp());
                     ws.getmEdifice().setPostGridFloor(0, data.getPosition().getXpos(), data.getPosition().getYpos(), ws.getIdGridPAgent(id-1));
                     Agent.sendMessage(AddAgenteFloorGuardJME.class, Const.World+(ws.getIdFloor()+1), dataJME);
-                    System.out.println(ws.getmEdifice());
                 }else if (data.getTypeChange()==-4){
-                    System.out.println("LLego-------------------"+data.getType());
                     PositionController pc=ws.getAgentController(id-1);
                     AddAgentDataJME dataJME=new AddAgentDataJME(reply_with,in_reply_to,data.getPosition().getXpos(), data.getPosition().getYpos(), data.getPosition().getIdfloor()-1, data.getAlias(), new Vector3D(0, 0, 1), pc.getType(), pc.getRadius(), pc.getHeight());
                     pc.setEnabled(false);
                     removeAgentJME(pc.getNode(), ws.getApp());
                     ws.getmEdifice().setPostGridFloor(0, data.getPosition().getXpos(), data.getPosition().getYpos(), ws.getIdGridPAgent(id-1));
                     Agent.sendMessage(AddAgenteFloorGuardJME.class, Const.World+(ws.getIdFloor()-1), dataJME);
-                    System.out.println(ws.getmEdifice());
                 }
                 
         } catch (Exception e) {

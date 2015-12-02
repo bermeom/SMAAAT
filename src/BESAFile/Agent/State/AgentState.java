@@ -46,6 +46,7 @@ public class AgentState extends  StateBESA{
     protected int movX[]={1,0, 0,-1,-1,1,-1, 1};
     protected int movY[]={0,1,-1, 0,-1,1, 1,-1};
     protected List<Boolean> fullExplorationFloor;
+    protected int nExproationFloor;
     protected boolean deadLock;
     protected boolean winNegotiation;
     protected NegotiationData negotiationData;
@@ -82,6 +83,7 @@ public class AgentState extends  StateBESA{
             this.climbStairsForFloor.add(new ArrayList<Position>());
             this.fullExplorationFloor.add(false);
         }    
+        this.nExproationFloor=1;
     }
     
 
@@ -114,6 +116,7 @@ public class AgentState extends  StateBESA{
             this.climbStairsForFloor.add(new ArrayList<Position>());
             this.fullExplorationFloor.add(false);
         }  
+        this.nExproationFloor=1;
     }
 
     public ModelEdifice getEdifice() {
@@ -390,15 +393,17 @@ public class AgentState extends  StateBESA{
             }else{
                 // -> Explorin region Goal <-
                 /*Find door down*/
-                if (this.downStairsForFloor.get(this.position.getIdfloor()).size()>0&&this.position.getIdfloor()!=1){
-                    int i=0;
-                    System.out.println("NEW GOAL ->>>>>>>>>>>>>");
-                    this.addGoal(this.downStairsForFloor.get(this.position.getIdfloor()).get(i), true, true, this.edifice.getPostGridFloor(this.downStairsForFloor.get(this.position.getIdfloor()).get(i)));
-                }else if (this.climbStairsForFloor.get(this.position.getIdfloor()).size()>0){
-                    int i=0;
-                    System.out.println("NEW GOAL ->>>>>>>>>>>>>");
-                    this.addGoal(this.climbStairsForFloor.get(this.position.getIdfloor()).get(i), true, true, this.edifice.getPostGridFloor(this.climbStairsForFloor.get(this.position.getIdfloor()).get(i)));
-                } 
+                if(this.nExproationFloor==this.edifice.getnFlooors()){
+                
+                }else if (this.downStairsForFloor.get(this.position.getIdfloor()).size()>0&&this.position.getIdfloor()!=1){
+                        int i=0;
+                        System.out.println("NEW GOAL ->>>>>>>>>>>>>");
+                        this.addGoal(this.downStairsForFloor.get(this.position.getIdfloor()).get(i), true, true, this.edifice.getPostGridFloor(this.downStairsForFloor.get(this.position.getIdfloor()).get(i)));
+                        }else if (this.climbStairsForFloor.get(this.position.getIdfloor()).size()>0){
+                                int i=0;
+                                System.out.println("NEW GOAL ->>>>>>>>>>>>>");
+                                this.addGoal(this.climbStairsForFloor.get(this.position.getIdfloor()).get(i), true, true, this.edifice.getPostGridFloor(this.climbStairsForFloor.get(this.position.getIdfloor()).get(i)));
+                        } 
                 /******************/
             }        
                    
@@ -448,6 +453,7 @@ public class AgentState extends  StateBESA{
                 this.desiredGoals.addLast(new DesiredGoal(p,gridWeights,true,this.edifice.getPostGridFloor(p)));
                 //System.out.println(this.goal);
             }else{
+                this.nExproationFloor++;
                 this.fullExplorationFloor.set(this.position.getIdfloor(), true);
                 this.motion.setIsNull(true); 
                 goalSeek();

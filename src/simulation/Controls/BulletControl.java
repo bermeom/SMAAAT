@@ -27,7 +27,18 @@ public class BulletControl extends RigidBodyControl implements PhysicsCollisionL
             return;
         }
         if (event.getObjectA() == this || event.getObjectB() == this) {
+            String nameNode="";
+            this.setLinearVelocity(this.getLinearVelocity().mult(0));
+            if(event.getObjectA() == this){
+                nameNode=event.getObjectB().getUserObject()+"";
+            }else{
+                nameNode=event.getObjectA().getUserObject()+"";
+            }
+            nameNode=nameNode.split(" ")[0];
+            System.out.println("->>>>>>>>>>"+nameNode);
             hasCollide = true;
+           
+            
         }
     }
 
@@ -35,9 +46,13 @@ public class BulletControl extends RigidBodyControl implements PhysicsCollisionL
     public void update(float tpf) {
         super.update(tpf);
         if (hasCollide) {
+             removeThis();
+        }
+    }
+    
+    private void removeThis(){
             space.removeCollisionListener(this);
             space.remove(this);
             spatial.removeFromParent();
-        }
     }
 }

@@ -23,6 +23,7 @@ public class AgentProtectorState extends AgentState{
     public AgentProtectorState(int xpos, int ypos, int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
         super(xpos, ypos, idfloor, alias, direction, radius, width, length, nFlooors);
         this.type=1;
+        this.sightRange=3;
         this.hostages=new ArrayList<String>();
     }
 

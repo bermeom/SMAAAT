@@ -43,6 +43,9 @@ public class AddAgenteFloorGuardJME extends GuardBESA {
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         AddAgentDataJME data = (AddAgentDataJME)ebesa.getData();
+        int reply_with=data.getReply_with();
+        int in_reply_to=data.getIn_reply_to();
+            
         try {
             WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
             if(!validationPosition(ws.getmEdifice().getPostGridFloor(0, data.getXpos(), data.getYpos()))){
@@ -77,8 +80,8 @@ public class AddAgenteFloorGuardJME extends GuardBESA {
             controller.setEnabled(false);
             ws.addAgent(data.getAlias(),controller,data);
             node.addControl(controller);
-            System.out.println("---------------------------------------------++++++++++++++++++++");
-            answer(true, data.getAlias(),data.getType(),data.getReply_with(),data.getIn_reply_to(),new Position(data.getXpos(), data.getYpos(), data.getIdfloor()));
+            
+            answer(true, data.getAlias(),data.getType(),reply_with,in_reply_to,new Position(data.getXpos(), data.getYpos(), data.getIdfloor()));
         } catch (Exception e) {
             ReportBESA.error(e);
             answer(false, data.getAlias(),data.getType(),data.getReply_with(),data.getIn_reply_to(),new Position(data.getXpos(), data.getYpos(), data.getIdfloor()));

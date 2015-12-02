@@ -2,6 +2,7 @@ package simulation.utils;
 
 import BESAFile.Agent.State.Position;
 import BESAFile.Data.Vector3D;
+import BESAFile.Model.SeenObject;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -14,6 +15,7 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import java.sql.Time;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Random;
 
 public class Utils {
@@ -178,6 +180,12 @@ public class Utils {
         return mat;
     }
     
-    
+    public static SeenObject selectRandomSeenObjects(List<SeenObject> seenObjects){
+            if(seenObjects.size()>0){
+                int n=Utils.randomIntegerMA(0, seenObjects.size()-1);
+                return  seenObjects.get(n);
+            }
+            return null;
+    }
     
 }
