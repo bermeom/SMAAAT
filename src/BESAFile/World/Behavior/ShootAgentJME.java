@@ -42,6 +42,10 @@ public class ShootAgentJME extends GuardBESA{
         ShootAgentDataJME data = (ShootAgentDataJME) ebesa.getData();
         WorldStateJME state = (WorldStateJME) this.getAgent().getState();
         int id=state.getmEdifice().getPostGridFloor(0,data.getPosition().getXpos(), data.getPosition().getYpos());
+        if(id<=0){
+            return;
+        }
+        
         PositionController pc=state.getAgentController(id-1);    
         Sphere bullet;
         float bulletRadius = ((float) pc.getRadius()) / 5;

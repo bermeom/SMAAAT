@@ -27,6 +27,9 @@ public class AgentNegotiationGuard extends GuardBESA  {
     public void funcExecGuard(EventBESA ebesa) {
         try {
             AgentState state = (AgentState) this.getAgent().getState();
+            if(state.getLife()<=0){
+                return;
+            }
             NegotiationData data = (NegotiationData ) ebesa.getData();
             if (state.getNegotiationData().isIsNull()){
                 sendMessageNegotiation(data, state.getAlias());

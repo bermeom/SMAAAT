@@ -156,7 +156,7 @@ public class PositionController extends AbstractControl implements ActionListene
                     contOut++;
                     if (contOut>=this.limitContOut){
                         System.out.println("++++++++++++++>>>>>>> CONTOUT "+this.alias+" 2<<<<<<<<<<<<<<<<<<<<<<");
-                        sendMessage(UpdateGuardJME.class,Const.World, this.data);
+                        //sendMessage(UpdateGuardJME.class,Const.World+this.data.getPosition().getIdfloor(), this.data);
                         if (this.data!=null){
                             this.data.setAction("moveNACK");
                             sendMessage(UpdateGuardJME.class,Const.World+this.data.getPosition().getIdfloor(), this.data);

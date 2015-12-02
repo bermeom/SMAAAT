@@ -29,11 +29,13 @@ import BESAFile.Data.Vector3D;
 import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
 import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
 import BESAFile.Agent.Behavior.AgentNegotiationGuard;
+import BESAFile.Agent.Behavior.DecreaseLifeGuard;
 import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
 import BESAFile.World.Behavior.AddAgenteFloorGuardJME;
 import BESAFile.World.Behavior.ChangeFloorGuardJME;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.ShootAgentJME;
+import BESAFile.World.Behavior.ShutdownAgentGuardJME;
 import BESAFile.World.Behavior.SubscribeGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Behavior.SimulationStartJME;
@@ -133,7 +135,7 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         
             //createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
             //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
-            //createAgentProtector(0, 9,9, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 9,9, new Vector3f(0, 0, 1));
             createAgentEnemy(0, 6,9, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
             /*
@@ -183,6 +185,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         struct.addBehavior("AgentNegotiationGuard");
         struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
+        struct.addBehavior("DecreaseLifeGuard");
+        struct.bindGuard("DecreaseLifeGuard",DecreaseLifeGuard.class);
         
         AgentProtector agent = new AgentProtector(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -200,6 +204,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         struct.addBehavior("AgentNegotiationGuard");
         struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
+        struct.addBehavior("DecreaseLifeGuard");
+        struct.bindGuard("DecreaseLifeGuard",DecreaseLifeGuard.class);
         
         AgentEnemy agent = new AgentEnemy(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -215,7 +221,11 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         struct.addBehavior("AgentNegotiationGuard");
         struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
+        struct.addBehavior("DecreaseLifeGuard");
+        struct.bindGuard("DecreaseLifeGuard",DecreaseLifeGuard.class);
         
+        
+        //
         AgentHostage agent = new AgentHostage(state.getAlias(), state, struct, passwdAg);
         agent.start();
         consecutiveAgenHostage++;
@@ -231,6 +241,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         struct.addBehavior("AgentNegotiationGuard");
         struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
+        struct.addBehavior("DecreaseLifeGuard");
+        struct.bindGuard("DecreaseLifeGuard",DecreaseLifeGuard.class);
         
         AgentExplorer agent = new AgentExplorer(state.getAlias(), state, struct, passwdAg);
         agent.start();
@@ -246,13 +258,15 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         wrlStruct.addBehavior("ChangeFloorGuardJME");
         wrlStruct.addBehavior("AddAgenteFloorGuardJME");
         wrlStruct.addBehavior("ShootAgentJME");
+        wrlStruct.addBehavior("ShutdownAgentGuardJME");
         wrlStruct.bindGuard("SubscribeGuardJME", SubscribeGuardJME.class);
         wrlStruct.bindGuard("SensorsAgentGuardJME", SensorsAgentGuardJME.class);
         wrlStruct.bindGuard("simulationStartJME", SimulationStartJME.class);
         wrlStruct.bindGuard("ChangeFloorGuardJME", ChangeFloorGuardJME.class);
         wrlStruct.bindGuard("AddAgenteFloorGuardJME", AddAgenteFloorGuardJME.class);
         wrlStruct.bindGuard("ShootAgentJME", ShootAgentJME.class);
-        //*/ChangeFloorGuardJME
+        wrlStruct.bindGuard("ShutdownAgentGuardJME", ShutdownAgentGuardJME.class);
+        //*/
         wrlStruct.addBehavior("UpdateGuardJME");
         wrlStruct.bindGuard("UpdateGuardJME", UpdateGuardJME.class);
         WorldAgentJME wa = new WorldAgentJME(Const.World+idFloor, ws, wrlStruct, passwdAg);

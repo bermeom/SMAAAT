@@ -53,6 +53,7 @@ public class AgentState extends  StateBESA{
     protected boolean changeFloor;
     protected List<List<Position> > climbStairsForFloor;
     protected List<List<Position> > downStairsForFloor;
+    protected int life;
     
     
     public AgentState(int xpos, int ypos,int idfloor, String alias, Vector3D direction, double radius,int width,int length,int nFlooors) {
@@ -84,6 +85,7 @@ public class AgentState extends  StateBESA{
             this.fullExplorationFloor.add(false);
         }    
         this.nExproationFloor=1;
+        this.life=10;
     }
     
 
@@ -117,6 +119,7 @@ public class AgentState extends  StateBESA{
             this.fullExplorationFloor.add(false);
         }  
         this.nExproationFloor=1;
+        this.life=10;
     }
 
     public ModelEdifice getEdifice() {
@@ -345,6 +348,19 @@ public class AgentState extends  StateBESA{
     public void setChangeFloor(boolean changeFloor) {
         this.changeFloor = changeFloor;
     }
+
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+    
+    public void decreaseLife() {
+        this.life--;
+    }
+    
     
     public Motion getMovementsRandom(List<Motion> motions){
             if(motions.size()>0){
