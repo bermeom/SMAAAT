@@ -11,6 +11,7 @@ import BESA.Kernell.System.Directory.AgHandlerBESA;
 import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
 import BESAFile.Agent.State.AgentEnemyState;
+import BESAFile.Agent.State.AgentExplorerState;
 import BESAFile.Agent.State.AgentHostageState;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
@@ -19,12 +20,19 @@ import BESAFile.Agent.State.Motion;
 import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
+import BESAFile.Data.ChangeFloorData;
+import BESAFile.Data.FolowingData;
+import BESAFile.Data.NegotiationData;
 import BESAFile.Data.Vector3D;
 import BESAFile.Model.SeenObject;
 import BESAFile.Model.SeenWall;
+import BESAFile.World.Behavior.ChangeFloorGuardJME;
 import BESAFile.World.Behavior.SensorsAgentGuardJME;
 import BESAFile.World.Behavior.UpdateGuardJME;
 import BESAFile.World.Model.ModelEdifice;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,21 +49,26 @@ import simulation.utils.Utils;
  * @author berme_000
  */
 public class AgentHostageMoveGuard  extends GuardBESA  {
-   
+  
     @Override
     public void funcExecGuard(EventBESA ebesa) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         try {
             AgentState state = (AgentState) this.getAgent().getState();
             ActionDataAgent data = (ActionDataAgent) ebesa.getData();
+            if(!state.getAlias().equals(data.getAlias())||state.getLife()<=0){
+                return;
+            }
             switch (data.getAction()) {
                 case "move":
                     //ReportBESA.info("-------------------Move:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
                     moveAgent(data.getReply_with(),data.getIn_reply_to(),data.getMotion());
-
                     break;
                 case "NACK":
                     nack(data,state);
+                    break;
+                case "NACK_DC"://disable controles
+                    nack_dc(data,state);
                     break;
                 case "ACK":
                      ack(data,state);
@@ -63,10 +76,19 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                 case("ACK_SENSOR"):
                     ackSensor(data);
                     break;
+                case("ACK_NEGOTIATION"):
+                    ackNegotiation(data,state);
+                    break;
+                case("NACK_CHANGE_FLOOR"):
+                    nack_change_floor(data,state);
+                    break;
+                case("ACK_CHANGE_FLOOR"):
+                    ackChangeFloor(data,state);
+                    break;
 
             }
         } catch (Exception e) {
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: MAIN xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx " +e);
             Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, e);
  
         }
@@ -76,9 +98,9 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
         try {
             AgentState state = (AgentState) this.getAgent().getState();
             ActionData ad = new ActionData(reply_with,in_reply_to,state.getType(), state.getAlias(),(float)state.getSpeed(),motion,state.getPosition(), "move");
-            Agent.sendMessage(UpdateGuardJME.class,Const.World, ad);
+            Agent.sendMessage(UpdateGuardJME.class,Const.World+state.getIdfloor(), ad);
         } catch (Exception e) {
-               System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+               System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR:  moveAgent xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
 
         }
         
@@ -98,124 +120,182 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
         
     }
     
-    private boolean[][] border(boolean [][]mat, Position p, int width,int length ,int tam){
-        if(p.getYpos()+1>=width){
-            for(int i=0;i<tam;i++){
-                mat[i][1+(int)(tam/2)]=false;
-            }
-        }
-        if(p.getYpos()-1<0){
-            for(int i=0;i<tam;i++){
-                mat[i][(int)(tam/2)-1]=false;
-            }
-        }
-        if(p.getXpos()+1>=length){
-            for(int i=0;i<tam;i++){
-                mat[1+(int)(tam/2)][i]=false;
-            }
-        }
-        if(p.getXpos()-1<0){
-            for(int i=0;i<tam;i++){
-                mat[(int)(tam/2)-1][i]=false;
-            }
-        }
-        int x=tam/2;
-        
-        if(!mat[x-1][x]){
-            for(int i=0;i<tam;i++){
-                mat[x-1][i]=false;
-            }
-        }
-        if(!mat[x+1][x]){
-            for(int i=0;i<tam;i++){
-                mat[x+1][i]=false;
-            }
-        }
-        if(!mat[x][x-1]){
-            for(int i=0;i<tam;i++){
-                mat[i][x-1]=false;
-            }
-        }
-        if(!mat[x][x+1]){
-            for(int i=0;i<tam;i++){
-                mat[i][x+1]=false;
-            }
-        }
-        return mat;
-    }
     
     
-    private void ackSensor(ActionDataAgent data){
-        try {
+    private void ackSensor(ActionDataAgent data) throws InterruptedException, IOException{
+        //try {
             //System.out.println("-------------------ACK_SENSOR :D--------- "+data.getAlias());
             AgentHostageState state = (AgentHostageState) this.getAgent().getState();
             state.resetContMsOld();
-            List<SeenObject> enemies=new ArrayList<>();
+            List<SeenObject> protector=new ArrayList<SeenObject>();
+            List<SeenObject> hostage=new ArrayList<SeenObject>();
+            List<SeenObject> enemies=new ArrayList<SeenObject>();
+            List<Motion> climbStairs=new ArrayList<Motion>();
+            List<Motion> downStairs=new ArrayList<Motion>();
             int tam=(int)state.getSightRange()*2+1;
-            boolean [][]mat=new boolean[tam][tam];
+            int [][]mat=new int[tam][tam];
             for (int i=0;i<tam;i++){
                 for (int j=0;j<tam;j++){
-                    mat[i][j]=true;
+                    mat[i][j]=-1;
                 }
             }
             state.setPosition(data.getPosition());
+            int k=1;
             for (SeenObject so:data.getSeenObjects()){
                 switch(so.getType()){
+                    case(-4):downStairs.add(new Motion(so.getPosition())); 
+                            state.addDownStairs(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos());
+                            state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); 
+                            break;//Walls
+                    case(-3):climbStairs.add(new Motion(so.getPosition())); 
+                            state.addClimbtairs(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos());    
+                            state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); 
+                            break;//Walls
+                    case(-2):state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); break;//Walls
                     case(-1):state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(), so.getType()); break;//Walls
-                    case(1):break;//Protector
+                    case(0):break;//Protector
+                    case(1):protector.add(so);break;//Protector
                     case(2):break;//Exprorator
-                    case(3):break;//Hostage
+                    case(3):hostage.add(so);break;//Hostage
                     case(4):enemies.add(so);break;//Enemmy
                 }
-                mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=false;
+                if (so.getType()>0){
+                    mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=k;
+                }else{
+                    mat[state.getSightRange()+so.getPosition().getXpos()-data.getPosition().getXpos()][state.getSightRange()+so.getPosition().getYpos()-data.getPosition().getYpos()]=so.getType();
+                }
+                if (so.getType()!=-1&&so.getType()!=-4&&so.getType()!=-3){
+                    state.setModelEdiffice(so.getPosition().getIdfloor(), so.getPosition().getXpos(), so.getPosition().getYpos(),0);
+                }
+                k++;
             }
-            mat=border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
-            mat[tam/2][tam/2]=false;
-            List<Motion> motions=new ArrayList<>();
+            
+            /*
+            if(state.getPosition().getIdfloor()==0&&downStairs.size()>0&&!state.getDesiredGoals().isEmpty()&&state.getGoalType()!=-4){
+                Motion m=state.getMovementsRandom(climbStairs);
+                System.out.println(">>>>>>>>>>>>>>>> "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+                state.addGoal(new Position(m), true, true, state.getEdifice().getPostGridFloor(new Position(m)));
+                //System.out.println("ENTRO");
+            }
+            */
+            
+            
+            mat=Utils.border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
+            mat[tam/2][tam/2]=-1;
+            List<Motion> movements=new ArrayList<>();
             int offset=(int)(tam/2)-1;
             for (int i=offset;i<offset+3;i++){
                 for (int j=offset;j<offset+3;j++){
-                    if (mat[i][j]){
-                       motions.add(new Motion(state.getXpos()+i-1-offset, state.getYpos()+j-1-offset, state.getIdfloor()));
+                    if (mat[i][j]==0||mat[i][j]==-4||mat[i][j]==-3){
+                       movements.add(new Motion(state.getXpos()+i-1-offset, state.getYpos()+j-1-offset, state.getIdfloor()));
+                       //state.setModelEdiffice(state.getIdfloor(), movements.get(movements.size()-1).getXpos(), movements.get(movements.size()-1).getYpos(),0);
                     }
                 }
                 
             }
-            /*
-            //System.out.println(state.getEdifice());
-            if(!state.getHostages().isEmpty()){
-                callHostages();
-            }
             
-            if(!enemies.isEmpty()){
-                shootEnemies();
-            }
-            */
-            Motion motion;
-            state.marckConsecutive(data.getIn_reply_to());
+            //System.out.println(state.getPosition());
+            //System.out.println(state.getEdifice());
+            
+           
+             state.marckConsecutive(data.getIn_reply_to());
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
-            if (motions.size()>0){
-                Random random=new Random(System.currentTimeMillis());
-                int n=0;
-                do{
-                    n= random.nextInt(motions.size());
-                }while(n<0 || n>=motions.size());
-                motion=motions.get(n);
-               
-                moveAgent(reply_with, in_reply_to, motion);
+           
+            if(!protector.isEmpty()&&!state.isFollowing()){
+                callProtectorHelp(reply_with,in_reply_to,protector,state.getAlias());
+            }else if(!protector.isEmpty()){
+                Position leader=null;
+                int typeAgent=1;
+                for(SeenObject so:protector){
+                    if(so.getName().equals(state.getAgentFollow())){
+                      leader=so.getPosition();
+                      typeAgent=so.getType();
+                    }
+                }
+                if(leader==null){
+                    for(SeenObject so:hostage){
+                        if(so.getName().equals(state.getAgentFollow())){
+                          leader=so.getPosition();
+                          typeAgent=so.getType();
+                        }
+                    }
+                }
+                
+                if(leader==null){
+                    for(SeenObject so:enemies){
+                        if(so.getName().equals(state.getAgentFollow())){
+                          leader=so.getPosition();
+                          typeAgent=so.getType();
+                        }
+                    }
+                }
+                if (leader==null){
+                    state.setFollowing(false);
+                    state.setMotion(state.getMovementsRandom(movements));
+                }else{
+                    int dd = Math.max(Math.abs(state.getPosition().getXpos()-leader.getXpos()), state.getPosition().getYpos()-leader.getYpos());
+                    if(dd>1){
+                        
+                        if (state.getPostLeader()==null){
+                            while (!state.getDesiredGoals().isEmpty()){
+                                state.getDesiredGoals().pop();
+                            }
+                            state.addGoal(leader, true, true, typeAgent);
+                            state.findMotion(movements);
+                        }else{
+                            
+                        }
+                    }else{
+                        
+                    }
+                    }
             }else{
-                msnSensor(reply_with, in_reply_to);
+                state.setMotion(state.getMovementsRandom(movements));
+                }
+           
+            
+            if (!state.getMotion().isIsNull()){
+                if (state.getPosition().isEquals(state.getMotion())){
+                    disableController(reply_with, in_reply_to);
+                    Thread.sleep(Utils.randomIntegerMA(0,100));
+                    msnSensor(reply_with, in_reply_to);
+                }else{
+                    //disableController(reply_with, in_reply_to);
+                    //printMatANDMotion(mat,state.getMotion());
+                    //stop();
+                    moveAgent(reply_with, in_reply_to, state.getMotion());
+                }
+            }else{
+                if (state.isChangeFloor()){
+                    disableController(reply_with, in_reply_to);
+                    sendChangeFloor(reply_with, in_reply_to);
+                }else if(state.isDeadLock()){
+                        System.out.println("------------------------- DEADLOCK --------------------------- "+state.getAlias()+" "+state.getDesiredGoal());
+                        SeenObject agent=state.solutionDeadLock(data.getSeenObjects(), mat);
+                        if (agent!=null){
+                            sendMessageNegotiation(reply_with, in_reply_to,agent);
+                        }
+                        disableController(reply_with, in_reply_to);
+                }else if (state.isFullExplorationMap(state.getPosition().getIdfloor())){
+                            disableController(reply_with, in_reply_to);
+                        }else{
+                            msnSensor(reply_with, in_reply_to);
+                            }
+                
             }
-            
+       /*
         } catch (Exception e) {
-            System.out.println(" xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxx ERROR ACK SENSOR");
+            System.out.println(" xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxx ERROR ACK SENSOR "+e);
         }
-            
+            */
     }
 
-    private void callHostages() {
-
+    private void callProtectorHelp(int reply_with, int in_reply_to, List<SeenObject> protector, String alias) {
+        for (SeenObject so:protector){
+                FolowingData data=new FolowingData(reply_with, in_reply_to, so.getType(), alias, so.getPosition(),"HELP");
+                Agent.sendMessage(HELPAgentProtectorGuard.class, so.getName(), data);
+                }
     }
 
     private void shootEnemies() {
@@ -224,20 +304,53 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
 
     private void msnSensor(int reply_with,int in_reply_to) {
         boolean sw=false;
-        do{
+        //do{
             try {
                 AgentState state = (AgentState) this.getAgent().getState();
                 ActionDataAgent actionData = new ActionDataAgent(reply_with,in_reply_to,state.getType(), state.getSightRange(), state.getRadius(), state.getHeight(), state.getAlias(),state.getPosition(), "Sensing");
-                Agent.sendMessage(SensorsAgentGuardJME.class,Const.World, actionData);
+                Agent.sendMessage(SensorsAgentGuardJME.class,Const.World+state.getIdfloor(), actionData);
                 sw=true;
             } catch (Exception e) {
-                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR:  msnSensor xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
                 ReportBESA.error(e);
                 sw=false;
             }
-        }while(!sw);
+        //}while(!sw);
     }
 
+    private void disableController(int reply_with,int in_reply_to) {
+        boolean sw=false;
+        //do{
+            try {
+                AgentState state = (AgentState) this.getAgent().getState();
+                ActionData actionData = new ActionData(reply_with,in_reply_to,state.getType(),state.getPosition(), state.getAlias(), "disableController");
+                Agent.sendMessage(UpdateGuardJME.class,Const.World+state.getIdfloor(), actionData);
+                sw=true;
+            } catch (Exception e) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: disableController  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
+                ReportBESA.error(e);
+                sw=false;
+            }
+        //}while(!sw);
+    }
+    
+    
+    private void sendChangeFloor(int reply_with,int in_reply_to) {
+        boolean sw=false;
+        //do{
+            try {
+                AgentState state = (AgentState) this.getAgent().getState();
+                ChangeFloorData actionData = new ChangeFloorData(reply_with, in_reply_to, state.getGoalType(),state.getType(), state.getPosition(),state.getAlias());
+                Agent.sendMessage(ChangeFloorGuardJME.class,Const.World+state.getIdfloor(), actionData);
+                sw=true;
+            } catch (Exception e) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: sendChangeFloor xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
+                ReportBESA.error(e);
+                sw=false;
+            }
+        //}while(!sw);
+    }
+    
     private void nack(ActionDataAgent data, AgentState state) {
         //ReportBESA.info("-------------------NAK :(--------- ");
         state.setPosition(data.getPosition());
@@ -252,10 +365,28 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
          }
          msnSensor(data.getIn_reply_to(),data.getReply_with());
     }
+    
+    private void ackNegotiation(ActionDataAgent data, AgentState state) throws InterruptedException {
+        //ReportBESA.info("-------------------ACK NEGOTIATION  :D--------- ");
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             System.out.println("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------NACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
+         if (state.isWinNegotiation()){
+             Thread.sleep(500);
+         }
+         state.setDeadLock(false);
+         ReportBESA.info("-------------------ACK NEGOTIATION  :D--------- "+state.getAlias());
+         msnSensor(data.getIn_reply_to(),data.getReply_with());
+    }
 
     private void ack(ActionDataAgent data, AgentState state) {
         //ReportBESA.info("-------------------ACK:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
-        state.setPosition(data.getPosition());
          if (!state.getIdConsecutive(data.getIn_reply_to())){
              state.plusPlusContMsOld();
              ReportBESA.info("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
@@ -263,10 +394,97 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                  ReportBESA.info("-------------------ACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
                  return ;
              }
-
+             state.setPosition(data.getPosition());
+         }else{
+             state.setPosition(data.getPosition());
          }
          msnSensor(data.getIn_reply_to(),data.getReply_with());
     }
+    
+    
+    private void ackChangeFloor(ActionDataAgent data, AgentState state) {
+        ReportBESA.info("-------------------ACK CHANGE FLOOR:D--------- "+((AgentState) this.getAgent().getState()).getAlias());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             ReportBESA.info("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------ACK:D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+             state.setPosition(data.getPosition());
+         }else{
+             state.setPosition(data.getPosition());
+         }
+         state.getDesiredGoals().pop();
+         state.setChangeFloor(false);
+         msnSensor(data.getIn_reply_to(),data.getReply_with());
+    }
+
+    private void sendMessageNegotiation(int reply_with, int in_reply_to, SeenObject agent) {
+        boolean sw=false;
+        //do{
+            try {
+                AgentState state = (AgentState) this.getAgent().getState();
+                NegotiationData actionData = new NegotiationData(reply_with,in_reply_to,state.getType(), state.getAlias(),state.getGoal(),Utils.randomInteger(0, 10));
+                Agent.sendMessage(AgentNegotiationGuard.class,agent.getName(), actionData);
+                sw=true;
+                state.setNegotiationData(actionData);
+            } catch (Exception e) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR: sendMessageNegotiation xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
+                ReportBESA.error(e);
+                sw=false;
+            }
+        //}while(!sw);
+    
+    
+    }
+    
+    private void stop() throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String linea=br.readLine();
+    }
+
+    private void nack_dc(ActionDataAgent data, AgentState state) {
+        //ReportBESA.info("-------------------NAK_DC :(--------- ");
+        state.setPosition(data.getPosition());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             System.out.println("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------NAK_DC :D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
+         
+    }
+
+    private void printMatANDMotion(int[][] mat, Motion motion) {
+        System.out.println(motion);
+        mat[mat.length/2][mat.length/2]=-2;
+        for (int i=0;i<mat.length;i++){
+                for (int j=0;j<mat[i].length;j++){
+                    System.out.print("\t"+mat[i][j]);
+                }
+                System.out.println("");
+                
+            }
+    }
+
+    private void nack_change_floor(ActionDataAgent data, AgentState state) {
+        ReportBESA.info("-------------------NACK_CHANGE_FLOOR :(--------- ");
+        state.setPosition(data.getPosition());
+         if (!state.getIdConsecutive(data.getIn_reply_to())){
+             state.plusPlusContMsOld();
+             System.out.println("+++++++++++++++++++++++++++++++++++  Message OLD "+state.getAlias()+" "+state.getContMessagesOld());
+             if (!state.isExceededContMsOld()){
+                 ReportBESA.info("-------------------NAK_DC :D OLD--------- "+((AgentState) this.getAgent().getState()).getAlias());
+                 return ;
+             }
+
+         }
+    }
+
     
     
 }

@@ -30,6 +30,7 @@ import BESAFile.Agent.Behavior.AgentExplorerMoveGuard;
 import BESAFile.Agent.Behavior.AgentHostageMoveGuard;
 import BESAFile.Agent.Behavior.AgentNegotiationGuard;
 import BESAFile.Agent.Behavior.DecreaseLifeGuard;
+import BESAFile.Agent.Behavior.FollowHostageGuard;
 import BESAFile.Agent.Behavior.HELPAgentProtectorGuard;
 import BESAFile.World.Behavior.AddAgenteFloorGuardJME;
 import BESAFile.World.Behavior.ChangeFloorGuardJME;
@@ -133,27 +134,16 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             characterNode = new Node();
             this.bulletsNode=new Node();
         
-            //createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
-            //createAgentHostage(0, 4,0, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
+            createAgentHostage(1, 4,0, new Vector3f(0, 0, 1));
+            /*
             createAgentProtector(0, 9,9, new Vector3f(0, 0, 1));
             createAgentEnemy(0, 6,9, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 2,1, new Vector3f(0, 0, 1));
-            /*
-            createAgentExplorer(0, 0,5, new Vector3f(0, 0, 1));
-            createAgentExplorer(0, 0,8, new Vector3f(0, 0, 1));
-            
-            /*
-            for(int i=10;i<50;i++){
-                for(int j=10;j<13;j++){
-                    createAgentExplorer(0, i,j, new Vector3f(0, 0, 1));
-                }
-            }
-            
-            /*
+            createAgentExplorer(0, 6,5, new Vector3f(0, 0, 1));
             createAgentEnemy(0, 4,2, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 4,3, new Vector3f(0, 0, 1));
             createAgentHostage(0, 3,3, new Vector3f(0, 0, 1));
-            createAgentProtector(0,  4,3, new Vector3f(0, 0, 1));
+            createAgentProtector(0,  2,3, new Vector3f(0, 0, 1));
             
             createAgentProtector(0, 7,7, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 8,7, new Vector3f(0, 0, 1));
@@ -180,7 +170,8 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         StructBESA struct = new StructBESA();
         struct.addBehavior("agentMove");
         struct.bindGuard("agentMove", AgentProtectorMoveGuard.class);
-        struct.bindGuard("agentMove", HELPAgentProtectorGuard.class);
+        struct.addBehavior("HELPAgentProtectorGuard");
+        struct.bindGuard("HELPAgentProtectorGuard", HELPAgentProtectorGuard.class);
         struct.addBehavior("SubscribeResponseGuard");
         struct.bindGuard("SubscribeResponseGuard",SubscribeResponseGuard.class);
         struct.addBehavior("AgentNegotiationGuard");
@@ -223,9 +214,11 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
         struct.bindGuard("AgentNegotiationGuard",AgentNegotiationGuard.class);
         struct.addBehavior("DecreaseLifeGuard");
         struct.bindGuard("DecreaseLifeGuard",DecreaseLifeGuard.class);
+        struct.addBehavior("FollowHostageGuard");
+        struct.bindGuard("FollowHostageGuard",FollowHostageGuard.class);
         
         
-        //
+        //FollowHostageGuard
         AgentHostage agent = new AgentHostage(state.getAlias(), state, struct, passwdAg);
         agent.start();
         consecutiveAgenHostage++;

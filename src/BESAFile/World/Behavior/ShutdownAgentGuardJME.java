@@ -72,14 +72,16 @@ public class ShutdownAgentGuardJME extends GuardBESA{
       boolean sw=false;
         //do{
             try {
-                
+                 Thread.sleep(100);
                 AgHandlerBESA ah = AdmBESA.getInstance().getHandlerByAlias(data.getAlias());
                 AdmBESA.getInstance().killAgent(ah.getAgId(),Const.passwdAg);
                 sw=true;
             } catch (ExceptionBESA ex) {
                 Logger.getLogger(ShutdownAgentGuardJME.class.getName()).log(Level.SEVERE, null, ex);
                 sw=false;
-           }
+           } catch (InterruptedException ex) {
+            Logger.getLogger(ShutdownAgentGuardJME.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //}while(!sw);
     }
     

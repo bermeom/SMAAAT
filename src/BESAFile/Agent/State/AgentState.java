@@ -477,7 +477,7 @@ public class AgentState extends  StateBESA{
     
     } 
     
-    private ModelFloor waveFront(Position goal,ModelFloor gridWeights) {
+    protected ModelFloor waveFront(Position goal,ModelFloor gridWeights) {
                     Deque<Position> bfs = new ArrayDeque<Position>();
                     Position p=new Position();
                     bfs.add(goal);
@@ -499,7 +499,7 @@ public class AgentState extends  StateBESA{
         
     }
 
-    private void findMotion(List<Motion> movements) {
+    public void findMotion(List<Motion> movements) {
             int de=ModelFloor.null_,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
             this.motion.setIsNull(true); 
             List<Motion> lm=new ArrayList<Motion>();
