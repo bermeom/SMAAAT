@@ -16,6 +16,13 @@ public class UtilitiesEdificeFactory {
         ModelEdifice mEdifice=new ModelEdifice(width, length, nFloors,false);
         for (int i=0;i<nFloors;i++){
            
+            mEdifice.setPostGridFloor(i,7 ,0, -1);
+            mEdifice.setPostGridFloor(i,7,1, -1);            
+            mEdifice.setPostGridFloor(i,7,2, -1);            
+            mEdifice.setPostGridFloor(i,7,3, -1);            
+            mEdifice.setPostGridFloor(i,7,4, -1);            
+            
+            /*
             mEdifice.setPostGridFloor(i,7 ,1, -1);
             mEdifice.setPostGridFloor(i,0,0, -1);            
             mEdifice.setPostGridFloor(i,0,1, -1);            

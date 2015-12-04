@@ -27,6 +27,7 @@ public class AgentHostageState extends AgentState{
         this.type=3;
         this.following=false;
         postLeader=null;
+        this.speed=3;
     }
 
     public AgentHostageState(int xpos, int ypos, int idfloor, String alias, Vector3D direction, double radius, double height,int width,int length,int nFlooors) {
@@ -34,6 +35,7 @@ public class AgentHostageState extends AgentState{
         this.type=3;
         this.following=false;
         postLeader=null;
+        this.speed=3;
     }
 
     public String getAgentFollow() {

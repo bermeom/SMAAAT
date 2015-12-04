@@ -188,4 +188,8 @@ public class Utils {
             return null;
     }
     
+    
+    public static int euclideanDistance2D(int x1,int y1,int x2,int y2){
+        return (int)(100*Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+    }
 }

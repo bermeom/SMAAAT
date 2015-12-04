@@ -86,7 +86,7 @@ public class PositionController extends AbstractControl implements ActionListene
         this.motion=new Motion(this.poistion.getXpos(), this.poistion.getYpos(), this.poistion.getIdfloor());
         this.move=false;
         moveCharacter(modelForwardDir,0 );
-        this.limitContOut=1000;
+        this.limitContOut=10000;
         this.enabledPS=false;
     }
 
@@ -115,10 +115,14 @@ public class PositionController extends AbstractControl implements ActionListene
     private boolean moveCharacter(Vector3f modelForwardDir,float speed_){
         BetterCharacterControl control = spatial.getControl(BetterCharacterControl.class);
         try {
-            control.setWalkDirection(modelForwardDir.normalizeLocal().mult(speed_));
-            control.setViewDirection(modelForwardDir.normalize());                    
+            if(control!=null){
+                control.setWalkDirection(modelForwardDir.normalizeLocal().mult(speed_));
+                control.setViewDirection(modelForwardDir.normalize());                    
+            }else{
+                System.out.println("Control "+control);
+            }
         } catch (Exception e) {
-            System.out.println(" -------------- ERROR  -------------   ");
+            System.out.println(" -------------- ERROR  -------------   "+speed_+" "+ modelForwardDir+" "+believedPosition+" "+this.poistion+" "+data.getMotion()+" "+control);
             Logger.getLogger(this.alias).log(Level.SEVERE, null, e);
         }
         return true;

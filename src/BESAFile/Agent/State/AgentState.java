@@ -66,7 +66,7 @@ public class AgentState extends  StateBESA{
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors,true);
         this.edifice.setPostGridFloor(idfloor,xpos,ypos,0);
-        this.speed=3;
+        this.speed=2;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
         this.contMessagesOld=0;
@@ -288,6 +288,9 @@ public class AgentState extends  StateBESA{
     }
     
     public int getGoalType() {
+        if(this.desiredGoals.isEmpty()){
+            return 0;
+        }
         return this.desiredGoals.getFirst().getType();
     }
 
@@ -383,6 +386,8 @@ public class AgentState extends  StateBESA{
                findMotion(movements);
             }else if(!this.desiredGoals.isEmpty()&&(this.getGoalType()==-3||this.getGoalType()==-4)&&this.position.isEquals(this.getGoal())){
                 this.changeFloor=true;
+            }else if(!this.desiredGoals.isEmpty()&&(this.getGoalType()==-0)&&!this.position.isEquals(this.getGoal())){
+               findMotion(movements);
             }else{
                    if(!this.desiredGoals.isEmpty()){
                        this.desiredGoals.pop();
@@ -410,7 +415,13 @@ public class AgentState extends  StateBESA{
                 // -> Explorin region Goal <-
                 /*Find door down*/
                 if(this.nExproationFloor==this.edifice.getnFlooors()){
-                
+                    Position p;
+                    do {             
+                       p=new Position(Utils.randomInteger(0, this.edifice.getWidth()-1),Utils.randomInteger(0, this.edifice.getLength()-1), Utils.randomInteger(1, this.edifice.getnFlooors()-1));
+                    } while (this.edifice.getPostGridFloor(p)!=0);
+                    this.addGoal(p, true, true, 0);
+                    //System.out.println("New GOAL .>>>>>>>>>>"+p);
+                    //System.out.println(" ->"+this.desiredGoals.getFirst().getGridWeights());
                 }else if (this.downStairsForFloor.get(this.position.getIdfloor()).size()>0&&this.position.getIdfloor()!=1){
                         int i=0;
                         System.out.println("NEW GOAL ->>>>>>>>>>>>>");
@@ -490,11 +501,11 @@ public class AgentState extends  StateBESA{
                             newY=movY[i]+p.getYpos();
                             if (intervalValidation(newX,this.edifice.getWidth())&&intervalValidation(newY,this.edifice.getLength())&&Const.validationIdGrid(gridWeights.get(newX, newY))){
                                 bfs.add(new Position(newX, newY, this.position.getIdfloor()));
-                                gridWeights.set(newX, newY, gridWeights.get(p.getXpos(), p.getYpos())+1);
+                                gridWeights.set(newX, newY, gridWeights.get(p.getXpos(), p.getYpos())+Utils.euclideanDistance2D(newX, newY,p.getXpos() , p.getYpos()));
                             }
                         }
                     }
-                    //System.out.println(this.gridWeights);
+                    //System.out.println(gridWeights);
                     return gridWeights;
         
     }

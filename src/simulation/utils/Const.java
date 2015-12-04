@@ -24,7 +24,7 @@ public final class Const {
     public static final float z=0;
     public static final int width=10;
     public static final int length=10;
-    public static final int nFloors=3;
+    public static final int nFloors=2;
     public static final long sleep=300;
     public static final float  kGrid=2;
     public static final float  passwdAg=0.91f;

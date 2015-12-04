@@ -146,7 +146,7 @@ public class UpdateGuardJME extends GuardBESA{
                        ActionDataAgent ad =new ActionDataAgent(data.getIn_reply_to(),data.getReply_with(),data.getType(),"ACK",data.getAlias(),new Position(data.getMotion().getXpos(), data.getMotion().getYpos(), data.getMotion().getIdfloor()));
                        Agent.sendMessage(Const.getGuardMove(data.getType()),data.getAlias(),ad);
                    }else{
-                        System.out.println(state.getmEdifice());
+                        System.out.println("ACK"+state.getmEdifice().getPostGridFloor(0,data.getMotion().getXpos(), data.getMotion().getYpos())+" == "+data.getId()+"\n"+state.getmEdifice());
                    }
                    sw=true;
             } catch (Exception e) {

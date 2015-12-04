@@ -170,14 +170,17 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                 k++;
             }
             
-            /*
-            if(state.getPosition().getIdfloor()==0&&downStairs.size()>0&&!state.getDesiredGoals().isEmpty()&&state.getGoalType()!=-4){
-                Motion m=state.getMovementsRandom(climbStairs);
-                System.out.println(">>>>>>>>>>>>>>>> "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+            
+            if(downStairs.size()>0&&state.getGoalType()!=-4){
+                Motion m=state.getMovementsRandom(downStairs);
+                System.out.println(">>>>>>>>>>>>>>>> Hostage "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+                while (!state.getDesiredGoals().isEmpty()){
+                    state.getDesiredGoals().pop();
+                }
                 state.addGoal(new Position(m), true, true, state.getEdifice().getPostGridFloor(new Position(m)));
                 //System.out.println("ENTRO");
             }
-            */
+            //*/
             
             
             mat=Utils.border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
@@ -202,7 +205,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
            
-            if(!protector.isEmpty()&&!state.isFollowing()){
+            if(!protector.isEmpty()&&!state.isFollowing()&&(state.getGoalType()!=-4)){
                 callProtectorHelp(reply_with,in_reply_to,protector,state.getAlias());
             }else if(!protector.isEmpty()){
                 Position leader=null;
@@ -232,28 +235,29 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                 }
                 if (leader==null){
                     state.setFollowing(false);
+                    state.setPostLeader(null);
                     state.setMotion(state.getMovementsRandom(movements));
                 }else{
                     int dd = Math.max(Math.abs(state.getPosition().getXpos()-leader.getXpos()), state.getPosition().getYpos()-leader.getYpos());
-                    if(dd>1){
-                        
-                        if (state.getPostLeader()==null){
+                    boolean sw=false;
+                    if(dd==1&&state.getPostLeader()!=null&&Const.validationIdGrid(mat[state.getPostLeader().getXpos()-state.getXpos()+1+offset][state.getPostLeader().getYpos()-state.getYpos()+1+offset])){
+                        state.setMotion(new Motion(state.getPostLeader()));
+                    }else{  
                             while (!state.getDesiredGoals().isEmpty()){
                                 state.getDesiredGoals().pop();
                             }
                             state.addGoal(leader, true, true, typeAgent);
                             state.findMotion(movements);
+                                           }
+                    state.setPostLeader(leader);
+                    
+                    }
+            }else if(state.getGoalType()== -4){
+                            state.nextMotion(movements);
                         }else{
-                            
+                            state.setMotion(state.getMovementsRandom(movements));
                         }
-                    }else{
-                        
-                    }
-                    }
-            }else{
-                state.setMotion(state.getMovementsRandom(movements));
-                }
-           
+            //*/
             
             if (!state.getMotion().isIsNull()){
                 if (state.getPosition().isEquals(state.getMotion())){
