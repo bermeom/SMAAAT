@@ -31,9 +31,11 @@ public class FollowHostageGuard extends GuardBESA{
                 state.setFollowing(true);
                 System.out.println(" Leader = "+state.getAgentLeader());
                 System.out.println(" Follow = "+state.getAgentFollow());
+                FolowingData fd=new FolowingData(data.getIn_reply_to(),data.getReply_with(), state.getType(), state.getAlias(), state.getPosition(), "ACK");
+                Agent.sendMessage(HELPAgentProtectorGuard.class,state.getAgentLeader(), fd);
             }else{
                 FolowingData fd=new FolowingData(data.getIn_reply_to(),data.getReply_with(), state.getType(), state.getAlias(), state.getPosition(), "NACK");
-                Agent.sendMessage(HELPAgentProtectorGuard.class, data.getAlias(), fd);
+                Agent.sendMessage(HELPAgentProtectorGuard.class, data.getAgentLeader(), fd);
             }
             } catch (Exception e) {
            

@@ -364,6 +364,14 @@ public class AgentState extends  StateBESA{
         this.life--;
     }
     
+    public Position getPositionsRandom(List<Position> positions){
+            if(positions.size()>0){
+                int n=Utils.randomIntegerMA(0, positions.size()-1);
+                return  positions.get(n);
+            }
+            return null;
+    }
+    
     
     public Motion getMovementsRandom(List<Motion> motions){
             if(motions.size()>0){
@@ -379,6 +387,7 @@ public class AgentState extends  StateBESA{
     
     public boolean nextMotion(List<Motion> movements){
            this.motion.setIsNull(true); 
+          
            if (!this.desiredGoals.isEmpty()&&this.edifice.getPostGridFloor(this.desiredGoals.getFirst().getGoal().getIdfloor(), this.desiredGoals.getFirst().getGoal().getXpos(), this.desiredGoals.getFirst().getGoal().getYpos())==ModelFloor.null_){
                //System.out.println(this.getGridWeights());
                findMotion(movements);
@@ -580,6 +589,39 @@ public class AgentState extends  StateBESA{
     
     }
 
+    public void addGoalBetweenFloors(Position goal,int type){
+        boolean attraction=true;
+        boolean first=true;
+        if(goal.getIdfloor()>this.position.getIdfloor()){
+            Position gp;
+            addGoal(goal, attraction, first, type);
+        
+            for(int n=goal.getIdfloor();n>=this.position.getIdfloor();n--){
+                gp=getPositionsRandom(this.climbStairsForFloor.get(n));
+                if(gp==null){
+                    break;
+                }
+                addGoal(gp, attraction, first, this.edifice.getPostGridFloor(gp));
+            }
+            
+        }else if(goal.getIdfloor()<this.position.getIdfloor()){
+                Position gp;
+                for(int n=goal.getIdfloor();n<=this.position.getIdfloor();n++){
+                    gp=getPositionsRandom(this.climbStairsForFloor.get(n));
+                    if(gp==null){
+                        break;
+                    }
+                    addGoal(gp, attraction, first, this.edifice.getPostGridFloor(gp));
+                }
+                
+        }else{
+        
+            addGoal(goal, attraction, first, type);
+        }
+        
+    
+    }
+    
     public void addGoal(Position goal,boolean attraction,boolean first,int type){
         
         ModelFloor gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
@@ -592,6 +634,8 @@ public class AgentState extends  StateBESA{
             this.desiredGoals.addLast(new DesiredGoal(goal, gridWeights, attraction,type));
         }
     }
+    
+    
     
     public DesiredGoal getDesiredGoal(){
         return this.desiredGoals.getFirst();
@@ -611,6 +655,23 @@ public class AgentState extends  StateBESA{
             this.climbStairsForFloor.get(idfloor).add(new Position(xPos, yPos, idfloor));
         }
     }
+
+    public List<List<Position>> getClimbStairsForFloor() {
+        return climbStairsForFloor;
+    }
+
+    public void setClimbStairsForFloor(List<List<Position>> climbStairsForFloor) {
+        this.climbStairsForFloor = climbStairsForFloor;
+    }
+
+    public List<List<Position>> getDownStairsForFloor() {
+        return downStairsForFloor;
+    }
+
+    public void setDownStairsForFloor(List<List<Position>> downStairsForFloor) {
+        this.downStairsForFloor = downStairsForFloor;
+    }
+    
     
     
     

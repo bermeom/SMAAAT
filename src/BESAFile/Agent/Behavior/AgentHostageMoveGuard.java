@@ -207,7 +207,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
            
             if(!protector.isEmpty()&&!state.isFollowing()&&(state.getGoalType()!=-4)){
                 callProtectorHelp(reply_with,in_reply_to,protector,state.getAlias());
-            }else if(!protector.isEmpty()){
+            }else if(!protector.isEmpty()&&(state.getGoalType()!=-4)){
                 Position leader=null;
                 int typeAgent=1;
                 for(SeenObject so:protector){

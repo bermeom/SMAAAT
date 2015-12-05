@@ -10,6 +10,7 @@ import BESA.Log.ReportBESA;
 import BESAFile.Agent.Agent;
 import BESAFile.Agent.State.AgentProtectorState;
 import BESAFile.Agent.State.AgentState;
+import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.FolowingData;
 import java.util.List;
@@ -30,7 +31,7 @@ public class HELPAgentProtectorGuard  extends GuardBESA{
                 return;
             }   
             FolowingData data = (FolowingData) ebesa.getData();
-            System.out.println(">>>>>>>>>>>> HELP!!!!!! "+data.getAlias());
+            System.out.println(">>>>>>>>>>>> HELP!!!!!! "+data.getAlias()+" "+data.getAction());
            
             
             if (data.getAction().equals("HELP")&&state.getHostages().size()<=2){
@@ -66,8 +67,17 @@ public class HELPAgentProtectorGuard  extends GuardBESA{
                     state.getHostages().remove(k);
                 }
                 
+                }else if(data.getAction().equals("ACK")){
+                        System.out.println("-----------------------*******************-------------");
+                        Position p=state.getPositionsRandom(state.getDownStairsForFloor().get(1));
+                        state.addGoalBetweenFloors(p, state.getEdifice().getPostGridFloor(p));
+                        System.out.println("->>>>>>>>>>>>>>>>>> "+state.getGoalType());
+                
                 }
             } catch (Exception e) {
+                
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx  ERROR:  msnSensor xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +e);
+                ReportBESA.error(e);
            
             }
     }

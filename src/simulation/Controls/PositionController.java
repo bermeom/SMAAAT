@@ -120,6 +120,8 @@ public class PositionController extends AbstractControl implements ActionListene
                 control.setViewDirection(modelForwardDir.normalize());                    
             }else{
                 System.out.println("Control "+control);
+                BetterCharacterControl physicsCharacter = new BetterCharacterControl((float)data.getRadius(),(float)data.getHeight() , 15.0f);
+                node.addControl(physicsCharacter);
             }
         } catch (Exception e) {
             System.out.println(" -------------- ERROR  -------------   "+speed_+" "+ modelForwardDir+" "+believedPosition+" "+this.poistion+" "+data.getMotion()+" "+control);
