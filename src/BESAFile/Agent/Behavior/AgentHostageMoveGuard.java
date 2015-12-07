@@ -205,9 +205,9 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
            
-            if(!protector.isEmpty()&&!state.isFollowing()&&(state.getGoalType()!=-4)){
+            if(state.getIdfloor()!=0&&(!protector.isEmpty())&&!state.isFollowing()&&(state.getGoalType()!=-4)){
                 callProtectorHelp(reply_with,in_reply_to,protector,state.getAlias());
-            }else if(!protector.isEmpty()&&(state.getGoalType()!=-4)){
+            }else if(state.getIdfloor()!=0&&(!protector.isEmpty()||!hostage.isEmpty()||!enemies.isEmpty())&&(state.getGoalType()!=-4)){
                 Position leader=null;
                 int typeAgent=1;
                 for(SeenObject so:protector){
@@ -238,24 +238,38 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
                     state.setPostLeader(null);
                     state.setMotion(state.getMovementsRandom(movements));
                 }else{
-                    int dd = Math.max(Math.abs(state.getPosition().getXpos()-leader.getXpos()), state.getPosition().getYpos()-leader.getYpos());
-                    boolean sw=false;
-                    if(dd==1&&state.getPostLeader()!=null&&Const.validationIdGrid(mat[state.getPostLeader().getXpos()-state.getXpos()+1+offset][state.getPostLeader().getYpos()-state.getYpos()+1+offset])){
-                        state.setMotion(new Motion(state.getPostLeader()));
-                    }else{  
-                            while (!state.getDesiredGoals().isEmpty()){
-                                state.getDesiredGoals().pop();
+                        int dd = Math.max(Math.abs(state.getPosition().getXpos()-leader.getXpos()), state.getPosition().getYpos()-leader.getYpos());
+                        boolean sw=false;
+                         try {
+                            if(dd==1&&state.getPostLeader()!=null){
+                                state.setMotion(new Motion(state.getPosition()));
+                            }else if(dd==2&&state.getPostLeader()!=null&&Const.validationIdGrid(mat[state.getPostLeader().getXpos()-state.getXpos()+1+offset][state.getPostLeader().getYpos()-state.getYpos()+1+offset])){
+                                state.setMotion(new Motion(state.getPostLeader()));
+                            }else{  
+                                    while (!state.getDesiredGoals().isEmpty()){
+                                        state.getDesiredGoals().pop();
+                                    }
+                                    state.addGoal(leader, true, true, typeAgent);
+                                    state.findMotion(movements);
                             }
-                            state.addGoal(leader, true, true, typeAgent);
-                            state.findMotion(movements);
-                                           }
-                    state.setPostLeader(leader);
-                    
-                    }
+                        
+                        } catch (Exception e) {
+                                   System.out.println( dd+" == "+1+" && "+state.getPostLeader()+" "+(state.getPostLeader().getXpos()-state.getXpos()+1+offset)+" "+(state.getPostLeader().getYpos()-state.getYpos()+1+offset)+" "+mat.length+" "+mat[0].length+" !=null + &&Const.validationIdGrid(mat[][])");
+                                    while (!state.getDesiredGoals().isEmpty()){
+                                        state.getDesiredGoals().pop();
+                                    }
+                                    state.addGoal(leader, true, true, typeAgent);
+                                    state.findMotion(movements);
+                        }
+                        state.setPostLeader(leader);
+                }
             }else if(state.getGoalType()== -4){
                             state.nextMotion(movements);
                         }else{
                             state.setMotion(state.getMovementsRandom(movements));
+                            state.setFollowing(false);
+                            state.setPostLeader(null);
+                            
                         }
             //*/
             
@@ -419,6 +433,7 @@ public class AgentHostageMoveGuard  extends GuardBESA  {
          }else{
              state.setPosition(data.getPosition());
          }
+         
          state.getDesiredGoals().pop();
          state.setChangeFloor(false);
          msnSensor(data.getIn_reply_to(),data.getReply_with());

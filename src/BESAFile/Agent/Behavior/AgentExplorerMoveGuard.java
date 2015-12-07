@@ -168,6 +168,9 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             if(state.getPosition().getIdfloor()==0&&climbStairs.size()>0&&!state.getDesiredGoals().isEmpty()&&state.getGoalType()!=-3){
                 Motion m=state.getMovementsRandom(climbStairs);
                 System.out.println(">>>>>>>>>>>>>>>> "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+                while (!state.getDesiredGoals().isEmpty()){
+                    state.getDesiredGoals().pop();
+                }
                 state.addGoal(new Position(m), true, true, state.getEdifice().getPostGridFloor(new Position(m)));
                 //System.out.println("ENTRO");
             }
@@ -189,15 +192,7 @@ public class AgentExplorerMoveGuard extends GuardBESA  {
             //System.out.println(state.getPosition());
             //System.out.println(state.getEdifice());
             
-            /*
-            if(!state.getHostages().isEmpty()){
-                callHostages();
-            }
-            
-            if(!enemies.isEmpty()){
-                shootEnemies();
-            }
-            */
+         
             state.marckConsecutive(data.getIn_reply_to());
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();

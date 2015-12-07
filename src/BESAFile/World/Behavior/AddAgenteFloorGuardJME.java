@@ -69,18 +69,23 @@ public class AddAgenteFloorGuardJME extends GuardBESA {
             node.attachChild(model);
             
             //Bullet
-            BetterCharacterControl physicsCharacter = new BetterCharacterControl((float)data.getRadius(),(float)data.getHeight() , 15.0f);
+            BetterCharacterControl physicsCharacter ;//= new BetterCharacterControl((float)data.getRadius(),(float)data.getHeight() , 15.0f);
+             
+            do{
+                physicsCharacter = new BetterCharacterControl((float)data.getRadius(),(float)data.getHeight() , 15.0f);
+            }while(physicsCharacter==null);
             node.addControl(physicsCharacter);
             //ws.getApp().getPhysicsSpace().add(physicsCharacter);
-            physicsCharacter.setViewDirection(direction);
+            
             //*/
             //ws.getApp().getCharacterNode().attachChild(node); 
-            subcribeInApp(physicsCharacter, node, ws.getApp());
             PositionController controller=new PositionController(node,direction,position,data.getAlias(),data.getType(),0,data.getRadius(),data.getHeight(),new Position(data.getXpos(), data.getYpos(),data.getIdfloor()) );
             controller.setEnabled(false);
+            subcribeInApp(physicsCharacter, node, ws.getApp(),direction,controller);
+            physicsCharacter.setViewDirection(direction);
             ws.addAgent(data.getAlias(),controller,data);
             node.addControl(controller);
-            
+    
             answer(true, data.getAlias(),data.getType(),reply_with,in_reply_to,new Position(data.getXpos(), data.getYpos(), data.getIdfloor()));
         } catch (Exception e) {
             ReportBESA.error(e);
@@ -93,14 +98,17 @@ public class AddAgenteFloorGuardJME extends GuardBESA {
         return id==-3||id==-4;
     }
     
-    private void subcribeInApp(final BetterCharacterControl physicsCharacter,final Node node,final SmaaatApp app ){
+    private void subcribeInApp(final BetterCharacterControl physicsCharacter,final Node node,final SmaaatApp app , final Vector3f direction, final PositionController controller){
         
         WorldAgentJME wAgent = ((WorldAgentJME) agent);
         
         wAgent.execAsyncInWorldThread(new Callable<Void>() {
                 public Void call() throws Exception {
+                   
+                    
                     app.getPhysicsSpace().add(physicsCharacter);
-                    app.getCharacterNode().attachChild(node); 
+                    app.getCharacterNode().attachChild(node);
+                    
                     return null;
                 }
             });

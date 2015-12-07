@@ -19,6 +19,7 @@ import BESAFile.Agent.State.Position;
 import BESAFile.Data.ActionData;
 import BESAFile.Data.ActionDataAgent;
 import BESAFile.Data.ChangeFloorData;
+import BESAFile.Data.FolowingData;
 import BESAFile.Data.NegotiationData;
 import BESAFile.Data.ShootAgentDataJME;
 import BESAFile.Data.Vector3D;
@@ -130,6 +131,7 @@ public class AgentEnemyMoveGuard  extends GuardBESA  {
             AgentEnemyState state = (AgentEnemyState) this.getAgent().getState();
             state.resetContMsOld();
             List<SeenObject> agentsPandE=new ArrayList<SeenObject>();
+            List<SeenObject> hostage=new ArrayList<SeenObject>();
             List<Motion> climbStairs=new ArrayList<Motion>();
             List<Motion> downStairs=new ArrayList<Motion>();
             int tam=(int)state.getSightRange()*2+1;
@@ -156,7 +158,7 @@ public class AgentEnemyMoveGuard  extends GuardBESA  {
                     case(0):break;//Protector
                     case(1):agentsPandE.add(so);break;//Protector
                     case(2):agentsPandE.add(so);break;//Exprorator
-                    case(3):break;//Hostage
+                    case(3):hostage.add(so);break;//Hostage
                     case(4):break;//Enemmy
                 }
                 if (so.getType()>0){
@@ -172,6 +174,9 @@ public class AgentEnemyMoveGuard  extends GuardBESA  {
             if(state.getPosition().getIdfloor()==0&&climbStairs.size()>0&&!state.getDesiredGoals().isEmpty()&&state.getGoalType()!=-3){
                 Motion m=state.getMovementsRandom(climbStairs);
                 System.out.println(">>>>>>>>>>>>>>>> "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+                while (!state.getDesiredGoals().isEmpty()){
+                    state.getDesiredGoals().pop();
+                }
                 state.addGoal(new Position(m), true, true, state.getEdifice().getPostGridFloor(new Position(m)));
                 //System.out.println("ENTRO");
             }
@@ -197,12 +202,11 @@ public class AgentEnemyMoveGuard  extends GuardBESA  {
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
             
-           /*
-            if(!state.getHostages().isEmpty()){
-                callHostages();
+           
+            if(state.getHostages().size()<=2&&hostage.size()>0){
+                callHostages(hostage,state);
             }
-            * 
-            * */
+           
             if(!agentsPandE.isEmpty()&&Utils.randomIntegerMA(0, 100)%2==0){
                 disableController(reply_with, in_reply_to);
                 shootProtectorOrExprorator(reply_with, in_reply_to, agentsPandE);
@@ -210,9 +214,8 @@ public class AgentEnemyMoveGuard  extends GuardBESA  {
             }
             
             //*/
-            
-            
-            if (state.nextMotion(movements)){
+            state.setMotion(state.getMovementsRandom(movements));
+            if (!state.getMotion().isIsNull()){
                 if (state.getPosition().isEquals(state.getMotion())){
                     disableController(reply_with, in_reply_to);
                     Thread.sleep(Utils.randomIntegerMA(0,100));
@@ -248,8 +251,22 @@ public class AgentEnemyMoveGuard  extends GuardBESA  {
             */
     }
 
-    private void callHostages() {
-
+    private void callHostages(List<SeenObject> hostage, AgentEnemyState state) {
+                boolean sw=false;
+                for (SeenObject hSO:hostage){
+                    sw=false;
+                    for (String h:state.getHostages()){
+                        if(h.equals(hSO.getName())){
+                            sw=true;
+                        }
+                    }
+                    if(!sw){
+                        state.getHostages().add(hSO.getName());
+                        System.out.println("SEND MSN");
+                        FolowingData fd=new FolowingData(1,1, state.getAlias(), state.getAlias(),"REPLAY");
+                        Agent.sendMessage(FollowHostageGuard.class, hSO.getName(), fd);
+                    }
+                }
     }
 
    private void shootProtectorOrExprorator(int reply_with,int in_reply_to,List<SeenObject> agents) {

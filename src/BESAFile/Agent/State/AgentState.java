@@ -101,7 +101,7 @@ public class AgentState extends  StateBESA{
         this.type=0;
         this.edifice=new ModelEdifice(width, length, nFlooors,true);
         this.edifice.setPostGridFloor(idfloor,xpos,ypos,0);
-        this.speed=1;
+        this.speed=2;
         this.consecutiveMSN=new boolean[1000];
         this.nextConsecutive=0;
          this.nextConsecutive=0;
@@ -366,7 +366,7 @@ public class AgentState extends  StateBESA{
     
     public Position getPositionsRandom(List<Position> positions){
             if(positions.size()>0){
-                int n=Utils.randomIntegerMA(0, positions.size()-1);
+                int n=Utils.randomInteger(0, positions.size()-1);
                 return  positions.get(n);
             }
             return null;
@@ -375,7 +375,7 @@ public class AgentState extends  StateBESA{
     
     public Motion getMovementsRandom(List<Motion> motions){
             if(motions.size()>0){
-                int n=Utils.randomIntegerMA(0, motions.size()-1);
+                int n=Utils.randomInteger(0, motions.size()-1);
                 return  motions.get(n);
             }
             return new Motion();
@@ -389,7 +389,9 @@ public class AgentState extends  StateBESA{
            this.motion.setIsNull(true); 
           
            if (!this.desiredGoals.isEmpty()&&this.edifice.getPostGridFloor(this.desiredGoals.getFirst().getGoal().getIdfloor(), this.desiredGoals.getFirst().getGoal().getXpos(), this.desiredGoals.getFirst().getGoal().getYpos())==ModelFloor.null_){
+               //System.out.println(this.edifice.getFloor(this.position.getIdfloor()));
                //System.out.println(this.getGridWeights());
+               //System.out.println(this.getGoal());
                findMotion(movements);
             }else if(!this.desiredGoals.isEmpty()&&(this.getGoalType()==-3||this.getGoalType()==-4)&&!this.position.isEquals(this.getGoal())){
                findMotion(movements);
@@ -423,12 +425,13 @@ public class AgentState extends  StateBESA{
             }else{
                 // -> Explorin region Goal <-
                 /*Find door down*/
-                if(this.nExproationFloor==this.edifice.getnFlooors()){
+                if(this.nExproationFloor==this.edifice.getnFlooors()&&this.isFullExplorationMap(this.position.getIdfloor())){
                     Position p;
                     do {             
                        p=new Position(Utils.randomInteger(0, this.edifice.getWidth()-1),Utils.randomInteger(0, this.edifice.getLength()-1), Utils.randomInteger(1, this.edifice.getnFlooors()-1));
                     } while (this.edifice.getPostGridFloor(p)!=0);
-                    this.addGoal(p, true, true, 0);
+                    this.addGoalBetweenFloors(p,0);
+                    
                     //System.out.println("New GOAL .>>>>>>>>>>"+p);
                     //System.out.println(" ->"+this.desiredGoals.getFirst().getGridWeights());
                 }else if (this.downStairsForFloor.get(this.position.getIdfloor()).size()>0&&this.position.getIdfloor()!=1){
@@ -520,32 +523,31 @@ public class AgentState extends  StateBESA{
     }
 
     public void findMotion(List<Motion> movements) {
-            int de=ModelFloor.null_,minDisctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
             this.motion.setIsNull(true); 
+            if(movements.size()<=0){
+                return;
+            }
+            int de=ModelFloor.null_,disctane=-1;//this.gridWeights.get(this.position.getXpos(), this.position.getXpos());
             List<Motion> lm=new ArrayList<Motion>();
             for(Motion m:movements){
                  de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
-                 if(minDisctane==-1||(minDisctane>de&&this.desiredGoals.getFirst().isAttraction())||(minDisctane<de&&!this.desiredGoals.getFirst().isAttraction())){
-                     minDisctane=de;
+                 if(disctane==-1||(disctane>de&&this.desiredGoals.getFirst().isAttraction())||(disctane<de&&!this.desiredGoals.getFirst().isAttraction())){
+                     disctane=de;
                      }
              }
-            if(minDisctane!=-1&&de==ModelFloor.null_){
+            if(disctane!=-1&&de==ModelFloor.null_){
+                
                 Position goal=this.desiredGoals.getFirst().getGoal();
-                boolean atractionTem=this.desiredGoals.getFirst().isAttraction();
-                ModelFloor gridWeights=new ModelFloor(this.edifice.getWidth(), this.edifice.getLength(), true);
-                gridWeights.copyFloorArry(this.edifice.getFloor(goal.getIdfloor()).getFloor());
-                gridWeights=waveFront(this.desiredGoals.getFirst().getGoal(), gridWeights);
                 this.desiredGoals.pop();
-                this.desiredGoals.addFirst(new DesiredGoal(goal, gridWeights,atractionTem,this.edifice.getPostGridFloor(goal)));
-                //System.out.println(gridWeights);
-                //System.out.println(this.edifice);
+                
+                this.addGoalBetweenFloors(goal, this.edifice.getPostGridFloor(goal));
                 findMotion(movements);
                 return;
             }
             
             for(Motion m:movements){
                  de=this.desiredGoals.getFirst().getGridWeights().get(m.getXpos(), m.getYpos());
-                 if(minDisctane==de){
+                 if(disctane==de){
                      lm.add(m);
                      }
               }

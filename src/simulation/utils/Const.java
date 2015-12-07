@@ -22,8 +22,8 @@ public final class Const {
     public static final float x=0;
     public static final float y=0;
     public static final float z=0;
-    public static final int width=10;
-    public static final int length=10;
+    public static final int width=30;
+    public static final int length=30;
     public static final int nFloors=2;
     public static final long sleep=300;
     public static final float  kGrid=2;
@@ -73,6 +73,6 @@ public final class Const {
     }
      
     public static boolean validationIdGrid(int id){
-        return id==0||id==-3||id==-4;
+        return (id==-3||id==-4||id==0);
     }
 }

@@ -173,13 +173,16 @@ public class AgentProtectorMoveGuard extends GuardBESA {
             if(state.getPosition().getIdfloor()==0&&climbStairs.size()>0&&!state.getDesiredGoals().isEmpty()&&state.getGoalType()!=-3){
                 Motion m=state.getMovementsRandom(climbStairs);
                 System.out.println(">>>>>>>>>>>>>>>> "+state.getGoalType()+" +++++++++++++++++++ "+state.getEdifice().getPostGridFloor(new Position(m)));
+                while (!state.getDesiredGoals().isEmpty()){
+                    state.getDesiredGoals().pop();
+                }
                 state.addGoal(new Position(m), true, true, state.getEdifice().getPostGridFloor(new Position(m)));
                 //System.out.println("ENTRO");
             }
             
             mat=Utils.border(mat, data.getPosition(), state.getEdifice().getWidth(),state.getEdifice().getLength(),tam);
             mat[tam/2][tam/2]=-1;
-            List<Motion> movements=new ArrayList<>();
+            List<Motion> movements=new ArrayList<Motion>();
             int offset=(int)(tam/2)-1;
             for (int i=offset;i<offset+3;i++){
                 for (int j=offset;j<offset+3;j++){
@@ -198,19 +201,13 @@ public class AgentProtectorMoveGuard extends GuardBESA {
             int reply_with=state.getNextConsecutive();
             int in_reply_to=data.getReply_with();
             
-            /*
-            if(!state.getHostages().isEmpty()){
-                callHostages();
-            }
-            */
-            if(!enemies.isEmpty()&&Utils.randomIntegerMA(0, 100)%2==0){
+           if(!enemies.isEmpty()&&Utils.randomIntegerMA(0, 100)%2==0){
                 disableController(reply_with, in_reply_to);
                 shootEnemies(reply_with, in_reply_to, enemies);
                 return;
             }
             ///*/
-           
-            
+                       
             if (state.nextMotion(movements)){
                 if (state.getPosition().isEquals(state.getMotion())){
                     disableController(reply_with, in_reply_to);
@@ -224,6 +221,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
                 }
             }else{
                 if (state.isChangeFloor()){
+                    state.getHostages().clear();
                     disableController(reply_with, in_reply_to);
                     sendChangeFloor(reply_with, in_reply_to);
                 }else if(state.isDeadLock()){
@@ -386,6 +384,7 @@ public class AgentProtectorMoveGuard extends GuardBESA {
          }else{
              state.setPosition(data.getPosition());
          }
+         ((AgentProtectorState)state).getHostages().clear();
          state.getDesiredGoals().pop();
          state.setChangeFloor(false);
          msnSensor(data.getIn_reply_to(),data.getReply_with());

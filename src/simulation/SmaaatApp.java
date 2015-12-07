@@ -133,10 +133,23 @@ public class SmaaatApp extends SimpleApplication implements ActionListener {
             
             characterNode = new Node();
             this.bulletsNode=new Node();
-        
-            createAgentProtector(0, 2,1, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 28,1, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 28,0, new Vector3f(0, 0, 1));
+            createAgentExplorer(0, 1,28, new Vector3f(0, 0, 1));
+            createAgentProtector(0, 0,28, new Vector3f(0, 0, 1));
+           
+           
             createAgentHostage(1, 4,0, new Vector3f(0, 0, 1));
+            createAgentHostage(1, 3,0, new Vector3f(0, 0, 1));
             createAgentEnemy(1, 5,5, new Vector3f(0, 0, 1));
+            createAgentEnemy(1, 4,5, new Vector3f(0, 0, 1));
+            
+            
+            createAgentEnemy(1, 25,25, new Vector3f(0, 0, 1));
+            createAgentEnemy(1, 5,10, new Vector3f(0, 0, 1));
+            createAgentHostage(1, 5,11, new Vector3f(0, 0, 1));
+            createAgentHostage(1, 24,25, new Vector3f(0, 0, 1));
+            
             /*
             createAgentProtector(0, 9,9, new Vector3f(0, 0, 1));
             createAgentExplorer(0, 6,5, new Vector3f(0, 0, 1));

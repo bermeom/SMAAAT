@@ -69,8 +69,8 @@ public class HELPAgentProtectorGuard  extends GuardBESA{
                 
                 }else if(data.getAction().equals("ACK")){
                         System.out.println("-----------------------*******************-------------");
-                        Position p=state.getPositionsRandom(state.getDownStairsForFloor().get(1));
-                        state.addGoalBetweenFloors(p, state.getEdifice().getPostGridFloor(p));
+                        Position p=state.getPositionsRandom(state.getDownStairsForFloor().get(state.getPosition().getIdfloor()));
+                        state.addGoal(p,true,true, state.getEdifice().getPostGridFloor(p));
                         System.out.println("->>>>>>>>>>>>>>>>>> "+state.getGoalType());
                 
                 }

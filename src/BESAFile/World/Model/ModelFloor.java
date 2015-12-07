@@ -18,7 +18,7 @@ public class ModelFloor {
     protected int[][]floor;
     protected int width;
     protected int length;
-    public static final int null_=(1<<32-2);  
+    public static final int null_=-(1<<32-2);  
     
     public ModelFloor(int width,int length,boolean withNull){
         this.width=width;

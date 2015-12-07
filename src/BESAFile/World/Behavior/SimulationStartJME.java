@@ -24,6 +24,7 @@ public class SimulationStartJME extends GuardBESA{
     public void funcExecGuard(EventBESA ebesa) {
          try {
             WorldStateJME ws = (WorldStateJME)this.getAgent().getState();
+            ReportBESA.info("------------>>>>>>>>>>>>>>>>> START <<<<<<<<<<<<<<<<<<<<<<<<<-----------------"+ws.getIdFloor());
             for(ModelAgentWorld maw:ws.getListAgents()){
                 answer(true, maw.getAlias());
             }
