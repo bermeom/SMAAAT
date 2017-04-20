@@ -1,2 +1,2 @@
 # SMAAAT
-Proyect System MultiAgent, developing in the JMonkeyEngine (http://jmonkeyengine.org/)
+MultiAgent System Proyect, it is developing with JMonkeyEngine (http://jmonkeyengine.org/) JMonkeyEngine (http://jmonkeyengine.org/)
